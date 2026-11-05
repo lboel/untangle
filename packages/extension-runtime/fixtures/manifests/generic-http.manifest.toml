@@ -1,0 +1,39 @@
+# Beispielmanifest: ein Werkzeug, das Untangles eigenes `generic-findings`
+# schreibt. Der Werkzeugname ist eine Nutzerangabe (E2).
+schemaVersion = 1
+id = "generic-http"
+displayName = "Generic HTTP Analyzer"
+category = "sast"
+invocation = ["http"]
+languages = []
+outputFormat = "generic-findings"
+networkAccess = "loopback"
+networkJustification = "the analyzer exposes its API on a loopback port only"
+requiresLicenseAcknowledgment = false
+
+[http]
+defaultUrl = "http://127.0.0.1:9000"
+analyzePath = "/analyze"
+analyzeMethod = "POST"
+
+[resources]
+minMemoryMb = 128
+recommendedMemoryMb = 256
+recommendedCpus = 1
+
+[license]
+spdxId = "Apache-2.0"
+usageRestriction = "none"
+
+[severityMapping]
+mappingVersion = "untangle-severity-map-v1"
+fallback = "medium"
+caseInsensitive = true
+rules = [
+  { from = "error", to = "high" },
+  { from = "warning", to = "medium" },
+]
+
+[telemetry]
+sendsTelemetry = false
+disabledByDefault = true

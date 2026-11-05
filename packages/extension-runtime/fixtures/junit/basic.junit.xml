@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="acceptance" tests="5" failures="2" errors="1" skipped="1" time="1.482">
+  <testsuite name="checkout" tests="4" failures="2" errors="1" skipped="1" time="1.100" timestamp="2026-09-01T10:00:00" hostname="build-01">
+    <properties>
+      <property name="runner" value="ci"/>
+    </properties>
+    <testcase name="applies the discount" classname="checkout.CartTest" file="src/checkout/cart.ts" line="42" time="0.210">
+      <failure message="expected 90 but received 100" type="AssertionError">at cart.ts:42
+at runner.ts:9</failure>
+    </testcase>
+    <testcase name="rejects an empty cart" classname="checkout.CartTest" file="src/checkout/cart.ts" line="77" time="0.050">
+      <failure message="expected the call to throw" type="AssertionError"/>
+    </testcase>
+    <testcase name="loads the tax table" classname="checkout.TaxTest" file="src/checkout/tax.ts" line="8" time="0.700">
+      <error message="connection refused" type="NetworkError">tax.ts:8</error>
+    </testcase>
+    <testcase name="handles gift cards" classname="checkout.CartTest" file="src/checkout/cart.ts" line="120" time="0.100"/>
+    <testcase name="supports split payment" classname="checkout.CartTest" file="src/checkout/cart.ts" time="0.000">
+      <skipped message="not implemented yet"/>
+    </testcase>
+  </testsuite>
+  <testsuite name="reporting" tests="1" failures="1" errors="0" skipped="0" time="0.382">
+    <testcase name="renders the summary" classname="reporting.SummaryTest" time="0.382">
+      <failure message="snapshot mismatch" type="SnapshotError"/>
+    </testcase>
+  </testsuite>
+</testsuites>

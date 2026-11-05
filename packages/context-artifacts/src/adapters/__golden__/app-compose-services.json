@@ -1,0 +1,24 @@
+[
+  {
+    "content": "    build: .\n    ports:\n      - \"3000:3000\"\n",
+    "kind": "compose_service",
+    "range": {
+      "endByte": 61,
+      "endLine": 5,
+      "startByte": 17,
+      "startLine": 3
+    },
+    "title": "api"
+  },
+  {
+    "content": "    image: postgres:16\n    environment:\n      POSTGRES_PASSWORD: secret\n",
+    "kind": "compose_service",
+    "range": {
+      "endByte": 139,
+      "endLine": 9,
+      "startByte": 67,
+      "startLine": 7
+    },
+    "title": "db"
+  }
+]

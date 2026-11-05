@@ -1,0 +1,58 @@
+schemaVersion = 1
+id = "restricted-tool"
+displayName = "Restricted Analyzer"
+category = "quality-platform"
+invocation = ["container"]
+languages = []
+outputFormat = "generic-findings"
+networkAccess = "loopback"
+networkJustification = "the analyzer exposes its API on a loopback port only"
+requiresLicenseAcknowledgment = true
+
+[container]
+image = "registry.example.invalid/restricted-analyzer"
+digest = "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+analyzeArgs = ["analyze", "{workspace}"]
+
+[[container.ports]]
+name = "api"
+containerPort = 9000
+hostPortDefault = 19000
+
+[container.workspaceMount]
+mountPath = "/workspace"
+readOnly = true
+
+[container.healthcheck]
+kind = "http"
+httpPath = "/api/system/status"
+intervalMs = 5000
+timeoutMs = 2000
+retries = 12
+
+[resources]
+minMemoryMb = 2048
+recommendedMemoryMb = 4096
+recommendedCpus = 4
+
+[license]
+spdxId = "LicenseRef-source-available-1.0"
+usageRestriction = "restricted"
+restrictionSummary = "Analyzers may only be used under the vendor's source-available terms."
+
+[severityMapping]
+mappingVersion = "untangle-severity-map-v1"
+fallback = "info"
+caseInsensitive = true
+rules = [
+  { from = "INFO", to = "info" },
+  { from = "MINOR", to = "low" },
+  { from = "MAJOR", to = "medium" },
+  { from = "CRITICAL", to = "high" },
+  { from = "BLOCKER", to = "critical" },
+]
+
+[telemetry]
+sendsTelemetry = true
+disableMechanism = "telemetry.enable=false"
+disabledByDefault = true

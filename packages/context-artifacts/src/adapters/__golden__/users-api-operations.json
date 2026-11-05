@@ -1,0 +1,46 @@
+[
+  {
+    "content": "  title: Users API\n  version: \"1.0.0\"\n",
+    "kind": "openapi_info",
+    "range": {
+      "endByte": 59,
+      "endLine": 4,
+      "startByte": 21,
+      "startLine": 3
+    },
+    "title": "info: Users API"
+  },
+  {
+    "content": "      operationId: listUsers\n      summary: List users\n      responses:\n        \"200\":\n          description: OK\n",
+    "kind": "openapi_operation",
+    "range": {
+      "endByte": 198,
+      "endLine": 12,
+      "startByte": 85,
+      "startLine": 8
+    },
+    "title": "GET /users (listUsers)"
+  },
+  {
+    "content": "      operationId: createUser\n      summary: Create a user\n      responses:\n        \"201\":\n          description: Created\n",
+    "kind": "openapi_operation",
+    "range": {
+      "endByte": 330,
+      "endLine": 18,
+      "startByte": 208,
+      "startLine": 14
+    },
+    "title": "POST /users (createUser)"
+  },
+  {
+    "content": "      operationId: getUserById\n      summary: Get a single user\n      responses:\n        \"200\":\n          description: OK\n",
+    "kind": "openapi_operation",
+    "range": {
+      "endByte": 476,
+      "endLine": 25,
+      "startByte": 354,
+      "startLine": 21
+    },
+    "title": "GET /users/{id} (getUserById)"
+  }
+]

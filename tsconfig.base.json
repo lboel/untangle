@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+
+  // ENTSCHEIDUNG Source-Maps (WP-224).
+  //
+  // Die Frage war: Maps erzeugen und die Quellen MITLIEFERN, oder die Maps im
+  // Veroeffentlichungs-Build gar nicht erst erzeugen? Entschieden ist das
+  // Erste. Zwei Gruende:
+  //
+  //   1. Lizenz. Untangle steht unter AGPL-3.0-only. Der Quelltext gehoert
+  //      ohnehin zu dem, was der Empfaenger bekommen soll; ihn aus dem
+  //      Tarball herauszuhalten und statt dessen die Maps wegzulassen, waere
+  //      genau die falsche Richtung.
+  //   2. Fehlersuche beim Nutzer. Ein Stapelanriss aus `untangle index` zeigt
+  //      mit Map und Quelle die echte Zeile in `src/**`; ohne beides nur eine
+  //      Position im emittierten Bundle. Die paar hundert Kilobyte pro
+  //      Tarball sind das wert.
+  //
+  // Die Entscheidung traegt nur, solange BEIDE Seiten im selben Tarball
+  // liegen. Deshalb ist `src` in jeder `files`-Liste, und deshalb prueft
+  // `pnpm check-publishable` fuer JEDE `.map` im Tarball, dass ihre
+  // `sources`-Eintraege im selben Tarball aufloesen ("tote Source-Maps").
+  // Wer hier `sourceMap`/`declarationMap` abschaltet, muss dort ebenfalls
+  // nachziehen — und umgekehrt.
+
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "moduleDetection": "force",
+    "verbatimModuleSyntax": true,
+    "resolveJsonModule": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "declaration": true,
+    // Siehe die Entscheidung oben: Maps NUR zusammen mit ausgeliefertem `src`.
+    "declarationMap": true,
+    "sourceMap": true,
+    "composite": true,
+    "incremental": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "noEmitOnError": true,
+    "newLine": "lf"
+  }
+}

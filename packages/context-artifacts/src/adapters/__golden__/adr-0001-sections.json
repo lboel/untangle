@@ -1,0 +1,68 @@
+[
+  {
+    "content": "# ADR 0001: Use SQLite\n\n",
+    "kind": "markdown_section",
+    "range": {
+      "endByte": 24,
+      "endLine": 2,
+      "startByte": 0,
+      "startLine": 1
+    },
+    "title": "ADR 0001: Use SQLite"
+  },
+  {
+    "content": "## Status\n\nAccepted\n\n",
+    "kind": "markdown_section",
+    "range": {
+      "endByte": 45,
+      "endLine": 6,
+      "startByte": 24,
+      "startLine": 3
+    },
+    "title": "ADR 0001: Use SQLite › Status"
+  },
+  {
+    "content": "## Context\n\nWe need a small embedded database for local-first storage.\n\n",
+    "kind": "markdown_section",
+    "range": {
+      "endByte": 117,
+      "endLine": 10,
+      "startByte": 45,
+      "startLine": 7
+    },
+    "title": "ADR 0001: Use SQLite › Context"
+  },
+  {
+    "content": "### Alternatives Considered\n\n- Postgres — too heavy for a single-user desktop app.\n- MySQL — same concern, plus an extra service to run.\n\n",
+    "kind": "markdown_section",
+    "range": {
+      "endByte": 259,
+      "endLine": 15,
+      "startByte": 117,
+      "startLine": 11
+    },
+    "title": "ADR 0001: Use SQLite › Context › Alternatives Considered"
+  },
+  {
+    "content": "## Decision\n\nWe will use SQLite via better-sqlite3.\n\n```ts\n// a fenced code block containing a fake \"## heading\" that must NOT be sectioned\nconst notAHeading = \"## not a real heading\";\n```\n\n",
+    "kind": "markdown_section",
+    "range": {
+      "endByte": 449,
+      "endLine": 24,
+      "startByte": 259,
+      "startLine": 16
+    },
+    "title": "ADR 0001: Use SQLite › Decision"
+  },
+  {
+    "content": "## Consequences\n\nSimpler ops, less horizontal scale.\n",
+    "kind": "markdown_section",
+    "range": {
+      "endByte": 502,
+      "endLine": 28,
+      "startByte": 449,
+      "startLine": 25
+    },
+    "title": "ADR 0001: Use SQLite › Consequences"
+  }
+]

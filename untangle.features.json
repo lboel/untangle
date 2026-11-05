@@ -1,0 +1,1351 @@
+{
+  "schemaVersion": 1,
+  "owners": [
+    {
+      "id": "role.wp-01",
+      "label": "WP-01 — Domain, ports and identity contracts",
+      "kind": "role",
+      "status": "declared",
+      "sources": [
+        {
+          "path": "docs/BUILD_PLAN.md",
+          "heading": "4. Dateibesitz-Matrix"
+        }
+      ]
+    },
+    {
+      "id": "role.wp-02",
+      "label": "WP-02 — Configuration and schemas",
+      "kind": "role",
+      "status": "declared",
+      "sources": [
+        {
+          "path": "docs/BUILD_PLAN.md",
+          "heading": "4. Dateibesitz-Matrix"
+        }
+      ]
+    },
+    {
+      "id": "role.wp-03",
+      "label": "WP-03 — Observability",
+      "kind": "role",
+      "status": "declared",
+      "sources": [
+        {
+          "path": "docs/BUILD_PLAN.md",
+          "heading": "4. Dateibesitz-Matrix"
+        }
+      ]
+    },
+    {
+      "id": "role.wp-04",
+      "label": "WP-04 — Testkit and port contracts",
+      "kind": "role",
+      "status": "declared",
+      "sources": [
+        {
+          "path": "docs/BUILD_PLAN.md",
+          "heading": "4. Dateibesitz-Matrix"
+        }
+      ]
+    },
+    {
+      "id": "role.wp-05",
+      "label": "WP-05 — File discovery",
+      "kind": "role",
+      "status": "declared",
+      "sources": [
+        {
+          "path": "docs/BUILD_PLAN.md",
+          "heading": "4. Dateibesitz-Matrix"
+        }
+      ]
+    },
+    {
+      "id": "role.wp-06",
+      "label": "WP-06 — Parser registry except Python",
+      "kind": "role",
+      "status": "declared",
+      "sources": [
+        {
+          "path": "docs/BUILD_PLAN.md",
+          "heading": "4. Dateibesitz-Matrix"
+        }
+      ]
+    },
+    {
+      "id": "role.wp-09",
+      "label": "WP-09 — Python adapter",
+      "kind": "role",
+      "status": "declared",
+      "sources": [
+        {
+          "path": "docs/BUILD_PLAN.md",
+          "heading": "4. Dateibesitz-Matrix"
+        }
+      ]
+    },
+    {
+      "id": "role.wp-07",
+      "label": "WP-07 — Lossless chunking",
+      "kind": "role",
+      "status": "declared",
+      "sources": [
+        {
+          "path": "docs/BUILD_PLAN.md",
+          "heading": "4. Dateibesitz-Matrix"
+        }
+      ]
+    },
+    {
+      "id": "role.wp-08",
+      "label": "WP-08 — Complexity measurement",
+      "kind": "role",
+      "status": "declared",
+      "sources": [
+        {
+          "path": "docs/BUILD_PLAN.md",
+          "heading": "4. Dateibesitz-Matrix"
+        }
+      ]
+    },
+    {
+      "id": "role.wp-10",
+      "label": "WP-10 — Ollama embeddings",
+      "kind": "role",
+      "status": "declared",
+      "sources": [
+        {
+          "path": "docs/BUILD_PLAN.md",
+          "heading": "4. Dateibesitz-Matrix"
+        }
+      ]
+    },
+    {
+      "id": "role.wp-11",
+      "label": "WP-11 — Qdrant storage",
+      "kind": "role",
+      "status": "declared",
+      "sources": [
+        {
+          "path": "docs/BUILD_PLAN.md",
+          "heading": "4. Dateibesitz-Matrix"
+        }
+      ]
+    },
+    {
+      "id": "role.wp-12",
+      "label": "WP-12 — Local storage",
+      "kind": "role",
+      "status": "declared",
+      "sources": [
+        {
+          "path": "docs/BUILD_PLAN.md",
+          "heading": "4. Dateibesitz-Matrix"
+        }
+      ]
+    },
+    {
+      "id": "role.wp-13",
+      "label": "WP-13 — Index job mechanics",
+      "kind": "role",
+      "status": "declared",
+      "sources": [
+        {
+          "path": "docs/BUILD_PLAN.md",
+          "heading": "4. Dateibesitz-Matrix"
+        }
+      ]
+    },
+    {
+      "id": "role.wp-14",
+      "label": "WP-14 — Watcher package",
+      "kind": "role",
+      "status": "declared",
+      "sources": [
+        {
+          "path": "docs/BUILD_PLAN.md",
+          "heading": "4. Dateibesitz-Matrix"
+        }
+      ]
+    },
+    {
+      "id": "role.wp-15",
+      "label": "WP-15 — Context artifact adapter",
+      "kind": "role",
+      "status": "declared",
+      "sources": [
+        {
+          "path": "docs/BUILD_PLAN.md",
+          "heading": "4. Dateibesitz-Matrix"
+        }
+      ]
+    },
+    {
+      "id": "role.wp-17",
+      "label": "WP-17 — File graph",
+      "kind": "role",
+      "status": "declared",
+      "sources": [
+        {
+          "path": "docs/BUILD_PLAN.md",
+          "heading": "4. Dateibesitz-Matrix"
+        }
+      ]
+    },
+    {
+      "id": "role.wp-18",
+      "label": "WP-18 — Symbol graph",
+      "kind": "role",
+      "status": "declared",
+      "sources": [
+        {
+          "path": "docs/BUILD_PLAN.md",
+          "heading": "4. Dateibesitz-Matrix"
+        }
+      ]
+    },
+    {
+      "id": "role.wp-19",
+      "label": "WP-19 — Search engine and Search Journeys",
+      "kind": "role",
+      "status": "declared",
+      "sources": [
+        {
+          "path": "docs/BUILD_PLAN.md",
+          "heading": "4. Dateibesitz-Matrix"
+        }
+      ]
+    },
+    {
+      "id": "role.wp-21",
+      "label": "WP-21 — Planned Change Intelligence",
+      "kind": "role",
+      "status": "declared",
+      "sources": [
+        {
+          "path": "docs/BUILD_PLAN.md",
+          "heading": "4. Dateibesitz-Matrix"
+        }
+      ]
+    },
+    {
+      "id": "role.wp-23",
+      "label": "WP-23 — Core pipeline and analysis services",
+      "kind": "role",
+      "status": "declared",
+      "sources": [
+        {
+          "path": "docs/BUILD_PLAN.md",
+          "heading": "4. Dateibesitz-Matrix"
+        }
+      ]
+    },
+    {
+      "id": "role.wp-26",
+      "label": "WP-26 — CLI and MCP adapters in apps/cli",
+      "kind": "role",
+      "status": "declared",
+      "sources": [
+        {
+          "path": "docs/BUILD_PLAN.md",
+          "heading": "4. Dateibesitz-Matrix"
+        }
+      ]
+    },
+    {
+      "id": "role.wp24",
+      "label": "WP-24 — MCP compatibility wrapper in apps/mcp-server",
+      "kind": "role",
+      "status": "declared",
+      "sources": [
+        {
+          "path": "docs/BUILD_PLAN.md",
+          "heading": "4. Dateibesitz-Matrix"
+        }
+      ]
+    }
+  ],
+  "features": [
+    {
+      "id": "untangle.model",
+      "title": "Domain contracts and stable identities",
+      "stage": "implemented",
+      "review": "proposed",
+      "intent": [
+        {
+          "role": "vision",
+          "path": "vision.md",
+          "heading": "8.5 Stable identity over source position"
+        },
+        {
+          "role": "specification",
+          "path": "spec.md",
+          "heading": "5. Identity model"
+        }
+      ],
+      "owners": ["role.wp-01"],
+      "code": {
+        "include": ["packages/domain/src/**/*.ts"],
+        "exclude": ["**/*.test.ts", "**/test-support/**"]
+      },
+      "tests": {
+        "include": ["packages/domain/src/**/*.test.ts"]
+      },
+      "criteria": [
+        {
+          "id": "model.regression-files",
+          "description": "Complete regression-file contract: every reported case in these files passes without skips.",
+          "tests": [
+            "packages/domain/src/identity.test.ts",
+            "packages/domain/src/invariants.test.ts",
+            "packages/domain/src/identifier-tokenizer.test.ts"
+          ]
+        }
+      ],
+      "dependsOn": []
+    },
+    {
+      "id": "untangle.configuration",
+      "title": "Configuration, layering and profile identity",
+      "stage": "implemented",
+      "review": "proposed",
+      "intent": [
+        {
+          "role": "vision",
+          "path": "vision.md",
+          "heading": "8.8 Defaults must work locally"
+        },
+        {
+          "role": "specification",
+          "path": "spec.md",
+          "heading": "4. Configuration"
+        }
+      ],
+      "owners": ["role.wp-02"],
+      "code": {
+        "include": ["packages/config/src/**/*.ts"],
+        "exclude": ["**/*.test.ts", "**/test-support/**"]
+      },
+      "tests": {
+        "include": ["packages/config/src/**/*.test.ts"]
+      },
+      "criteria": [
+        {
+          "id": "configuration.regression-files",
+          "description": "Complete regression-file contract: every reported case in these files passes without skips.",
+          "tests": [
+            "packages/config/src/load.test.ts",
+            "packages/config/src/validate.test.ts",
+            "packages/config/src/hash.test.ts"
+          ]
+        }
+      ],
+      "dependsOn": ["untangle.model"]
+    },
+    {
+      "id": "untangle.discovery",
+      "title": "Content-bound discovery and ignore boundaries",
+      "stage": "implemented",
+      "review": "proposed",
+      "intent": [
+        {
+          "role": "vision",
+          "path": "vision.md",
+          "heading": "7.4 Local-first and private by default"
+        },
+        {
+          "role": "specification",
+          "path": "spec.md",
+          "heading": "6. File discovery and ignore rules"
+        }
+      ],
+      "owners": ["role.wp-05"],
+      "code": {
+        "include": ["packages/scanner/src/**/*.ts"],
+        "exclude": ["**/*.test.ts", "**/test-support/**"]
+      },
+      "tests": {
+        "include": ["packages/scanner/src/**/*.test.ts"]
+      },
+      "criteria": [
+        {
+          "id": "discovery.regression-files",
+          "description": "Complete regression-file contract: every reported case in these files passes without skips.",
+          "tests": ["packages/scanner/src/discovery.test.ts"]
+        }
+      ],
+      "dependsOn": ["untangle.model", "untangle.configuration"]
+    },
+    {
+      "id": "untangle.parsing",
+      "title": "Multilingual parse facts with visible coverage",
+      "stage": "implemented",
+      "review": "proposed",
+      "intent": [
+        {
+          "role": "vision",
+          "path": "vision.md",
+          "heading": "1c. The core is language-agnostic — prose is first-class"
+        },
+        {
+          "role": "specification",
+          "path": "spec.md",
+          "heading": "7. Parsers and language support"
+        }
+      ],
+      "owners": ["role.wp-06", "role.wp-09"],
+      "code": {
+        "include": ["packages/parser-registry/src/**/*.ts"],
+        "exclude": ["**/*.test.ts", "**/test-support/**", "**/fixtures/**", "**/__golden__/**"]
+      },
+      "tests": {
+        "include": ["packages/parser-registry/src/**/*.test.ts"]
+      },
+      "criteria": [
+        {
+          "id": "parsing.regression-files",
+          "description": "Complete regression-file contract: every reported case in these files passes without skips.",
+          "tests": [
+            "packages/parser-registry/src/languages/golden.test.ts",
+            "packages/parser-registry/src/honesty.test.ts"
+          ]
+        }
+      ],
+      "dependsOn": ["untangle.model"]
+    },
+    {
+      "id": "untangle.chunking",
+      "title": "Lossless code and prose chunks",
+      "stage": "implemented",
+      "review": "proposed",
+      "intent": [
+        {
+          "role": "vision",
+          "path": "vision.md",
+          "heading": "8.4 No silent data loss"
+        },
+        {
+          "role": "specification",
+          "path": "spec.md",
+          "heading": "8. AST chunking"
+        }
+      ],
+      "owners": ["role.wp-07"],
+      "code": {
+        "include": ["packages/chunker/src/**/*.ts"],
+        "exclude": ["**/*.test.ts", "**/test-support/**", "**/fixtures/**"]
+      },
+      "tests": {
+        "include": ["packages/chunker/src/**/*.test.ts"]
+      },
+      "criteria": [
+        {
+          "id": "chunking.regression-files",
+          "description": "Complete regression-file contract: every reported case in these files passes without skips.",
+          "tests": ["packages/chunker/src/coverage.test.ts"]
+        }
+      ],
+      "dependsOn": ["untangle.model", "untangle.parsing"]
+    },
+    {
+      "id": "untangle.complexity",
+      "title": "Versioned AST and prose complexity",
+      "stage": "implemented",
+      "review": "proposed",
+      "intent": [
+        {
+          "role": "vision",
+          "path": "vision.md",
+          "heading": "1f. Target: continuously low complexity per feature"
+        },
+        {
+          "role": "specification",
+          "path": "spec.md",
+          "heading": "16. Complexity Engine"
+        }
+      ],
+      "owners": ["role.wp-08", "role.wp-26"],
+      "code": {
+        "include": ["packages/complexity/src/**/*.ts", "apps/cli/src/commands/complexity.ts"],
+        "exclude": ["**/*.test.ts", "**/test-support/**", "**/fixtures/**"]
+      },
+      "tests": {
+        "include": [
+          "packages/complexity/src/**/*.test.ts",
+          "apps/cli/src/commands/complexity.test.ts"
+        ]
+      },
+      "criteria": [
+        {
+          "id": "complexity.regression-files",
+          "description": "Complete regression-file contract: every reported case in these files passes without skips.",
+          "tests": [
+            "packages/complexity/src/cognitive.test.ts",
+            "packages/complexity/src/scope-aggregate.test.ts",
+            "packages/complexity/src/aggregator.test.ts"
+          ]
+        }
+      ],
+      "dependsOn": ["untangle.model", "untangle.parsing"]
+    },
+    {
+      "id": "untangle.embedding",
+      "title": "Ollama embedding provider and offline provider",
+      "stage": "implemented",
+      "review": "proposed",
+      "intent": [
+        {
+          "role": "vision",
+          "path": "vision.md",
+          "heading": "8.2 Structure before embeddings"
+        },
+        {
+          "role": "specification",
+          "path": "spec.md",
+          "heading": "9. Embeddings with Ollama"
+        }
+      ],
+      "owners": ["role.wp-10", "role.wp-23"],
+      "code": {
+        "include": [
+          "packages/embeddings-ollama/src/**/*.ts",
+          "packages/core/src/offline-embedder.ts"
+        ],
+        "exclude": ["**/*.test.ts", "**/test-support/**"]
+      },
+      "tests": {
+        "include": [
+          "packages/embeddings-ollama/src/**/*.test.ts",
+          "packages/core/src/offline-embedder.test.ts"
+        ]
+      },
+      "criteria": [
+        {
+          "id": "embedding.regression-files",
+          "description": "Complete regression-file contract: every reported case in these files passes without skips.",
+          "tests": [
+            "packages/embeddings-ollama/src/provider.test.ts",
+            "packages/core/src/offline-embedder.test.ts"
+          ]
+        }
+      ],
+      "dependsOn": ["untangle.model", "untangle.configuration"]
+    },
+    {
+      "id": "untangle.storage",
+      "title": "Qdrant and local persistent storage ports",
+      "stage": "implemented",
+      "review": "proposed",
+      "intent": [
+        {
+          "role": "vision",
+          "path": "vision.md",
+          "heading": "8.7 Compatibility is versioned"
+        },
+        {
+          "role": "specification",
+          "path": "spec.md",
+          "heading": "10. Qdrant storage"
+        }
+      ],
+      "owners": ["role.wp-11", "role.wp-12"],
+      "code": {
+        "include": ["packages/storage-qdrant/src/**/*.ts", "packages/storage-local/src/**/*.ts"],
+        "exclude": ["**/*.test.ts", "**/test-support/**", "**/testing/**"]
+      },
+      "tests": {
+        "include": [
+          "packages/storage-qdrant/src/**/*.test.ts",
+          "packages/storage-local/src/**/*.test.ts"
+        ]
+      },
+      "criteria": [
+        {
+          "id": "storage.regression-files",
+          "description": "Complete regression-file contract: every reported case in these files passes without skips.",
+          "tests": [
+            "packages/storage-qdrant/src/vector-store.test.ts",
+            "packages/storage-qdrant/src/bm25-text.test.ts",
+            "packages/storage-local/src/storage.test.ts"
+          ]
+        }
+      ],
+      "dependsOn": ["untangle.model", "untangle.configuration"]
+    },
+    {
+      "id": "untangle.index",
+      "title": "Full and incremental code index with graph publication",
+      "stage": "implemented",
+      "review": "proposed",
+      "intent": [
+        {
+          "role": "vision",
+          "path": "vision.md",
+          "heading": "8.3 Incremental by default"
+        },
+        {
+          "role": "specification",
+          "path": "spec.md",
+          "heading": "11. Full index"
+        }
+      ],
+      "owners": ["role.wp-23", "role.wp-13", "role.wp-26"],
+      "code": {
+        "include": [
+          "packages/core/src/**/*.ts",
+          "packages/jobs/src/**/*.ts",
+          "apps/cli/src/commands/index/**/*.ts"
+        ],
+        "exclude": ["**/*.test.ts", "**/test-support/**", "packages/core/src/product-alignment/**"]
+      },
+      "tests": {
+        "include": ["packages/core/src/**/*.test.ts", "packages/jobs/src/**/*.test.ts"]
+      },
+      "criteria": [
+        {
+          "id": "index.regression-files",
+          "description": "Complete regression-file contract: every reported case in these files passes without skips.",
+          "tests": [
+            "packages/core/src/pipeline.test.ts",
+            "packages/core/src/stages/prune-generation.test.ts",
+            "packages/jobs/src/runner.test.ts"
+          ]
+        }
+      ],
+      "dependsOn": [
+        "untangle.discovery",
+        "untangle.parsing",
+        "untangle.chunking",
+        "untangle.complexity",
+        "untangle.embedding",
+        "untangle.storage",
+        "untangle.file-graph",
+        "untangle.symbol-graph"
+      ]
+    },
+    {
+      "id": "untangle.index-freshness",
+      "title": "Index freshness, migration and explicit refresh",
+      "stage": "implemented",
+      "review": "proposed",
+      "intent": [
+        {
+          "role": "vision",
+          "path": "vision.md",
+          "heading": "Branch and worktree awareness"
+        },
+        {
+          "role": "specification",
+          "path": "spec.md",
+          "heading": "12. Incremental updates and watchers"
+        }
+      ],
+      "owners": ["role.wp-26"],
+      "code": {
+        "include": ["apps/cli/src/cli/index-freshness.ts", "apps/cli/src/commands/index-watch.ts"],
+        "exclude": ["**/*.test.ts", "**/test-support/**"]
+      },
+      "tests": {
+        "include": [
+          "apps/cli/src/cli/index-freshness.test.ts",
+          "apps/cli/src/commands/index-watch.test.ts"
+        ]
+      },
+      "criteria": [
+        {
+          "id": "index-freshness.regression-files",
+          "description": "Complete regression-file contract: every reported case in these files passes without skips.",
+          "tests": [
+            "apps/cli/src/cli/index-freshness.test.ts",
+            "apps/cli/src/commands/index-watch.test.ts"
+          ]
+        }
+      ],
+      "dependsOn": ["untangle.index", "untangle.configuration"]
+    },
+    {
+      "id": "untangle.search",
+      "title": "Independent symbol, lexical, semantic and pattern search",
+      "stage": "implemented",
+      "review": "proposed",
+      "intent": [
+        {
+          "role": "vision",
+          "path": "vision.md",
+          "heading": "8.1 Search before read"
+        },
+        {
+          "role": "specification",
+          "path": "spec.md",
+          "heading": "13. Search"
+        }
+      ],
+      "owners": ["role.wp-19", "role.wp-26"],
+      "code": {
+        "include": ["packages/search/src/**/*.ts", "apps/cli/src/commands/query.ts"],
+        "exclude": [
+          "**/*.test.ts",
+          "**/test-support/**",
+          "packages/search/src/product-complexity.ts",
+          "packages/search/src/findability.ts",
+          "packages/search/src/testing/**"
+        ]
+      },
+      "tests": {
+        "include": [
+          "packages/search/src/**/*.test.ts",
+          "apps/cli/src/commands/query*.test.ts",
+          "apps/cli/src/cli/search-graph-enrichment.test.ts"
+        ]
+      },
+      "criteria": [
+        {
+          "id": "search.regression-files",
+          "description": "Complete regression-file contract: every reported case in these files passes without skips.",
+          "tests": [
+            "packages/search/src/engine.test.ts",
+            "packages/search/src/engine-branches.test.ts",
+            "packages/search/src/tokenize.test.ts",
+            "packages/search/src/grep.test.ts"
+          ]
+        }
+      ],
+      "dependsOn": [
+        "untangle.model",
+        "untangle.storage",
+        "untangle.embedding",
+        "untangle.index-freshness",
+        "untangle.file-graph",
+        "untangle.symbol-graph"
+      ]
+    },
+    {
+      "id": "untangle.file-graph",
+      "title": "File imports, resolution, cycles and dependencies",
+      "stage": "implemented",
+      "review": "proposed",
+      "intent": [
+        {
+          "role": "vision",
+          "path": "vision.md",
+          "heading": "8.2 Structure before embeddings"
+        },
+        {
+          "role": "specification",
+          "path": "spec.md",
+          "heading": "14. File dependency graph"
+        }
+      ],
+      "owners": ["role.wp-17", "role.wp-26"],
+      "code": {
+        "include": ["packages/file-graph/src/**/*.ts", "apps/cli/src/commands/graph/**/*.ts"],
+        "exclude": ["**/*.test.ts", "**/test-support/**", "**/fixtures/**"]
+      },
+      "tests": {
+        "include": [
+          "packages/file-graph/src/**/*.test.ts",
+          "apps/cli/src/commands/graph/**/*.test.ts"
+        ]
+      },
+      "criteria": [
+        {
+          "id": "file-graph.regression-files",
+          "description": "Complete regression-file contract: every reported case in these files passes without skips.",
+          "tests": [
+            "packages/file-graph/src/graph.test.ts",
+            "packages/file-graph/src/cross-repo.test.ts",
+            "packages/file-graph/src/persistence.test.ts"
+          ]
+        }
+      ],
+      "dependsOn": ["untangle.model", "untangle.parsing", "untangle.storage"]
+    },
+    {
+      "id": "untangle.symbol-graph",
+      "title": "Symbol graph, call paths and impact",
+      "stage": "implemented",
+      "review": "proposed",
+      "intent": [
+        {
+          "role": "vision",
+          "path": "vision.md",
+          "heading": "8.2 Structure before embeddings"
+        },
+        {
+          "role": "specification",
+          "path": "spec.md",
+          "heading": "15. Symbol graph"
+        }
+      ],
+      "owners": ["role.wp-18", "role.wp-26"],
+      "code": {
+        "include": ["packages/symbol-graph/src/**/*.ts", "apps/cli/src/commands/flow/**/*.ts"],
+        "exclude": ["**/*.test.ts", "**/test-support/**", "**/fixtures/**"]
+      },
+      "tests": {
+        "include": [
+          "packages/symbol-graph/src/**/*.test.ts",
+          "apps/cli/src/commands/flow/**/*.test.ts"
+        ]
+      },
+      "criteria": [
+        {
+          "id": "symbol-graph.regression-files",
+          "description": "Complete regression-file contract: every reported case in these files passes without skips.",
+          "tests": [
+            "packages/symbol-graph/src/build.test.ts",
+            "packages/symbol-graph/src/paths.test.ts",
+            "packages/symbol-graph/src/impact.test.ts"
+          ]
+        }
+      ],
+      "dependsOn": ["untangle.model", "untangle.parsing", "untangle.file-graph", "untangle.storage"]
+    },
+    {
+      "id": "untangle.graph-explorer",
+      "title": "Local source-free graph explorer; ownership open",
+      "stage": "implemented",
+      "review": "proposed",
+      "intent": [
+        {
+          "role": "vision",
+          "path": "vision.md",
+          "heading": "7.1 Evidence-first Code Intelligence"
+        },
+        {
+          "role": "specification",
+          "path": "spec.md",
+          "heading": "14. File dependency graph"
+        }
+      ],
+      "owners": ["role.graph-explorer.unassigned"],
+      "code": {
+        "include": [
+          "packages/graph-explorer/src/**/*.ts",
+          "apps/cli/src/commands/graph/feature-*.ts"
+        ],
+        "exclude": ["**/*.test.ts", "**/test-support/**"]
+      },
+      "tests": {
+        "include": [
+          "packages/graph-explorer/src/**/*.test.ts",
+          "apps/cli/src/commands/graph/feature-map.test.ts"
+        ]
+      },
+      "criteria": [
+        {
+          "id": "graph-explorer.regression-files",
+          "description": "Complete regression-file contract: every reported case in these files passes without skips.",
+          "tests": [
+            "packages/graph-explorer/src/graph-explorer.test.ts",
+            "packages/graph-explorer/src/runtime.test.ts",
+            "apps/cli/src/commands/graph/feature-map.test.ts"
+          ]
+        }
+      ],
+      "dependsOn": ["untangle.file-graph", "untangle.symbol-graph"]
+    },
+    {
+      "id": "untangle.watch",
+      "title": "Watcher package and CLI polling for complexity and search",
+      "stage": "implemented",
+      "review": "proposed",
+      "intent": [
+        {
+          "role": "vision",
+          "path": "vision.md",
+          "heading": "8.3 Incremental by default"
+        },
+        {
+          "role": "specification",
+          "path": "spec.md",
+          "heading": "12. Incremental updates and watchers"
+        }
+      ],
+      "owners": ["role.wp-14", "role.wp-26"],
+      "code": {
+        "include": [
+          "packages/watcher/src/**/*.ts",
+          "apps/cli/src/commands/watch/**/*.ts",
+          "apps/cli/src/commands/watch-command.ts",
+          "apps/cli/src/commands/index-watch.ts"
+        ],
+        "exclude": ["**/*.test.ts", "**/test-support/**"]
+      },
+      "tests": {
+        "include": [
+          "packages/watcher/src/**/*.test.ts",
+          "apps/cli/src/commands/watch/**/*.test.ts",
+          "apps/cli/src/commands/index-watch.test.ts"
+        ]
+      },
+      "criteria": [
+        {
+          "id": "watch.regression-files",
+          "description": "Complete regression-file contract: every reported case in these files passes without skips.",
+          "tests": [
+            "packages/watcher/src/watcher.test.ts",
+            "apps/cli/src/commands/index-watch.test.ts",
+            "apps/cli/src/commands/watch/delta.test.ts"
+          ]
+        }
+      ],
+      "dependsOn": ["untangle.discovery", "untangle.complexity", "untangle.index-freshness"]
+    },
+    {
+      "id": "untangle.extensions",
+      "title": "Opt-in analyzer execution and scan; runtime ownership open",
+      "stage": "implemented",
+      "review": "proposed",
+      "intent": [
+        {
+          "role": "vision",
+          "path": "vision.md",
+          "heading": "7.6 Explainable Quality"
+        },
+        {
+          "role": "specification",
+          "path": "extensions.md",
+          "heading": "3. Guiding decisions X1–X8 (normative)"
+        }
+      ],
+      "owners": ["role.wp26", "role.extension-runtime.unassigned"],
+      "code": {
+        "include": [
+          "packages/extension-runtime/src/**/*.ts",
+          "apps/cli/src/commands/extensions/**/*.ts",
+          "apps/cli/src/commands/scan.ts",
+          "apps/cli/src/commands/extensions.ts"
+        ],
+        "exclude": ["**/*.test.ts", "**/test-support/**"]
+      },
+      "tests": {
+        "include": [
+          "packages/extension-runtime/src/**/*.test.ts",
+          "apps/cli/src/commands/extensions/**/*.test.ts",
+          "apps/cli/src/commands/scan.test.ts",
+          "apps/cli/src/commands/scan-feature.test.ts"
+        ]
+      },
+      "criteria": [
+        {
+          "id": "extensions.regression-files",
+          "description": "Complete regression-file contract: every reported case in these files passes without skips.",
+          "tests": [
+            "packages/extension-runtime/src/runtime.test.ts",
+            "packages/extension-runtime/src/boundary.test.ts",
+            "apps/cli/src/commands/scan.test.ts",
+            "apps/cli/src/commands/scan-feature.test.ts"
+          ]
+        }
+      ],
+      "dependsOn": ["untangle.model", "untangle.configuration", "untangle.complexity"]
+    },
+    {
+      "id": "untangle.search-journey",
+      "title": "Explicit search tasks, feature cohorts and separate measurement axes",
+      "stage": "implemented",
+      "review": "proposed",
+      "intent": [
+        {
+          "role": "vision",
+          "path": "vision.md",
+          "heading": "1e. Product complexity emerges along the search path"
+        },
+        {
+          "role": "specification",
+          "path": "spec.md",
+          "heading": "13.7 Search Journeys and Dynamic Product Complexity"
+        }
+      ],
+      "owners": ["role.wp-19", "role.wp-12", "role.wp-26"],
+      "code": {
+        "include": [
+          "packages/search/src/product-complexity.ts",
+          "packages/search/src/findability.ts",
+          "packages/storage-local/src/search-journey-store.ts",
+          "packages/domain/src/types/search-journey.ts",
+          "packages/domain/src/search-journey-validation.ts"
+        ],
+        "exclude": ["**/*.test.ts", "**/test-support/**"]
+      },
+      "tests": {
+        "include": [
+          "packages/search/src/product-complexity.test.ts",
+          "packages/search/src/findability.test.ts",
+          "packages/storage-local/src/search-journey-store.test.ts",
+          "packages/search/src/product-complexity-context.test.ts",
+          "packages/domain/src/search-journey-context-validation.test.ts",
+          "apps/cli/src/mcp/journey-context.test.ts"
+        ]
+      },
+      "criteria": [
+        {
+          "id": "search-journey.regression-files",
+          "description": "Complete regression-file contract: every reported case in these files passes without skips.",
+          "tests": [
+            "packages/search/src/product-complexity.test.ts",
+            "packages/search/src/findability.test.ts",
+            "packages/storage-local/src/search-journey-store.test.ts",
+            "packages/search/src/product-complexity-context.test.ts",
+            "packages/domain/src/search-journey-context-validation.test.ts",
+            "apps/cli/src/mcp/journey-context.test.ts"
+          ]
+        }
+      ],
+      "dependsOn": ["untangle.search", "untangle.complexity", "untangle.storage"]
+    },
+    {
+      "id": "untangle.init-context",
+      "title": "Local setup and document-bound product context inventory",
+      "stage": "implemented",
+      "review": "proposed",
+      "intent": [
+        {
+          "role": "vision",
+          "path": "vision.md",
+          "heading": "First implemented step: expose product context"
+        },
+        {
+          "role": "specification",
+          "path": "spec.md",
+          "heading": "20.2.1 Local product context in `init` V1"
+        }
+      ],
+      "owners": ["role.wp-26"],
+      "code": {
+        "include": ["apps/cli/src/commands/init/**/*.ts"],
+        "exclude": ["**/*.test.ts", "**/test-support/**"]
+      },
+      "tests": {
+        "include": ["apps/cli/src/commands/init/**/*.test.ts"]
+      },
+      "criteria": [
+        {
+          "id": "init-context.regression-files",
+          "description": "Complete regression-file contract: every reported case in these files passes without skips.",
+          "tests": [
+            "apps/cli/src/commands/init/product-context.test.ts",
+            "apps/cli/src/commands/init/product-context-integration.test.ts",
+            "apps/cli/src/commands/init/init.test.ts"
+          ]
+        }
+      ],
+      "dependsOn": ["untangle.configuration", "untangle.discovery"]
+    },
+    {
+      "id": "untangle.agent-interface",
+      "title": "CLI and MCP contracts, scope, diagnostics and explicit failures",
+      "stage": "implemented",
+      "review": "proposed",
+      "intent": [
+        {
+          "role": "vision",
+          "path": "vision.md",
+          "heading": "8.6 One engine, many hosts"
+        },
+        {
+          "role": "specification",
+          "path": "spec.md",
+          "heading": "21. MCP specification"
+        }
+      ],
+      "owners": ["role.wp-26", "role.wp24"],
+      "code": {
+        "include": [
+          "apps/cli/src/index.ts",
+          "apps/cli/src/cli/**/*.ts",
+          "apps/cli/src/mcp/**/*.ts",
+          "apps/cli/src/commands/mcp.ts",
+          "apps/cli/src/commands/doctor.ts",
+          "apps/cli/src/entry-point.ts",
+          "apps/cli/src/commands/doctor.languages.ts",
+          "apps/cli/src/commands/unavailable.ts",
+          "apps/mcp-server/src/**/*.ts"
+        ],
+        "exclude": ["**/*.test.ts", "**/test-support/**"]
+      },
+      "tests": {
+        "include": [
+          "apps/cli/src/cli/**/*.test.ts",
+          "apps/cli/src/mcp/**/*.test.ts",
+          "apps/cli/src/commands/mcp.test.ts",
+          "apps/cli/src/commands/doctor*.test.ts",
+          "apps/cli/src/*.test.ts",
+          "apps/mcp-server/src/**/*.test.ts"
+        ]
+      },
+      "criteria": [
+        {
+          "id": "agent-interface.regression-files",
+          "description": "Complete regression-file contract: every reported case in these files passes without skips.",
+          "tests": [
+            "apps/cli/src/mcp/server.test.ts",
+            "apps/cli/src/mcp/stdio.test.ts",
+            "apps/cli/src/mcp/partial-search.test.ts"
+          ]
+        }
+      ],
+      "dependsOn": [
+        "untangle.model",
+        "untangle.configuration",
+        "untangle.search",
+        "untangle.file-graph",
+        "untangle.symbol-graph",
+        "untangle.complexity",
+        "untangle.search-journey",
+        "untangle.product-alignment"
+      ]
+    },
+    {
+      "id": "untangle.product-alignment",
+      "title": "Declared feature alignment and complete feature complexity",
+      "stage": "implemented",
+      "review": "proposed",
+      "intent": [
+        {
+          "role": "vision",
+          "path": "vision.md",
+          "heading": "Next implemented step: declared feature alignment"
+        },
+        {
+          "role": "specification",
+          "path": "spec.md",
+          "heading": "20.2.2 Declared feature alignment V1"
+        }
+      ],
+      "owners": ["role.wp-23", "role.wp-01", "role.wp-26"],
+      "code": {
+        "include": [
+          "packages/core/src/product-alignment/**/*.ts",
+          "packages/domain/src/types/product-alignment.ts",
+          "apps/cli/src/commands/product.ts",
+          "apps/cli/src/commands/product-test-runner.ts",
+          "packages/core/src/sdd-connectors/**/*.ts",
+          "apps/cli/src/commands/sdd.ts"
+        ],
+        "exclude": ["**/*.test.ts", "**/test-support/**"]
+      },
+      "tests": {
+        "include": [
+          "packages/core/src/product-alignment/**/*.test.ts",
+          "apps/cli/src/commands/product.test.ts",
+          "apps/cli/src/mcp/product.test.ts",
+          "apps/cli/src/commands/product-process.test.ts",
+          "apps/cli/src/commands/product-workflow.test.ts",
+          "apps/cli/src/mcp/feature-workflow.test.ts",
+          "packages/core/src/product-alignment/product-path.test.ts",
+          "packages/core/src/product-alignment/product-test-run.test.ts",
+          "packages/core/src/sdd-connectors/**/*.test.ts",
+          "apps/cli/src/commands/sdd.test.ts",
+          "apps/cli/src/commands/product-sdd.test.ts"
+        ]
+      },
+      "criteria": [
+        {
+          "id": "product-alignment.regression-files",
+          "description": "Complete regression-file contract: every reported case in these files passes without skips.",
+          "tests": [
+            "packages/core/src/product-alignment/analysis.test.ts",
+            "packages/core/src/product-alignment/manifest.test.ts",
+            "packages/core/src/product-alignment/report.test.ts",
+            "apps/cli/src/commands/product.test.ts",
+            "apps/cli/src/commands/product-process.test.ts",
+            "apps/cli/src/commands/product-workflow.test.ts",
+            "apps/cli/src/mcp/feature-workflow.test.ts",
+            "packages/core/src/product-alignment/product-path.test.ts",
+            "packages/core/src/product-alignment/product-test-run.test.ts",
+            "packages/core/src/sdd-connectors/connectors.test.ts",
+            "apps/cli/src/commands/sdd.test.ts",
+            "apps/cli/src/commands/product-sdd.test.ts"
+          ]
+        }
+      ],
+      "dependsOn": [
+        "untangle.discovery",
+        "untangle.parsing",
+        "untangle.complexity",
+        "untangle.model"
+      ]
+    },
+    {
+      "id": "untangle.context-artifact-adapters",
+      "title": "Context artifact adapters, staleness and configured listing",
+      "stage": "implemented",
+      "review": "proposed",
+      "intent": [
+        {
+          "role": "vision",
+          "path": "vision.md",
+          "heading": "1c. The core is language-agnostic — prose is first-class"
+        },
+        {
+          "role": "specification",
+          "path": "spec.md",
+          "heading": "19. Context Artifacts"
+        }
+      ],
+      "owners": ["role.wp-15", "role.wp-26"],
+      "code": {
+        "include": ["packages/context-artifacts/src/**/*.ts"],
+        "exclude": [
+          "**/*.test.ts",
+          "**/test-support/**",
+          "**/fixtures/**",
+          "packages/context-artifacts/src/test-helpers.ts"
+        ]
+      },
+      "tests": {
+        "include": ["packages/context-artifacts/src/**/*.test.ts"]
+      },
+      "criteria": [
+        {
+          "id": "context-artifact-adapters.regression-files",
+          "description": "Complete regression-file contract: every reported case in these files passes without skips.",
+          "tests": [
+            "packages/context-artifacts/src/registry.test.ts",
+            "packages/context-artifacts/src/staleness.test.ts",
+            "packages/context-artifacts/src/honesty.test.ts"
+          ]
+        }
+      ],
+      "dependsOn": ["untangle.model", "untangle.configuration"]
+    },
+    {
+      "id": "untangle.observability",
+      "title": "Structured logs, profiling and secret redaction",
+      "stage": "implemented",
+      "review": "proposed",
+      "intent": [
+        {
+          "role": "vision",
+          "path": "vision.md",
+          "heading": "7.6 Explainable Quality"
+        },
+        {
+          "role": "specification",
+          "path": "spec.md",
+          "heading": "23. Health and observability"
+        }
+      ],
+      "owners": ["role.wp-03"],
+      "code": {
+        "include": ["packages/observability/src/**/*.ts"],
+        "exclude": ["**/*.test.ts", "**/test-support/**"]
+      },
+      "tests": {
+        "include": ["packages/observability/src/**/*.test.ts"]
+      },
+      "criteria": [
+        {
+          "id": "observability.regression-files",
+          "description": "Complete regression-file contract: every reported case in these files passes without skips.",
+          "tests": [
+            "packages/observability/src/logger.test.ts",
+            "packages/observability/src/redact.test.ts",
+            "packages/observability/src/metrics.test.ts"
+          ]
+        }
+      ],
+      "dependsOn": ["untangle.model"]
+    },
+    {
+      "id": "untangle.testkit",
+      "title": "Public test ports, fixture API and retrieval regression harness",
+      "stage": "implemented",
+      "review": "proposed",
+      "intent": [
+        {
+          "role": "vision",
+          "path": "vision.md",
+          "heading": "8.4 No silent data loss"
+        },
+        {
+          "role": "specification",
+          "path": "spec.md",
+          "heading": "27. Tests and conformance"
+        }
+      ],
+      "owners": ["role.wp-04"],
+      "code": {
+        "include": ["packages/testkit/src/**/*.ts", "packages/search/src/testing/**/*.ts"],
+        "exclude": ["**/*.test.ts", "**/test-support/**"]
+      },
+      "tests": {
+        "include": ["packages/testkit/src/**/*.test.ts", "packages/search/src/testing/**/*.test.ts"]
+      },
+      "criteria": [
+        {
+          "id": "testkit.regression-files",
+          "description": "Complete regression-file contract: every reported case in these files passes without skips.",
+          "tests": [
+            "packages/testkit/src/honesty/assert-honest.test.ts",
+            "packages/testkit/src/contracts/vector-store.contract.self-test.test.ts",
+            "packages/search/src/testing/search-port.contract.self-test.test.ts"
+          ]
+        }
+      ],
+      "dependsOn": ["untangle.model", "untangle.search"]
+    },
+    {
+      "id": "untangle.context-artifact-search",
+      "title": "Planned independent artifact index and retrieval path",
+      "stage": "planned",
+      "review": "proposed",
+      "intent": [
+        {
+          "role": "vision",
+          "path": "vision.md",
+          "heading": "1c. The core is language-agnostic — prose is first-class"
+        },
+        {
+          "role": "specification",
+          "path": "spec.md",
+          "heading": "19. Context Artifacts"
+        }
+      ],
+      "owners": ["role.wp-15"],
+      "code": {
+        "include": []
+      },
+      "tests": {
+        "include": []
+      },
+      "criteria": [],
+      "dependsOn": ["untangle.context-artifact-adapters", "untangle.index", "untangle.search"]
+    },
+    {
+      "id": "untangle.change-intelligence",
+      "title": "Planned complete Change Intelligence",
+      "stage": "planned",
+      "review": "proposed",
+      "intent": [
+        {
+          "role": "vision",
+          "path": "vision.md",
+          "heading": "7.3 Change intelligence rather than a static snapshot"
+        },
+        {
+          "role": "specification",
+          "path": "spec.md",
+          "heading": "17. Change Intelligence"
+        }
+      ],
+      "owners": ["role.wp-21"],
+      "code": {
+        "include": []
+      },
+      "tests": {
+        "include": []
+      },
+      "criteria": [],
+      "dependsOn": [
+        "untangle.complexity",
+        "untangle.file-graph",
+        "untangle.symbol-graph",
+        "untangle.search"
+      ]
+    }
+  ]
+}

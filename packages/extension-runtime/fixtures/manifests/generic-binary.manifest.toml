@@ -1,0 +1,39 @@
+# Beispielmanifest: ein Werkzeug, das Untangles eigenes `generic-findings`
+# schreibt. Der Werkzeugname ist eine Nutzerangabe (E2).
+schemaVersion = 1
+id = "generic-binary"
+displayName = "Generic Binary Analyzer"
+category = "sast"
+invocation = ["binary"]
+languages = []
+outputFormat = "generic-findings"
+networkAccess = "none"
+requiresLicenseAcknowledgment = false
+
+[binary]
+command = "generic-binary"
+versionArgs = ["--version"]
+versionPattern = "([0-9]+\\.[0-9]+\\.[0-9]+)"
+analyzeArgs = ["scan", "{target}"]
+
+[resources]
+minMemoryMb = 128
+recommendedMemoryMb = 256
+recommendedCpus = 1
+
+[license]
+spdxId = "Apache-2.0"
+usageRestriction = "none"
+
+[severityMapping]
+mappingVersion = "untangle-severity-map-v1"
+fallback = "medium"
+caseInsensitive = true
+rules = [
+  { from = "error", to = "high" },
+  { from = "warning", to = "medium" },
+]
+
+[telemetry]
+sendsTelemetry = false
+disabledByDefault = true

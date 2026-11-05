@@ -1,0 +1,24 @@
+[
+  {
+    "content": "FROM node:22-slim AS build\nWORKDIR /app\nCOPY . .\nRUN npm ci && npm run build\n\n",
+    "kind": "docker_stage",
+    "range": {
+      "endByte": 78,
+      "endLine": 5,
+      "startByte": 0,
+      "startLine": 1
+    },
+    "title": "build"
+  },
+  {
+    "content": "FROM node:22-slim\nWORKDIR /app\nCOPY --from=build /app/dist ./dist\nCMD [\"node\", \"dist/index.js\"]\n",
+    "kind": "docker_stage",
+    "range": {
+      "endByte": 174,
+      "endLine": 10,
+      "startByte": 78,
+      "startLine": 6
+    },
+    "title": "stage 1 (node:22-slim)"
+  }
+]

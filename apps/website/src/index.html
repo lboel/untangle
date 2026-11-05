@@ -1,0 +1,1138 @@
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="oklch(0.3 0.06 185)" />
+    <meta
+      name="description"
+      content="A local search and complexity harness for spec-driven engineering. Connect specs, features, code, tests and ownership. Keep complexity visible per feature."
+    />
+    <title>Untangle | A harness for spec-driven engineering</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="icon" type="image/svg+xml" href="./untangle-logo.svg" />
+    <script src="./site.js" defer></script>
+    <script type="module" src="./story.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Untangle home">
+        <img class="brand-mark" src="./untangle-logo.svg" alt="" width="44" height="40" />
+        <span>Untangle</span>
+      </a>
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a href="#untangle-story">How it works</a>
+        <a href="#real-codebase">Real codebase</a>
+        <a href="#search-signals">Search signals</a>
+      </nav>
+      <a class="header-action" href="#local-install">Get started</a>
+    </header>
+
+    <main id="main-content">
+      <section class="hero shell" id="top" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <h1 id="hero-title">Keep spec-driven code easy to change.</h1>
+          <p class="hero-support">
+            A local search and complexity harness for coding agents. Connect specifications to
+            declared features, code, tests and ownership. Give agents the context to understand the
+            implementation and measure its complexity before the next change.
+          </p>
+          <div class="hero-actions" aria-label="Page shortcuts">
+            <a class="button button--primary" href="#local-install"
+              >Analyze your first repository</a
+            >
+            <a class="text-link" href="#untangle-story">Follow the thread</a>
+          </div>
+          <p class="release-note">
+            Local CLI and MCP. Start without services. First public release in preparation.
+          </p>
+        </div>
+
+        <figure class="yarn-hero">
+          <img
+            class="hero-yarn-image"
+            src="./untangle-yarn-3d.png"
+            alt="A deep green 3D ball of woven yarn releasing one copper thread."
+            width="1774"
+            height="887"
+            fetchpriority="high"
+            decoding="async"
+          />
+          <figcaption>Keep complexity small per feature.</figcaption>
+          <p>Find the code. Read the responsibility. Choose a bounded change.</p>
+        </figure>
+      </section>
+
+      <section class="untangle-story" id="untangle-story" aria-labelledby="story-title">
+        <div class="shell">
+          <div class="story-heading">
+            <h2 id="story-title">From a tangled repository to a bounded change.</h2>
+            <p>
+              Follow one feature through Untangle. Find its implementation, understand the whole
+              responsibility and give your agent evidence for the next change.
+            </p>
+          </div>
+
+          <div class="story-grid">
+            <figure class="story-visual" aria-labelledby="story-scene-caption">
+              <nav class="story-navigation" aria-label="Untangle story chapters">
+                <a data-story-link href="#story-intent" aria-current="step">Intent</a>
+                <a data-story-link href="#story-search">Search</a>
+                <a data-story-link href="#story-feature">Feature</a>
+                <a data-story-link href="#story-change">Change</a>
+              </nav>
+              <div
+                class="yarn-stage"
+                id="yarn-stage"
+                tabindex="-1"
+                role="group"
+                aria-label="Interactive 3D yarn scene"
+                aria-describedby="story-scene-caption story-instructions"
+              >
+                <img
+                  id="yarn-fallback"
+                  src="./untangle-yarn-3d.png"
+                  alt="A woven yarn ball with a free thread: an illustration of tracing a feature through code."
+                  width="1774"
+                  height="887"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <canvas
+                  id="yarn-canvas"
+                  width="960"
+                  height="760"
+                  aria-hidden="true"
+                  hidden
+                ></canvas>
+                <p class="story-phase" id="story-phase">Start with the responsibility.</p>
+              </div>
+              <div class="story-controls" hidden>
+                <p id="story-instructions">
+                  Drag to turn. Use arrow keys when the scene is focused.
+                </p>
+                <button id="story-motion" type="button" aria-pressed="true" hidden>
+                  Pause motion
+                </button>
+              </div>
+              <figcaption id="story-scene-caption">
+                Illustrative relationships, not a measured repository graph. Your declarations
+                define the real boundaries.
+              </figcaption>
+              <a class="story-example-link" href="#real-codebase">Explore the real Untangle map</a>
+              <p id="story-status" class="visually-hidden" role="status" aria-live="polite"></p>
+            </figure>
+
+            <div class="story-steps">
+              <article id="story-intent" class="story-step is-active" data-story-step>
+                <h3>Start with the responsibility.</h3>
+                <p>
+                  Bring a Spec Kit or OpenSpec workspace, an existing feature manifest, or simply
+                  your code. Untangle helps connect declared intent to an implementation.
+                </p>
+                <pre
+                  tabindex="0"
+                  aria-label="Preview local spec connections"
+                ><code>untangle product connect auto --dry-run</code></pre>
+                <p class="story-boundary">
+                  Imported boundaries are review drafts. Setup invents no owners or passing tests.
+                </p>
+                <a href="#start">Start with or without a spec</a>
+              </article>
+              <article id="story-search" class="story-step" data-story-step>
+                <h3>Find the implementation.</h3>
+                <p>
+                  Search symbols, names and intent. Follow callers, dependencies and tests. Each
+                  retrieval path keeps its provenance, freshness and failure state visible.
+                </p>
+                <pre
+                  tabindex="0"
+                  aria-label="Search with fresh linked context"
+                ><code>untangle query "account lookup" \
+  --require-fresh --context --linked</code></pre>
+                <p class="story-boundary">
+                  Indexed search uses your configured local services. Direct code analysis can start
+                  without them.
+                </p>
+                <a href="#mcp">Connect search and your agent</a>
+              </article>
+              <article id="story-feature" class="story-step" data-story-step>
+                <h3>Read the whole feature.</h3>
+                <p>
+                  Follow the declared feature into code, helpers, tests and ownership. Measure its
+                  complete scope. Shared files and missing evidence stay in view.
+                </p>
+                <pre
+                  tabindex="0"
+                  aria-label="Inspect a declared feature"
+                ><code>untangle product --feature=accounts.lookup \
+  --format=json</code></pre>
+                <p class="story-boundary">
+                  A feature report keeps code metrics, test evidence and ownership separate.
+                </p>
+                <a href="#feature-probe">See what a feature report contains</a>
+              </article>
+              <article id="story-change" class="story-step" data-story-step>
+                <h3>Make the next change smaller.</h3>
+                <p>
+                  Use hotspots and feature budgets to choose one responsibility to simplify. Recheck
+                  behavior. Opt-in Search Journeys show where agents repeatedly lose the trail as
+                  the codebase changes.
+                </p>
+                <pre
+                  tabindex="0"
+                  aria-label="Measure the current code"
+                ><code>untangle complexity --format=json</code></pre>
+                <p class="story-boundary">
+                  Untangle provides evidence and agent hints. Your agent owns the edit.
+                </p>
+                <a href="#local-install">Analyze your first repository</a>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="codebase-section shell" id="real-codebase" aria-labelledby="codebase-title">
+        <div class="section-heading">
+          <h2 id="codebase-title">Watch a real codebase untangle.</h2>
+          <p>
+            Open the actual feature map behind this tool: 25 declared features, 1,095 nodes and
+            1,109 relationships. Untangle the wool map by feature, code area, tests, ownership,
+            Vision / Spec or unassigned files. Inspect the code, evidence and measured complexity.
+          </p>
+        </div>
+        <div class="codebase-actions">
+          <a class="button button--primary" href="./untangle-example.html"
+            >Open the full 3D viewer</a
+          >
+          <a class="text-link" href="./untangle-example.html#untangle-view"
+            >Try the untangling animation</a
+          >
+          <a class="text-link" href="./untangle-example.json" download="untangle-example.json"
+            >Download snapshot JSON</a
+          >
+        </div>
+        <p class="codebase-instructions" id="codebase-controls">
+          Choose a category under <strong>Untangle by</strong>, then use the Untangle button in the
+          map. Pause, resume or show the tangle again. Code and test areas follow directories;
+          ownership and document context follow declared feature links. Shared and missing context
+          stay visible. Open <strong>Groups</strong> for full names and counts. Code and
+          measurements stay unchanged. Search <code>untangle.embedding</code> to inspect a feature,
+          or use the accessible node list.
+        </p>
+        <iframe
+          class="codebase-viewer"
+          src="./untangle-example.html"
+          title="Untangle's real 3D feature and code map"
+          aria-describedby="codebase-controls codebase-provenance"
+          sandbox="allow-scripts"
+          loading="lazy"
+          referrerpolicy="no-referrer"
+        ></iframe>
+        <p class="codebase-provenance" id="codebase-provenance">
+          Frozen source snapshot at <code>d11bdaf</code>, generated with
+          <code>untangle graph features</code>. The complete graph includes complexity violations,
+          missing measurements and 101 unassigned code files. Ownership includes declared and
+          missing roles; test-run evidence is not attached. Shared feature scopes can overlap.
+        </p>
+        <p class="codebase-reproduce">
+          Generate the same kind of map for your repository after local setup:
+          <code>untangle graph features --format=json</code>. Its HTML and JSON stay in your
+          project's <code>.untangle/feature-map/</code> directory.
+        </p>
+      </section>
+
+      <section
+        class="quickstart-section shell"
+        id="local-install"
+        aria-labelledby="quickstart-title"
+      >
+        <div class="section-heading">
+          <h2 id="quickstart-title">Get a useful report before you add services.</h2>
+          <p>
+            Build the checkout, then measure its code. The first complexity report needs no account,
+            index, embedding model or running service.
+          </p>
+        </div>
+        <div class="quickstart-layout">
+          <div class="install-flow">
+            <p class="setup-prerequisites">
+              On Linux or macOS, use Node.js 22 (22.13+) or 24+ and pnpm 10.34.5. The
+              <span>npm package is not published yet</span>; use the
+              <a href="https://github.com/lboel/untangle">Untangle repository</a>. Repository access
+              is required until the public launch. For a new checkout:
+            </p>
+            <div class="command-block">
+              <div class="command-heading">
+                <span>Try Untangle on itself.</span>
+                <button type="button" class="copy-command" data-copy-command="setup-command" hidden>
+                  Copy commands
+                </button>
+              </div>
+              <pre
+                tabindex="0"
+                role="region"
+                aria-label="Repository setup commands"
+              ><code id="setup-command"><span>git clone https://github.com/lboel/untangle.git</span>
+<span>cd untangle</span>
+<span>pnpm setup:local</span>
+<span>UNTANGLE_CLI="$PWD/apps/cli/dist/index.js"</span>
+<span>untangle() { node "$UNTANGLE_CLI" "$@"; }</span></code></pre>
+            </div>
+            <p class="copy-status" id="copy-announcement" role="status" aria-live="polite"></p>
+            <p class="install-note">
+              <code>setup:local</code> installs the locked dependencies, builds the workspace and
+              prints the first complexity report. It also prints absolute CLI commands and MCP
+              configuration. The shell function makes the later examples work in this terminal.
+            </p>
+            <details class="measurement-details">
+              <summary>Prefer the individual build commands?</summary>
+              <pre
+                class="inline-command"
+                tabindex="0"
+                role="region"
+                aria-label="Manual repository build"
+              ><code>pnpm install --frozen-lockfile
+pnpm run build
+node apps/cli/dist/index.js complexity</code></pre>
+              <p>
+                Use <code>pnpm setup:local --skip-build</code> after a build you already trust, or
+                <code>pnpm setup:local --dry-run</code> to inspect the plan without executing it.
+              </p>
+            </details>
+          </div>
+          <div class="first-report">
+            <h3>See the scope behind the numbers.</h3>
+            <p>
+              The report lists complexity hotspots, source locations and analysis coverage. Give the
+              structured output to an agent to choose a bounded responsibility to inspect.
+            </p>
+            <pre
+              class="inline-command"
+              tabindex="0"
+              role="region"
+              aria-label="Structured complexity report"
+            ><code>untangle complexity --format=json</code></pre>
+            <details class="measurement-details">
+              <summary>Analyze your own repository</summary>
+              <p>
+                The shell function above works in the same terminal. Replace
+                <code>/path/to/your/project</code> before running these commands:
+              </p>
+              <pre
+                class="inline-command"
+                tabindex="0"
+                role="region"
+                aria-label="Analyze another repository"
+              ><code>cd /path/to/your/project
+untangle complexity
+untangle init --offline --dry-run</code></pre>
+              <p>
+                The analysis reads your sources. The initialization command previews configuration;
+                omit <code>--dry-run</code> only when you want to write it.
+              </p>
+            </details>
+          </div>
+        </div>
+        <p class="section-note">
+          Next, <a href="#start">connect a file to its feature</a> or
+          <a href="#mcp">add indexed search and your agent host</a>. No service setup is needed for
+          code or declared feature analysis.
+        </p>
+      </section>
+
+      <section class="start-section shell" id="start" aria-labelledby="start-title">
+        <div class="section-heading">
+          <h2 id="start-title">Connect the requirement to the feature it serves.</h2>
+          <p>
+            Start with an existing specification and a declared feature map, or a file from a search
+            result. See the full feature scope, tests, owners and missing evidence in one local
+            report.
+          </p>
+        </div>
+        <div class="start-paths">
+          <div>
+            <h3>With a specification and feature map</h3>
+            <p>
+              Select a file with <code>--path</code>. Untangle returns every matching declaration
+              and measures the whole feature, including its helpers and shared implementation.
+            </p>
+            <pre
+              class="inline-command"
+              tabindex="0"
+              role="region"
+              aria-label="Inspect a file's declared features"
+            ><code>untangle product --path=src/accounts/lookup.ts \
+  --format=json</code></pre>
+          </div>
+          <div>
+            <h3>Without a specification</h3>
+            <p>
+              Choose a feature identifier and a real source file. Preview a minimal declaration,
+              then review its boundaries and add the intent, tests and ownership you can establish.
+            </p>
+            <pre
+              class="inline-command"
+              tabindex="0"
+              role="region"
+              aria-label="Preview a new feature declaration"
+            ><code>untangle product --draft --feature=accounts.lookup \
+  --path=src/accounts/lookup.ts --format=json</code></pre>
+            <p>
+              When no manifest exists, <code>--draft</code> prints a review draft to stdout. It
+              writes no feature map and invents no owners, requirements or test coverage. After
+              review, save the returned <code>draft</code> object as
+              <code>untangle.features.json</code>; the full report is not the manifest.
+            </p>
+          </div>
+        </div>
+        <p class="section-note">
+          Run these examples from your project after the local setup above. Replace
+          <code>src/accounts/lookup.ts</code> with a real repository-relative file and choose your
+          own feature identifier. An existing <code>untangle.features.json</code> is read by
+          default; use <code>--manifest=PATH</code> for another file.
+        </p>
+        <details class="measurement-details">
+          <summary>Attach a real test run to the feature report</summary>
+          <p>
+            If your project uses Vitest, explicitly run its tests and capture the original results
+            against the before/after source inventory. Replace the test path with your own:
+          </p>
+          <pre
+            class="inline-command"
+            tabindex="0"
+            role="region"
+            aria-label="Run feature tests with source-bound evidence"
+          ><code>untangle product --path=src/accounts/lookup.ts \
+  --run-tests -- pnpm exec vitest run src/accounts/lookup.test.ts</code></pre>
+          <p>
+            The command runs without a shell. Failures, skipped tests and sources changed during
+            execution remain visible. Declared test files alone do not count as passed tests.
+          </p>
+        </details>
+        <details class="measurement-details">
+          <summary>Initialize with an existing vision or specification</summary>
+          <p>
+            <code>untangle init</code> detects languages, workspaces, ignore rules and local
+            context, then prepares a reviewable configuration. The document and map paths below must
+            already exist in your project:
+          </p>
+          <pre
+            class="inline-command"
+            tabindex="0"
+            role="region"
+            aria-label="Preview initialization with a specification"
+          ><code>untangle init --offline --dry-run \
+  --vision=docs/vision.md --spec=docs/spec.md \
+  --feature-map=untangle.features.json</code></pre>
+          <p>
+            Preview with <code>--dry-run</code>, then omit it to write the configuration.
+            <code>--offline</code> skips service probes. Initialization does not invent a spec,
+            assign owners or start recording searches.
+          </p>
+        </details>
+      </section>
+
+      <section class="measurement-section" id="measurement" aria-labelledby="measurement-title">
+        <div class="shell">
+          <div class="section-heading section-heading--measurement">
+            <div>
+              <h2 id="measurement-title">Three layers of complexity.</h2>
+            </div>
+            <p>
+              From individual functions to the features they support and the effort it takes an
+              agent to find them.
+            </p>
+          </div>
+
+          <ul class="measurement-layers">
+            <li id="repository-complexity">
+              <div>
+                <h3>Repository complexity</h3>
+                <p>
+                  Analyze cognitive and cyclomatic complexity, inspect dependencies and call paths,
+                  and find the hotspots behind a coding task.
+                </p>
+              </div>
+              <p class="layer-scope">
+                AST metrics, file and symbol graphs. Results state their scope and coverage.
+              </p>
+            </li>
+            <li class="layer-featured" id="feature-complexity">
+              <div>
+                <h3>Complexity per feature</h3>
+                <p>
+                  Connect vision and specifications to declared features, code, tests and ownership.
+                  See how much complexity each feature carries, where code is shared and which
+                  evidence is missing.
+                </p>
+              </div>
+              <p class="layer-scope">
+                Feature reports, complexity budgets and actionable hints for agents.
+              </p>
+            </li>
+            <li id="search-monitoring">
+              <div>
+                <h3>Search-based monitoring</h3>
+                <p>
+                  Record real search journeys: queries, candidates, navigation and a confirmed
+                  target. Compare search effort alongside the complexity of the code found.
+                </p>
+              </div>
+              <p class="layer-scope">
+                Local lexical, symbol, semantic and hybrid search. Recording is opt-in.
+              </p>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section
+        class="capabilities-section shell"
+        id="capabilities"
+        aria-labelledby="capabilities-title"
+      >
+        <div class="section-heading">
+          <h2 id="capabilities-title">Evidence for spec-driven agent work.</h2>
+          <p>
+            Use your existing specification and agent host. Untangle provides implementation
+            context, feature reports and search evidence for a coding task. Missing links and
+            unverified requirements remain visible.
+          </p>
+        </div>
+        <p class="table-scroll-note" id="capability-scroll-note">
+          Scroll the table horizontally to read each interface. With a keyboard, focus the table and
+          use the arrow keys.
+        </p>
+        <div
+          class="capability-table-wrap"
+          tabindex="0"
+          role="region"
+          aria-label="Coding capabilities and interfaces"
+          aria-describedby="capability-scroll-note"
+        >
+          <table class="capability-table">
+            <thead>
+              <tr>
+                <th scope="col">Task</th>
+                <th scope="col">What Untangle provides</th>
+                <th scope="col">Interface</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">Find the implementation</th>
+                <td>
+                  Independent lexical, symbol, semantic and hybrid search across indexed code and
+                  documentation. Freshness checks, ranking explanations and linked graph context.
+                </td>
+                <td><code>query</code><br /><code>untangle_search</code> in MCP</td>
+              </tr>
+              <tr>
+                <th scope="row">Follow the change</th>
+                <td>
+                  File and symbol dependencies, callers, call paths, cycles and the surrounding
+                  impact of a change.
+                </td>
+                <td><code>graph</code><br /><code>flow</code></td>
+              </tr>
+              <tr>
+                <th scope="row">Measure the code</th>
+                <td>
+                  Cognitive and cyclomatic complexity, function hotspots and scoped totals.
+                  Configurable thresholds make excessive complexity visible to agents and CI.
+                </td>
+                <td><code>complexity</code></td>
+              </tr>
+              <tr>
+                <th scope="row">Keep the view current</th>
+                <td>
+                  Metric deltas as files change. Incremental indexing with
+                  <code>watch --index</code>; <code>query --require-fresh</code> rejects stale
+                  indexed state.
+                </td>
+                <td><code>watch</code><br /><code>index</code></td>
+              </tr>
+              <tr>
+                <th scope="row">Assess the whole feature</th>
+                <td>
+                  Declared code and test scope, complexity budgets, shared implementation, ownership
+                  links and missing evidence, selected directly from a search result's file path.
+                  Source-bound test runs and next actions for agents.
+                </td>
+                <td><code>product</code><br /><code>untangle_product</code> in MCP</td>
+              </tr>
+              <tr>
+                <th scope="row">Bring your analyzers</th>
+                <td>
+                  Local complexity and enabled extension results in one report. Each measurement
+                  retains its provider, meaning and run status.
+                </td>
+                <td><code>scan</code></td>
+              </tr>
+              <tr>
+                <th scope="row">Learn from agent searches</th>
+                <td>
+                  Opt-in, task-scoped Search Journeys with linked searches, reported navigation,
+                  confirmed targets, abandoned tasks and caller-declared model, harness and strategy
+                  context. Optional feature attribution connects the task to its scope.
+                </td>
+                <td><code>untangle_search_session</code> in MCP</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="section-note">
+          Analysis commands support structured output; available MCP tools expose the same local
+          evidence to agent hosts. Language and parser coverage are reported explicitly. Lexical and
+          symbol search do not require an embedding service.
+        </p>
+        <details class="measurement-details command-examples">
+          <summary>Try the workflow on a coding task</summary>
+          <pre
+            class="inline-command"
+            tabindex="0"
+            role="region"
+            aria-label="Coding task commands"
+          ><code>untangle query "where is payment retried?" \
+  --require-fresh --linked --context --explain
+untangle complexity --max-cognitive=15 --format=json
+untangle product --path=src/payments/retry.ts --format=json
+untangle watch --index</code></pre>
+          <p>
+            Example task and source path. Replace them with your own; the source path must be
+            covered by a feature declaration. Indexed search and watch need the services described
+            in the <a href="#mcp">optional search setup</a>.
+          </p>
+        </details>
+
+        <div class="extension-layout" id="extensions">
+          <div>
+            <h3>Connect the analyzers you use.</h3>
+            <p>
+              Add Sentrux, SonarQube or another analyzer through an explicit extension manifest.
+              Untangle provides the common harness: invoke configured providers, collect their
+              evidence and report what ran, failed or was not measured.
+            </p>
+            <p>
+              Install and configure each provider first. Extensions can use a binary, container or
+              HTTP endpoint; they are enabled explicitly by the operator. Provider manifests are
+              installed separately.
+            </p>
+            <pre
+              class="inline-command"
+              tabindex="0"
+              role="region"
+              aria-label="Analyzer extension commands"
+            ><code>untangle extensions list --format=json
+untangle scan --feature=accounts.lookup --format=json</code></pre>
+            <p>
+              Use your declared feature identifier. File-scoped findings can be related to its
+              declared files; repository-wide values remain repository context.
+            </p>
+          </div>
+          <dl class="extension-providers">
+            <div>
+              <dt>Sentrux</dt>
+              <dd>Collect metrics from a configured binary provider.</dd>
+            </div>
+            <div>
+              <dt>SonarQube</dt>
+              <dd>
+                Read existing project measures from a configured server. This does not trigger a new
+                Sonar scan.
+              </dd>
+            </div>
+            <div>
+              <dt>Your analyzer</dt>
+              <dd>
+                Use SARIF, JUnit XML, generic findings or generic metrics through the extension
+                runtime.
+              </dd>
+            </div>
+          </dl>
+        </div>
+        <p class="section-note">
+          All providers support the same goal: reduce complexity. External measures retain their
+          definitions alongside Untangle's own metrics. Provider failures and missing coverage stay
+          visible; a collected report alone does not mean every analyzer passed.
+        </p>
+      </section>
+
+      <section class="probe-section shell" id="feature-probe" aria-labelledby="probe-title">
+        <div class="section-heading section-heading--probe">
+          <div>
+            <h2 id="probe-title">Keep complexity visible for every feature.</h2>
+          </div>
+          <p>
+            A spec-driven task rarely fits in one function. Untangle follows your declared feature
+            map across its code, tests and responsibilities, so an agent can assess the whole scope
+            of a change.
+          </p>
+        </div>
+
+        <div class="probe-instrument">
+          <ol
+            class="feature-map"
+            aria-label="Example declared feature map from vision to ownership"
+          >
+            <li><strong>Vision &amp; spec</strong><span>What profile cards should do</span></li>
+            <li>
+              <strong>Feature</strong><span><code>profile-cards</code></span>
+            </li>
+            <li>
+              <strong>Code</strong><span><code>ProfileCard.tsx</code></span>
+            </li>
+            <li>
+              <strong>Tests</strong><span><code>ProfileCard.test.tsx</code></span>
+            </li>
+            <li><strong>Ownership</strong><span>Declared frontend maintainer</span></li>
+          </ol>
+          <p class="feature-map-caption">
+            Illustrative mapping. Your manifest defines the feature boundaries and owners.
+          </p>
+
+          <div class="evidence-pair">
+            <section class="evidence-axis" aria-labelledby="feature-metrics-title">
+              <div class="axis-heading">
+                <h3 id="feature-metrics-title">What the feature costs in code</h3>
+              </div>
+              <ul class="axis-signals" aria-label="Feature complexity report contents">
+                <li>Code and test metrics reported separately</li>
+                <li>Cognitive and cyclomatic complexity, with metric scope</li>
+                <li>Shared files, declared feature dependencies and unmapped code</li>
+                <li>Threshold violations and next actions for agents</li>
+              </ul>
+            </section>
+            <section
+              class="evidence-axis evidence-axis--code"
+              aria-labelledby="feature-evidence-title"
+            >
+              <div class="axis-heading">
+                <h3 id="feature-evidence-title">What supports the feature</h3>
+              </div>
+              <ul class="axis-signals" aria-label="Feature evidence report contents">
+                <li>References to vision and specification</li>
+                <li>Selected code and test files</li>
+                <li>Supplied test results tied to the current source</li>
+                <li>Declared owners and missing or unverified links</li>
+              </ul>
+            </section>
+          </div>
+          <div class="probe-guardrail">
+            <p>
+              Set complexity budgets per feature. As functionality grows, the report shows where its
+              implementation exceeds those limits and needs attention.
+            </p>
+            <p>
+              The report checks the declared mapping and its evidence. It does not independently
+              certify feature behavior or ownership.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="search-signals-section shell"
+        id="search-signals"
+        aria-labelledby="search-signals-title"
+      >
+        <div class="section-heading">
+          <h2 id="search-signals-title">Let real searches guide the next improvement.</h2>
+          <p>
+            Keep local journey records and revisit comparable tasks as the repository changes. Use
+            recurring search difficulties to decide where code, documentation or feature boundaries
+            need a closer look.
+          </p>
+        </div>
+        <dl class="search-signals">
+          <div>
+            <dt>Repeated query reformulation</dt>
+            <dd>Investigate names that differ between the product, documentation and code.</dd>
+          </div>
+          <div>
+            <dt>Many plausible candidates</dt>
+            <dd>
+              Investigate overlapping responsibilities or feature boundaries that are hard to
+              distinguish.
+            </dd>
+          </div>
+          <div>
+            <dt>Long navigation paths</dt>
+            <dd>
+              Investigate scattered implementation, difficult dependencies or unclear ownership.
+            </dd>
+          </div>
+          <div>
+            <dt>A direct route to the confirmed target</dt>
+            <dd>
+              A useful signal of findable structure. Read it alongside complexity and feature
+              evidence.
+            </dd>
+          </div>
+        </dl>
+        <p class="section-note">
+          Start a session explicitly, link the agent's searches and confirm the target. These
+          patterns are hypotheses to investigate, not automatic diagnoses. Index coverage, agent
+          context and search strategy can also explain the effort. Recording begins when the host
+          opts in, not when you run <code>init</code>.
+        </p>
+      </section>
+
+      <section class="journey-section" id="journey" aria-labelledby="journey-title">
+        <div class="shell">
+          <div class="section-heading section-heading--journey">
+            <div>
+              <h2 id="journey-title">Easy to find is a signal of clear structure.</h2>
+            </div>
+            <p>
+              When your agent finds the code it needs, that is a useful signal. Repeated, comparable
+              searches show how consistently it can reach the right implementation.
+            </p>
+          </div>
+
+          <div class="journey-instrument">
+            <div class="journey-toolbar">
+              <div class="journey-tabs" role="tablist" aria-label="Search Journey scenario">
+                <button
+                  id="tab-clear"
+                  type="button"
+                  role="tab"
+                  aria-selected="true"
+                  aria-controls="scenario-clear"
+                  data-journey-tab="clear"
+                >
+                  Clear route
+                </button>
+                <button
+                  id="tab-tangled"
+                  type="button"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="scenario-tangled"
+                  data-journey-tab="tangled"
+                  tabindex="-1"
+                >
+                  Tangled route
+                </button>
+              </div>
+              <p class="instrument-disclaimer">Illustrative journey · not benchmark data</p>
+            </div>
+
+            <noscript>
+              <p class="noscript-note">
+                JavaScript is off, so both routes are shown in full instead of using the comparison
+                tabs.
+              </p>
+            </noscript>
+
+            <p class="visually-hidden" id="journey-announcement" aria-live="polite"></p>
+
+            <article
+              class="journey-scenario"
+              id="scenario-clear"
+              role="tabpanel"
+              tabindex="0"
+              aria-labelledby="tab-clear"
+              data-journey-panel="clear"
+            >
+              <header class="scenario-header">
+                <div>
+                  <p class="route-state"><span aria-hidden="true"></span> Direct hit</p>
+                  <h3>Clear route</h3>
+                </div>
+                <p>A feature name leads directly to the relevant component.</p>
+              </header>
+
+              <ol class="route route--clear" aria-label="Clear Search Journey steps">
+                <li>
+                  <span class="route-marker" aria-hidden="true">1</span>
+                  <p class="route-label">Intent</p>
+                  <strong>Improve profile cards</strong>
+                  <small>User request</small>
+                </li>
+                <li>
+                  <span class="route-marker" aria-hidden="true">2</span>
+                  <p class="route-label">Search 01</p>
+                  <strong>profile card component</strong>
+                  <small>6 candidates returned</small>
+                </li>
+                <li class="route-target">
+                  <span class="route-marker" aria-hidden="true">3</span>
+                  <p class="route-label">Confirmed target</p>
+                  <strong><code>ProfileCard.tsx</code></strong>
+                  <small>Returned at rank 1</small>
+                </li>
+              </ol>
+
+              <dl class="journey-metrics" aria-label="Clear route indicators">
+                <div>
+                  <dt>Searches</dt>
+                  <dd>1</dd>
+                </div>
+                <div>
+                  <dt>Candidates</dt>
+                  <dd>6</dd>
+                </div>
+                <div>
+                  <dt>Observed hops</dt>
+                  <dd>1</dd>
+                </div>
+                <div>
+                  <dt>Target rank</dt>
+                  <dd>#1</dd>
+                </div>
+              </dl>
+            </article>
+
+            <article
+              class="journey-scenario"
+              id="scenario-tangled"
+              role="tabpanel"
+              tabindex="0"
+              aria-labelledby="tab-tangled"
+              data-journey-panel="tangled"
+            >
+              <header class="scenario-header">
+                <div>
+                  <p class="route-state route-state--tangled">
+                    <span aria-hidden="true"></span> High search effort
+                  </p>
+                  <h3>Tangled route</h3>
+                </div>
+                <p>The same feature has different names across several parts of the repository.</p>
+              </header>
+
+              <ol class="route route--tangled" aria-label="Tangled Search Journey steps">
+                <li>
+                  <span class="route-marker" aria-hidden="true">1</span>
+                  <p class="route-label">Intent</p>
+                  <strong>Improve profile cards</strong>
+                  <small>User request</small>
+                </li>
+                <li>
+                  <span class="route-marker" aria-hidden="true">2</span>
+                  <p class="route-label">Search 01</p>
+                  <strong>profile display</strong>
+                  <small>42 candidates</small>
+                </li>
+                <li>
+                  <span class="route-marker" aria-hidden="true">3</span>
+                  <p class="route-label">Search 02 · reformulated</p>
+                  <strong>account card UI</strong>
+                  <small>31 candidates</small>
+                </li>
+                <li>
+                  <span class="route-marker" aria-hidden="true">4</span>
+                  <p class="route-label">Navigate</p>
+                  <strong>settings → shared → UI</strong>
+                  <small>2 reported navigation events</small>
+                </li>
+                <li>
+                  <span class="route-marker" aria-hidden="true">5</span>
+                  <p class="route-label">Search 03</p>
+                  <strong>UserCard container</strong>
+                  <small>23 candidates</small>
+                </li>
+                <li class="route-target">
+                  <span class="route-marker" aria-hidden="true">6</span>
+                  <p class="route-label">Confirmed target</p>
+                  <strong><code>ProfileCard.tsx</code></strong>
+                  <small>Returned at rank 7</small>
+                </li>
+              </ol>
+
+              <dl class="journey-metrics" aria-label="Tangled route indicators">
+                <div>
+                  <dt>Searches</dt>
+                  <dd>3</dd>
+                </div>
+                <div>
+                  <dt>Candidates</dt>
+                  <dd>96</dd>
+                </div>
+                <div>
+                  <dt>Observed hops</dt>
+                  <dd>5</dd>
+                </div>
+                <div>
+                  <dt>Target rank</dt>
+                  <dd>#7</dd>
+                </div>
+              </dl>
+            </article>
+          </div>
+          <p class="journey-note">
+            Explicitly confirmed targets close each search journey. Observed hops are counted
+            searches plus explicitly reported navigation events. Compare journeys with the same task
+            and measurement context.
+          </p>
+        </div>
+      </section>
+
+      <section class="method-section shell" id="method" aria-labelledby="method-title">
+        <div class="method-statement">
+          <h2 id="method-title">Read search effort alongside code complexity.</h2>
+        </div>
+        <div class="method-copy">
+          <p class="method-lead">
+            A small function can be hard to find. A large function can be easy to find. The two
+            measurements answer different questions.
+          </p>
+          <p>
+            Search effort and target-code complexity remain separate; they are never combined into
+            one score. Embeddings help retrieve code. They do not measure its complexity.
+          </p>
+          <details class="measurement-details">
+            <summary>What makes search journeys comparable?</summary>
+            <p>
+              Untangle records the ranking configuration, embedding profile, index generation and
+              immutable corpus revision. The caller can declare its agent model, harness, strategy,
+              task class, task mix and prior context; reports keep differing contexts in separate
+              cohorts. This context is declared, not independently verified. Legacy journeys with
+              incomplete context stay visible, but cannot establish a reliable comparison. Current
+              reports summarize cohorts, including completed and abandoned tasks; built-in
+              time-series and before/after trend views are not available yet.
+            </p>
+          </details>
+          <details class="measurement-details">
+            <summary>What is available in this release?</summary>
+            <p>
+              Repository analysis, declared feature reports and explicitly recorded Search Journeys
+              are available. Automatic feature detection, historical feature baselines and
+              autonomous refactoring remain planned. Missing parser coverage and unresolved graph
+              endpoints remain visible in reports.
+            </p>
+          </details>
+        </div>
+      </section>
+
+      <section class="privacy-section" id="privacy" aria-labelledby="privacy-title">
+        <div class="shell privacy-layout">
+          <div>
+            <h2 id="privacy-title">The default path stays local.</h2>
+            <p class="privacy-lead">
+              In the standard setup, code is processed by local or self-operated services; remote
+              endpoints are an explicit operator choice.
+            </p>
+          </div>
+          <ol class="privacy-rules">
+            <li>
+              <p>
+                <strong>Telemetry is off by default.</strong> A Search Journey starts explicitly.
+                Searches count only when the host links them to that session; navigation counts only
+                when the host or agent explicitly reports it.
+              </p>
+            </li>
+            <li>
+              <p>
+                <strong>Journey free text is opt-in.</strong><br />
+                Goals, queries and optional feature identifiers default to fingerprints generated
+                with workspace-local, domain-separated HMAC-SHA-256. Failed-search and free
+                abandonment details are omitted unless text retention was explicitly enabled. Source
+                chunks are never journey data.
+              </p>
+            </li>
+            <li>
+              <p>
+                <strong>Fingerprints are pseudonymous, not anonymous or encrypted.</strong> Metadata
+                still remains: locators, ranks, scores, explicit tool names and an optional
+                controlled abandonment reason code stay local even without text retention. The HMAC
+                key is stored separately, and someone with the complete local state can test
+                guesses. Journey files remain until the operator deliberately removes them.
+              </p>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="mcp-section shell" id="mcp" aria-labelledby="mcp-title">
+        <div class="mcp-intro">
+          <h2 id="mcp-title">Add search and your agent host when you need them.</h2>
+          <p>
+            Use the repository build for the CLI and MCP server. The npm package is not published
+            yet; a global install returns <code>E404</code>. Direct code and feature analysis run
+            without an index. Connect your host to those reports first; add indexed search when it
+            serves the task. Tools that are not available return <code>FEATURE_UNAVAILABLE</code>.
+          </p>
+        </div>
+
+        <div class="install-flow">
+          <p class="setup-prerequisites">
+            Use the absolute path to your built CLI and set the target project's root. MCP hosts
+            differ in configuration format; the stdio command stays the same.
+          </p>
+
+          <div class="mcp-wire">
+            <div>
+              <span class="wire-label">Local MCP command</span>
+              <code>node apps/cli/dist/index.js mcp --stdio</code>
+            </div>
+            <span class="wire-arrow" aria-hidden="true">→</span>
+            <div>
+              <span class="wire-label">Agent host</span>
+              <p>Point the host at an absolute path to the built CLI and set the workspace root.</p>
+            </div>
+          </div>
+
+          <details class="config-example">
+            <summary>Show a generic stdio configuration</summary>
+            <pre tabindex="0" role="region" aria-label="MCP stdio configuration"><code>{
+  "mcpServers": {
+    "untangle": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/untangle/apps/cli/dist/index.js",
+        "mcp",
+        "--stdio",
+        "--root=/absolute/path/to/project"
+      ]
+    }
+  }
+}</code></pre>
+          </details>
+          <details class="config-example">
+            <summary>Enable local indexed search</summary>
+            <p class="install-note">
+              Search needs Qdrant; service embeddings also need Ollama and the configured model.
+              <code>--embedder=offline</code> avoids Ollama. It uses deterministic vectors, without
+              language-model semantics; lexical and symbol search remain available.
+              <code>init</code> checks services; it does not start them or download models.
+            </p>
+            <pre
+              tabindex="0"
+              role="region"
+              aria-label="Enable indexed search after providing services"
+            ><code>untangle init
+untangle doctor
+untangle index
+untangle query "your coding task" --require-fresh</code></pre>
+            <p class="install-note">
+              Run from the target repository after providing the configured services. Inspect
+              <code>doctor</code> before indexing. Queries read the index; rebuild it or use
+              <code>watch --index</code> as sources change.
+            </p>
+          </details>
+          <p class="install-note">
+            Agents can hand a search result's <code>filePath</code> to
+            <code>untangle_product</code> as <code>path</code>. Start a Search Journey explicitly to
+            record search effort; an MCP connection alone starts no monitoring.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="shell">
+        <p><strong>Untangle</strong> · Repository complexity. Feature complexity. Search effort.</p>
+        <p>
+          Local CLI &amp; MCP · <a href="https://github.com/lboel/untangle">Repository</a> ·
+          <span>no analytics</span> · <a href="#privacy">Privacy</a>
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

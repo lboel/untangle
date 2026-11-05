@@ -1,0 +1,44 @@
+{
+  "path": "basic.py",
+  "source": "import os\nfrom .util import helper\n\n\nclass Greeter:\n    \"\"\"Greets people.\"\"\"\n\n    def __init__(self, name):\n        self.name = name\n\n    def greet(self, loud=False):\n        if loud or self.name == \"\":\n            return helper(self.name.upper())\n        return helper(self.name)\n\n\ndef make_greeter(name):\n    return Greeter(name)\n",
+  "expectedSymbols": [
+    {
+      "name": "Greeter",
+      "kind": "class",
+      "qualifiedName": "Greeter",
+      "exportedNames": ["Greeter"],
+      "hasDocRange": true
+    },
+    {
+      "name": "__init__",
+      "kind": "constructor",
+      "qualifiedName": "Greeter.__init__",
+      "normalizedSignature": "__init__(self, name)",
+      "exportedNames": []
+    },
+    {
+      "name": "greet",
+      "kind": "method",
+      "qualifiedName": "Greeter.greet",
+      "normalizedSignature": "greet(self, loud)",
+      "exportedNames": []
+    },
+    {
+      "name": "make_greeter",
+      "kind": "function",
+      "qualifiedName": "make_greeter",
+      "normalizedSignature": "make_greeter(name)",
+      "exportedNames": ["make_greeter"]
+    }
+  ],
+  "expectedImports": [
+    { "specifier": "os", "importKind": "import" },
+    { "specifier": ".util", "importKind": "import", "importedNames": ["helper"] }
+  ],
+  "expectedCalls": [
+    { "calleeName": "upper" },
+    { "calleeName": "helper" },
+    { "calleeName": "Greeter" }
+  ],
+  "expectedDecisionKinds": ["guard", "logical_or"]
+}

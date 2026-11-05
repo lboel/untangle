@@ -1,0 +1,51 @@
+# Beispielmanifest: ein SARIF-lieferndes Werkzeug, generisch formuliert.
+# Der Name des Werkzeugs ist eine Nutzerangabe; Untangle kennt nur das FORMAT.
+schemaVersion = 1
+id = "example-sast"
+displayName = "Example SAST Analyzer"
+category = "sast"
+invocation = ["binary"]
+languages = ["typescript", "python"]
+outputFormat = "sarif"
+networkAccess = "none"
+requiresLicenseAcknowledgment = false
+defaultRuleset = "curated/default"
+
+[binary]
+command = "example-sast"
+versionArgs = ["--version"]
+versionPattern = "([0-9]+\\.[0-9]+\\.[0-9]+)"
+minVersion = "1.4.0"
+analyzeArgs = ["scan", "--sarif", "--config", "{ruleset}", "{target}"]
+
+[resources]
+minMemoryMb = 256
+recommendedMemoryMb = 1024
+recommendedCpus = 2
+typicalStartupSeconds = 3
+
+[license]
+spdxId = "Apache-2.0"
+usageRestriction = "none"
+url = "https://example.invalid/license"
+
+[[rulesetSources]]
+ruleset = "curated/default"
+source = "registry"
+license = "Apache-2.0"
+usageRestriction = "none"
+
+[severityMapping]
+mappingVersion = "untangle-severity-map-v1"
+fallback = "medium"
+caseInsensitive = true
+rules = [
+  { from = "none", to = "info" },
+  { from = "note", to = "low" },
+  { from = "warning", to = "medium" },
+  { from = "error", to = "high" },
+]
+
+[telemetry]
+sendsTelemetry = false
+disabledByDefault = true

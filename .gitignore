@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+# Beiseite gelegter Ausgabebaum eines abgebrochenen `scripts/tsc-build.mjs`-Laufs.
+dist.prev/
+dist.build/
+.turbo/
+*.tsbuildinfo
+
+# Test coverage
+coverage/
+
+# Untangle local state (indexes, caches, locks) — never committed
+.untangle/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# OS cruft
+.DS_Store
+Thumbs.db
+
+# Editor state
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Local, unrecommended-for-commit repo config (spec.md §4.1)
+.untangle.local.json
+
+# Analyzer-Extensions sind NICHT Teil des Repositories (extensions.md X9).
+# Sie liegen im Nutzer-Datenverzeichnis und werden bewusst geladen.
+sonar-project.properties
+docker/extensions/
+.sentrux/
+
+# Local agent sessions can contain private project and conversation metadata.
+.helix/sessions/
+
+# Local scheduler lock, not project configuration.
+**/.claude/scheduled_tasks.lock

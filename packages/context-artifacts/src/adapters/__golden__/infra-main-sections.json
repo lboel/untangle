@@ -1,0 +1,46 @@
+[
+  {
+    "content": "variable \"region\" {\n  type    = string\n  default = \"eu-central-1\"\n}\n",
+    "kind": "terraform_variable",
+    "range": {
+      "endByte": 123,
+      "endLine": 5,
+      "startByte": 55,
+      "startLine": 2
+    },
+    "title": "region"
+  },
+  {
+    "content": "resource \"aws_s3_bucket\" \"data\" {\n  bucket = \"my-data-bucket\"\n  tags = {\n    Owner = \"platform\"\n  }\n}\n",
+    "kind": "terraform_resource",
+    "range": {
+      "endByte": 226,
+      "endLine": 12,
+      "startByte": 124,
+      "startLine": 7
+    },
+    "title": "aws_s3_bucket.data"
+  },
+  {
+    "content": "module \"network\" {\n  source = \"./modules/network\"\n  cidr   = \"10.0.0.0/16\"\n}\n",
+    "kind": "terraform_module",
+    "range": {
+      "endByte": 304,
+      "endLine": 17,
+      "startByte": 227,
+      "startLine": 14
+    },
+    "title": "network"
+  },
+  {
+    "content": "output \"bucket_arn\" {\n  value = aws_s3_bucket.data.arn\n}\n",
+    "kind": "terraform_output",
+    "range": {
+      "endByte": 362,
+      "endLine": 21,
+      "startByte": 305,
+      "startLine": 19
+    },
+    "title": "bucket_arn"
+  }
+]

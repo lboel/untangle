@@ -1,0 +1,47 @@
+{
+  "name": "@untangle-code/testkit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Untangle test infrastructure: in-memory port implementations, a deterministic embedder, a fixture builder, port-contract suites and retrieval-evaluation utilities. No network, no Docker, no Ollama.",
+  "license": "AGPL-3.0-only",
+  "homepage": "https://github.com/lboel/untangle",
+  "bugs": {
+    "url": "https://github.com/lboel/untangle/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lboel/untangle.git",
+    "directory": "packages/testkit"
+  },
+  "engines": {
+    "node": "^22.13.0 || >=24.0.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "eslint",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "node ../../scripts/tsc-build.mjs tsconfig.json",
+    "typecheck": "tsc -p tsconfig.typecheck.json",
+    "test": "vitest run",
+    "clean": "rm -rf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@untangle-code/domain": "workspace:*",
+    "vitest": "3.2.7"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.7",
+    "eslint": "9.39.5",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.69.0"
+  }
+}

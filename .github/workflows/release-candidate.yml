@@ -1,0 +1,52 @@
+name: Release candidate
+
+# Verifies original artifacts; publication is a separate protected operation.
+on:
+  push:
+    branches: ["release-candidate/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-candidate-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  candidate:
+    name: candidate (${{ matrix.os }}, node ${{ matrix.node-version }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        node-version: ["22.x", "24.x"]
+    steps:
+      - name: Checkout candidate source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: pnpm
+
+      - name: Verify all release gates with source-bound evidence
+        env:
+          RELEASE_EVIDENCE_DIR: ${{ runner.temp }}/untangle-release-evidence
+        run: node scripts/release-evidence.mjs --out-dir="$RELEASE_EVIDENCE_DIR"
+
+      - name: Preserve gate evidence, including failures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: untangle-candidate-${{ matrix.os }}-node-${{ matrix.node-version }}-attempt-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/untangle-release-evidence/
+          if-no-files-found: error
+          retention-days: 30
+          compression-level: 0

@@ -1,0 +1,60 @@
+# Untangle — Managed Local infrastructure (spec.md §3.1).
+#
+# Starts Qdrant and Ollama as Untangle-managed containers with persistent named
+# volumes. Both services bind ONLY to loopback (127.0.0.1) so they are never
+# reachable from other hosts on the network. Image tags are pinned; bump them
+# deliberately and record the change here.
+#
+# This file is optional: when `.untangle.json` configures external Qdrant/Ollama
+# endpoints (spec.md §3.2), Untangle never needs this compose file at all.
+
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.12.1
+    container_name: untangle-qdrant
+    restart: unless-stopped
+    ports:
+      # host:container — REST and gRPC, loopback-only.
+      - "127.0.0.1:16333:6333"
+      - "127.0.0.1:16334:6334"
+    volumes:
+      - untangle_qdrant_storage:/qdrant/storage
+    environment:
+      QDRANT__SERVICE__HTTP_PORT: "6333"
+      QDRANT__SERVICE__GRPC_PORT: "6334"
+      QDRANT__LOG_LEVEL: "INFO"
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'echo -n > /dev/tcp/127.0.0.1/6333' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    labels:
+      dev.untangle.managed: "true"
+      dev.untangle.service: "qdrant"
+
+  ollama:
+    image: ollama/ollama:0.5.4
+    container_name: untangle-ollama
+    restart: unless-stopped
+    ports:
+      # Host port 11435 so a natively installed Ollama on 11434 (spec.md §3.1,
+      # "Native Ollama probe") is never shadowed by the managed container.
+      - "127.0.0.1:11435:11434"
+    volumes:
+      - untangle_ollama_models:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'echo -n > /dev/tcp/127.0.0.1/11434' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    labels:
+      dev.untangle.managed: "true"
+      dev.untangle.service: "ollama"
+
+volumes:
+  untangle_qdrant_storage:
+    name: untangle_qdrant_storage
+  untangle_ollama_models:
+    name: untangle_ollama_models

@@ -1,0 +1,36 @@
+{
+  // Typecheck-only project: includes tests, emits nothing (mirrors the
+  // packages' own `tsconfig.typecheck.json`).
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": false,
+    "incremental": false,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "types": ["node"],
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false
+  },
+  "references": [
+    { "path": "../../packages/domain" },
+    { "path": "../../packages/file-graph" },
+    { "path": "../../packages/graph-explorer" },
+    { "path": "../../packages/config" },
+    { "path": "../../packages/observability" },
+    { "path": "../../packages/scanner" },
+    { "path": "../../packages/parser-registry" },
+    { "path": "../../packages/complexity" },
+    { "path": "../../packages/search" },
+    { "path": "../../packages/storage-qdrant" },
+    { "path": "../../packages/storage-local" },
+    { "path": "../../packages/embeddings-ollama" },
+    { "path": "../../packages/extension-runtime" },
+    { "path": "../../packages/chunker" },
+    { "path": "../../packages/jobs" },
+    { "path": "../../packages/symbol-graph" },
+    { "path": "../../packages/core" },
+    { "path": "../../packages/testkit" }
+  ],
+  "include": ["src/**/*.ts", "vitest.config.ts"]
+}

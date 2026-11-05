@@ -1,0 +1,30 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "tsBuildInfoFile": "tsconfig.tsbuildinfo",
+    "types": ["node"]
+  },
+  "references": [
+    { "path": "../../packages/domain" },
+    { "path": "../../packages/file-graph" },
+    { "path": "../../packages/graph-explorer" },
+    { "path": "../../packages/config" },
+    { "path": "../../packages/observability" },
+    { "path": "../../packages/scanner" },
+    { "path": "../../packages/parser-registry" },
+    { "path": "../../packages/complexity" },
+    { "path": "../../packages/search" },
+    { "path": "../../packages/storage-qdrant" },
+    { "path": "../../packages/storage-local" },
+    { "path": "../../packages/embeddings-ollama" },
+    { "path": "../../packages/extension-runtime" },
+    { "path": "../../packages/chunker" },
+    { "path": "../../packages/jobs" },
+    { "path": "../../packages/symbol-graph" },
+    { "path": "../../packages/core" }
+  ],
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.test.ts", "src/**/test-support.ts"]
+}

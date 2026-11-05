@@ -1,0 +1,65 @@
+{
+  "name": "@untangle-code/search",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "description": "Untangle retrieval core: hybrid search (dense + deterministic BM25 + exact symbol names) with reciprocal rank fusion, explainable score breakdowns, complexity/findability filters, grep mode and deterministic output formats (spec.md §13, vision.md §1b/§1d).",
+  "license": "AGPL-3.0-only",
+  "homepage": "https://github.com/lboel/untangle",
+  "bugs": {
+    "url": "https://github.com/lboel/untangle/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lboel/untangle.git",
+    "directory": "packages/search"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": "^22.13.0 || >=24.0.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.test.*",
+    "!dist/**/test-helpers.*",
+    "!dist/**/test-support.*",
+    "!dist/**/test-support/**",
+    "!dist/**/testing/**",
+    "!dist/**/__tests__/**",
+    "src",
+    "!src/**/*.test.ts",
+    "!src/**/test-helpers.ts",
+    "!src/**/test-support.ts",
+    "!src/**/test-support/**",
+    "!src/**/testing/**",
+    "LICENSE",
+    "NOTICE",
+    "README.md",
+    "THIRD_PARTY_LICENSES.md"
+  ],
+  "scripts": {
+    "prepack": "node ../../scripts/prepack-guard.mjs",
+    "build": "node ../../scripts/tsc-build.mjs tsconfig.json",
+    "typecheck": "tsc -p tsconfig.typecheck.json",
+    "test": "vitest run",
+    "clean": "rm -rf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@untangle-code/config": "workspace:*",
+    "@untangle-code/domain": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.7",
+    "@untangle-code/testkit": "workspace:*",
+    "typescript": "5.9.3",
+    "vitest": "3.2.7"
+  }
+}

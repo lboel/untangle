@@ -1,0 +1,356 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://untangle.dev/schema/config-v1.json",
+  "title": "Untangle Configuration v1",
+  "description": "JSON Schema for .untangle.json / .untangle.local.json (spec.md §4.2-4.8, product.md §11, portfolio.md §14.4). This schema is hand-authored for editor tooling (autocompletion, structural hints); it deliberately does NOT encode the 'unknown top-level field warns instead of failing' rule from spec.md §4.8 -- that rule is enforced by @untangle-code/config's own validator, not by schema validation, so additionalProperties:false here is advisory for tooling only.",
+  "type": "object",
+  "required": ["schemaVersion"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 1 },
+    "workspaceId": { "type": "string", "minLength": 1 },
+    "projectId": { "type": "string", "minLength": 1 },
+    "repositories": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/repositoryConfig" }
+    },
+    "qdrant": { "$ref": "#/$defs/qdrantConfig" },
+    "embeddings": { "$ref": "#/$defs/embeddingConfig" },
+    "index": { "$ref": "#/$defs/indexConfig" },
+    "search": { "$ref": "#/$defs/searchConfig" },
+    "graph": { "$ref": "#/$defs/graphConfig" },
+    "complexity": { "$ref": "#/$defs/complexityConfig" },
+    "changes": { "$ref": "#/$defs/changeConfig" },
+    "qualityGate": { "$ref": "#/$defs/qualityGateConfig" },
+    "contextArtifacts": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/contextArtifactConfig" }
+    },
+    "telemetry": { "$ref": "#/$defs/telemetryConfig" },
+    "portfolio": { "$ref": "#/$defs/portfolioConfig" }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "repositoryConfig": {
+      "type": "object",
+      "description": "spec.md §4.3",
+      "required": ["id", "path"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "minLength": 1 },
+        "label": { "type": "string" },
+        "ref": { "type": "string" },
+        "include": { "type": "array", "items": { "type": "string" } },
+        "exclude": { "type": "array", "items": { "type": "string" } },
+        "packageAliases": { "type": "object", "additionalProperties": { "type": "string" } },
+        "metadata": { "type": "object", "additionalProperties": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "qdrantConfig": {
+      "type": "object",
+      "description": "spec.md §4.4",
+      "required": ["mode"],
+      "properties": {
+        "mode": { "enum": ["managed", "external"] },
+        "url": { "type": "string" },
+        "apiKeyEnv": {
+          "type": "string",
+          "description": "Name of an environment variable; never the key itself (architecture.md §23.2)."
+        },
+        "collectionPrefix": { "type": "string" },
+        "requestTimeoutMs": { "type": "integer", "minimum": 1 },
+        "maxRetries": { "type": "integer", "minimum": 0 },
+        "upsertMaxPoints": { "type": "integer", "minimum": 1 },
+        "upsertBudgetBytes": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "embeddingConfig": {
+      "type": "object",
+      "description": "spec.md §4.5",
+      "required": [
+        "provider",
+        "mode",
+        "model",
+        "dimensions",
+        "contextLength",
+        "queryPrefix",
+        "documentPrefix",
+        "includePath",
+        "batchSize",
+        "maxConnections",
+        "requestTimeoutMs"
+      ],
+      "properties": {
+        "provider": { "const": "ollama" },
+        "mode": { "enum": ["auto", "managed", "external"] },
+        "url": { "type": "string" },
+        "apiKeyEnv": {
+          "type": "string",
+          "description": "Name of an environment variable; never the key itself (architecture.md §23.2)."
+        },
+        "model": { "type": "string", "minLength": 1 },
+        "dimensions": { "type": "integer", "minimum": 1 },
+        "contextLength": { "type": "integer", "minimum": 1 },
+        "queryPrefix": { "type": "string" },
+        "documentPrefix": { "type": "string" },
+        "includePath": { "type": "boolean" },
+        "batchSize": { "type": "integer", "minimum": 1 },
+        "maxConnections": { "type": "integer", "minimum": 1 },
+        "requestTimeoutMs": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "indexConfig": {
+      "type": "object",
+      "description": "spec.md §4.6",
+      "properties": {
+        "watch": { "type": "boolean" },
+        "reconcileIntervalMinutes": { "type": "number", "minimum": 0 },
+        "maxFileSizeMb": { "type": "number", "minimum": 0 },
+        "maxGraphFileSizeMb": { "type": "number", "minimum": 0 },
+        "scanConcurrency": { "type": "integer", "minimum": 1 },
+        "embeddingConcurrency": { "type": "integer", "minimum": 1 },
+        "filesPerCheckpoint": { "type": "integer", "minimum": 1 },
+        "targetChunkTokens": { "type": "integer", "minimum": 1 },
+        "maxChunkTokens": { "type": "integer", "minimum": 1 },
+        "fallbackOverlapTokens": { "type": "integer", "minimum": 0 },
+        "includeDotFiles": { "type": "boolean" },
+        "indexExtensionless": { "type": "boolean" },
+        "extraExtensions": { "type": "array", "items": { "type": "string" } },
+        "extensionLanguageMap": { "type": "object", "additionalProperties": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "searchConfig": {
+      "type": "object",
+      "description": "Untangle decision: spec.md §13 names no SearchConfig shape.",
+      "properties": {
+        "defaultLimit": { "type": "integer", "minimum": 1 },
+        "defaultCandidateLimit": { "type": "integer", "minimum": 1 },
+        "maxCandidateLimit": { "type": "integer", "minimum": 1 },
+        "diversifyByDefault": { "type": "boolean" },
+        "minScoreDefault": { "type": "number" },
+        "relevancePolicies": {
+          "type": "object",
+          "description": "Calibrated absence decisions keyed by the exact embedding profile id and additionally bound to one workspace and collection.",
+          "propertyNames": { "type": "string", "minLength": 1 },
+          "additionalProperties": { "$ref": "#/$defs/searchRelevancePolicyBinding" }
+        },
+        "boostWeights": {
+          "type": "object",
+          "properties": {
+            "exactSymbol": { "type": "number" },
+            "exactPath": { "type": "number" },
+            "repoPriority": { "type": "number" },
+            "graphProximity": { "type": "number" },
+            "recency": { "type": "number" },
+            "duplicatePenalty": { "type": "number" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "searchRelevancePolicyBinding": {
+      "type": "object",
+      "required": ["workspaceId", "collection", "policy"],
+      "properties": {
+        "workspaceId": { "type": "string", "minLength": 1 },
+        "collection": { "type": "string", "minLength": 1 },
+        "policy": { "$ref": "#/$defs/searchRelevancePolicy" }
+      },
+      "additionalProperties": false
+    },
+    "searchRelevancePolicy": {
+      "type": "object",
+      "required": [
+        "calibrationId",
+        "minimumDenseScore",
+        "minimumDenseSpread",
+        "denseReferenceRank",
+        "minimumCandidateIdfCoverage"
+      ],
+      "properties": {
+        "calibrationId": { "type": "string", "minLength": 1 },
+        "minimumDenseScore": { "type": "number", "minimum": -1, "maximum": 1 },
+        "minimumDenseSpread": { "type": "number", "minimum": 0, "maximum": 2 },
+        "denseReferenceRank": { "type": "integer", "minimum": 2 },
+        "minimumCandidateIdfCoverage": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "graphConfig": {
+      "type": "object",
+      "description": "Untangle decision, values anchored on architecture.md §17.4 traversal limits.",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "maxTraversalDepth": { "type": "integer", "minimum": 1 },
+        "maxTraversalNodes": { "type": "integer", "minimum": 1 },
+        "maxTraversalEdges": { "type": "integer", "minimum": 1 },
+        "maxTraversalWallTimeMs": { "type": "integer", "minimum": 1 },
+        "includeDynamicImports": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "complexityConfig": {
+      "type": "object",
+      "description": "Untangle decision; product.md §11 example anchors 'enabled'/'cognitiveAlgorithm'.",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "cognitiveAlgorithm": { "type": "string" },
+        "cyclomaticVariant": { "enum": ["classic", "extended", "both"] },
+        "maintainabilityIndexEnabled": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "changeConfig": {
+      "type": "object",
+      "description": "Untangle decision; weight defaults from spec.md §17.6.",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "riskWeights": {
+          "type": "object",
+          "properties": {
+            "churn": { "type": "number" },
+            "positiveCognitiveDelta": { "type": "number" },
+            "positiveCyclomaticDelta": { "type": "number" },
+            "blastRadius": { "type": "number" },
+            "graphCentrality": { "type": "number" },
+            "semanticChange": { "type": "number" },
+            "testDistance": { "type": "number" }
+          },
+          "additionalProperties": false
+        },
+        "symbolMatching": {
+          "type": "object",
+          "properties": {
+            "tokenSimilarityMin": { "type": "number", "minimum": 0, "maximum": 1 },
+            "enableEmbeddingSimilarity": { "type": "boolean" }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "qualityGateConfig": {
+      "type": "object",
+      "description": "spec.md §4.7",
+      "required": ["mode", "newCyclesAllowed", "minimumParseQuality", "ignoreExistingViolations"],
+      "properties": {
+        "mode": { "enum": ["off", "warn", "fail"] },
+        "newCyclesAllowed": { "type": "integer", "minimum": 0 },
+        "cognitivePerSymbolMax": { "type": "number" },
+        "cognitiveDeltaPerSymbolMax": { "type": "number" },
+        "cyclomaticPerSymbolMax": { "type": "number" },
+        "cyclomaticDeltaPerSymbolMax": { "type": "number" },
+        "maxNestingPerSymbolMax": { "type": "number" },
+        "maintainabilityIndexMin": { "type": "number" },
+        "riskScoreMax": { "type": "number" },
+        "minimumParseQuality": { "enum": ["failed", "partial", "complete"] },
+        "ignoreExistingViolations": { "type": "boolean" },
+        "include": { "type": "array", "items": { "type": "string" } },
+        "exclude": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "contextArtifactConfig": {
+      "type": "object",
+      "description": "spec.md §19.1-19.2",
+      "required": ["name", "path", "description"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "minLength": 1 },
+        "description": { "type": "string" },
+        "type": {
+          "enum": [
+            "auto",
+            "sql",
+            "openapi",
+            "asyncapi",
+            "protobuf",
+            "markdown",
+            "terraform",
+            "kubernetes",
+            "text"
+          ]
+        },
+        "include": { "type": "array", "items": { "type": "string" } },
+        "exclude": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "telemetryConfig": {
+      "type": "object",
+      "description": "spec.md §24: telemetry MUST default to off.",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "logLevel": { "enum": ["error", "warn", "info", "debug", "trace"] },
+        "metricsExport": { "enum": ["none", "prometheus"] }
+      },
+      "additionalProperties": false
+    },
+    "portfolioConfig": {
+      "type": "object",
+      "description": "portfolio.md §14.4 (normative shape)",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "includeTransitive": { "type": "boolean" },
+        "conventionMinRepos": { "type": "integer", "minimum": 0 },
+        "conventions": {
+          "type": "object",
+          "properties": {
+            "pinned": { "type": "array", "items": { "type": "string" } },
+            "suppressed": { "type": "array", "items": { "type": "string" } }
+          },
+          "additionalProperties": false
+        },
+        "radar": {
+          "type": "object",
+          "properties": {
+            "adoptShareMin": { "type": "number", "minimum": 0, "maximum": 1 },
+            "maintainShareMin": { "type": "number", "minimum": 0, "maximum": 1 },
+            "retireAfterDays": { "type": "integer", "minimum": 0 }
+          },
+          "additionalProperties": false
+        },
+        "blueprint": {
+          "type": "object",
+          "properties": {
+            "weights": {
+              "type": "object",
+              "description": "MUST sum to 1.0 (±0.001) -- portfolio.md §14.4.",
+              "properties": {
+                "adoption": { "type": "number" },
+                "recency": { "type": "number" },
+                "health": { "type": "number" },
+                "versionConsistency": { "type": "number" }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "enrichment": { "$ref": "#/$defs/portfolioEnrichmentConfig" }
+      },
+      "additionalProperties": false
+    },
+    "portfolioEnrichmentConfig": {
+      "type": "object",
+      "description": "portfolio.md §13. Default fully disabled.",
+      "required": ["enabled", "registries", "cacheTtlHours", "timeoutMs"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "registries": {
+          "type": "array",
+          "items": { "enum": ["npm", "pypi", "crates", "maven", "nuget", "go", "composer"] }
+        },
+        "registryUrls": { "type": "object", "additionalProperties": { "type": "string" } },
+        "cacheTtlHours": { "type": "number", "minimum": 0 },
+        "timeoutMs": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    }
+  }
+}

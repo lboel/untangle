@@ -1,0 +1,216 @@
+# ------------------------------------------------------------------------
+# untangle.toml — geschrieben von `untangle init`.
+#
+# Diese Datei ist ein VORSCHLAG, kein Diktat. Jeder Wert darf von Hand
+# geaendert werden; `untangle init` schreibt nur mit --force darueber und
+# meldet vorher, was sich unterscheiden wuerde. Was hier nicht steht, kommt
+# aus den Produktvorgaben (spec.md §4.1, unterste Ebene) — die Datei nennt
+# absichtlich nur, was init ENTSCHIEDEN hat, nicht jede Vorgabe.
+# ------------------------------------------------------------------------
+#
+# BEFUND 1 — SPRACHEN (gewichtet nach Zeilen)
+#   typescript    81.4 %    111.712 Zeilen     651 Dateien  (Parser: deep)
+#   markdown      10.6 %     14.568 Zeilen      33 Dateien  (kein Parser — nur Textsuche)
+#   yaml           2.5 %      3.433 Zeilen       4 Dateien  (kein Parser — nur Textsuche)
+#   javascript     2.4 %      3.333 Zeilen       9 Dateien  (Parser: deep)
+#   json           2.2 %      2.960 Zeilen      80 Dateien  (kein Parser — nur Textsuche)
+#   unknown        0.6 %        823 Zeilen      15 Dateien  (kein Parser — nur Textsuche)
+#   toml           0.2 %        231 Zeilen       5 Dateien  (kein Parser — nur Textsuche)
+#   shell          0.1 %        212 Zeilen       1 Dateien  (kein Parser — nur Textsuche)
+#   xml            0.0 %         34 Zeilen       2 Dateien  (kein Parser — nur Textsuche)
+#   Summe: 800 Dateien, 137.306 Zeilen; 83.8 % davon hat einen Parser (Symbole, Importe, Komplexitaet) — der Rest ist Textsuche.
+#   uebersprungen (binary): 3
+#   uebersprungen (gitignore): 63
+#   uebersprungen (security): 1
+#
+# BEFUND 2 — TOPOLOGIE
+#   Workspace-Globs: apps/*, benchmarks, fixtures, packages/*, plugins/*
+#   20 Pakete, 59 Kanten zwischen ihnen:
+#     @untangle-code/chunker — packages/chunker
+#     @untangle-code/cli — apps/cli
+#     @untangle-code/complexity — packages/complexity
+#     @untangle-code/config — packages/config
+#     @untangle-code/context-artifacts — packages/context-artifacts
+#     @untangle-code/domain — packages/domain
+#     @untangle-code/embeddings-ollama — packages/embeddings-ollama
+#     @untangle-code/extension-runtime — packages/extension-runtime
+#     @untangle-code/file-graph — packages/file-graph
+#     @untangle-code/jobs — packages/jobs
+#     @untangle-code/observability — packages/observability
+#     @untangle-code/parser-registry — packages/parser-registry
+#     @untangle-code/scanner — packages/scanner
+#     @untangle-code/search — packages/search
+#     @untangle-code/storage-local — packages/storage-local
+#     @untangle-code/storage-qdrant — packages/storage-qdrant
+#     @untangle-code/symbol-graph — packages/symbol-graph
+#     @untangle-code/testkit — packages/testkit
+#     @untangle-code/watcher — packages/watcher
+#     untangle-monorepo — .
+#   2 Container-Dienste, 2 Kanten — die groebere Ebene ueber den Paketen:
+#     ollama — docker/docker-compose.yml → ollama/ollama:0.5.4
+#     qdrant — docker/docker-compose.yml → qdrant/qdrant:v1.12.1
+#
+# BEFUND 3 — INFRASTRUKTUR
+#   Einbettungsanbieter: erreichbar unter http://127.0.0.1:11434 (Version 0.33.2), 2 Einbettungsmodelle
+#      embeddinggemma:300m (768 Dimensionen, 2.048 Kontext)
+#    → qwen3-embedding:0.6b (1.024 Dimensionen, 32.768 Kontext)
+#      gewaehlt weil: groesstes Kontextfenster unter 2 gemeldeten Einbettungsmodellen
+#   Vektorspeicher: nicht erreichbar (geprueft: http://127.0.0.1:16333) — kein Fehler.
+#   ABSICHTLICH NICHT GEPRUEFT: http://127.0.0.1:6333
+#      Standardport einer fremden Instanz — spec.md §3.2 verbietet, fremde Dienste zu veraendern. Bewusst uebernimm ihn mit UNTANGLE_QDRANT_URL, sonst startet `untangle` eine eigene Instanz auf 16333 mit eigenem Volume.
+#
+# BEFUND 4 — IGNORIERREGELN
+#   .gitignore: 20 Regeln. Der Scanner wertet sie bei JEDEM Lauf selbst aus (spec.md §6.2) — sie werden hier nicht verdoppelt, damit sie nicht auseinanderlaufen.
+#   2 Ausnahmeregeln (!…) blieben absichtlich dort: aus ihrer Reihenfolge geloest kehren sie ihre Bedeutung um.
+# ------------------------------------------------------------------------
+
+# Schemaversion dieser Datei. `untangle` liest sie und wandert aeltere
+# Fassungen selbst nach oben; von Hand hochsetzen muss man sie nie.
+schemaVersion = 1
+# Aus dem Verzeichnisnamen abgeleitet. Frei aenderbar — er benennt nur dieses Projekt.
+projectId = "untangle"
+# Nach dem ersten Dogfood-Index explizit fixiert: neue, rein operative
+# Konfigurationsfelder duerfen die Identitaet des bestehenden Workspace nicht
+# durch einen veraenderten Config-Hash verschieben.
+workspaceId = "85706254-8995-585b-bcb0-50fba3624f17"
+
+# ------------------------------------------------------------------------
+# REPOSITORIES
+#
+# Ein Eintrag je GIT-REPOSITORY, nicht je Paket: die Pakete und Dienste aus
+# Befund 2 liegen alle in diesem einen Repository und werden beim Indizieren
+# von selbst wieder erkannt. Ein zweites Repository (ein Nachbarprojekt, ein
+# gemeinsames Bibliotheks-Repo) kommt als weiterer [[repositories]]-Block
+# dazu; `path` ist relativ zu DIESER Datei oder absolut.
+# ------------------------------------------------------------------------
+[[repositories]]
+id = "untangle"
+path = "."
+label = "untangle"
+
+# Was NICHT indiziert wird. Die Liste ist ausgeschrieben und nicht versteckt,
+# weil genau hier die Vorgabe falsch sein kann: ein Projekt, dessen echte
+# Quellen in build/ liegen, muss diesen Eintrag streichen koennen.
+# Aus .gitignore uebernommen, weil die Vorgaben sie nicht kennen konnten: .DS_Store, .env, .idea, .turbo, .untangle
+# Der eigene Suchbenchmark und sein Ergebnisbericht bleiben ebenfalls draussen:
+# sonst koennte eine Negativfrage nach dem naechsten Reindex ihren eigenen
+# Wortlaut finden und damit genau die Messung verfaelschen, die sie prueft.
+exclude = [
+  ".DS_Store",
+  ".cache",
+  ".env",
+  ".git",
+  ".gradle",
+  ".idea",
+  ".next",
+  ".nuxt",
+  ".turbo",
+  ".untangle",
+  ".venv",
+  "__pycache__",
+  "build",
+  "coverage",
+  "dist",
+  "docs/BENCHMARK.md",
+  "node_modules",
+  "out",
+  "packages/search/benchmark",
+  "target",
+  "vendor",
+  "venv",
+]
+
+# ------------------------------------------------------------------------
+# VEKTORSPEICHER
+#
+# `managed`, weil keiner geantwortet hat: `untangle` startet dann eine EIGENE
+# Instanz mit eigenem Port und eigenem Volume. Eine fremde Instanz wird nie
+# uebernommen (spec.md §3.2).
+# ------------------------------------------------------------------------
+[qdrant]
+mode = "managed"
+# url = "http://127.0.0.1:16333"   # eigene Instanz, sobald sie laeuft
+# Trennt dieses Projekt von anderen auf derselben Instanz.
+collectionPrefix = "untangle_untangle_"
+# Ein API-Schluessel wird NIE hier abgelegt, nur der NAME der Umgebungsvariablen:
+# apiKeyEnv = "UNTANGLE_QDRANT_API_KEY"
+
+# Nicht geprueft: http://127.0.0.1:6333 — Standardport einer fremden Instanz — spec.md §3.2 verbietet, fremde Dienste zu veraendern. Bewusst uebernimm ihn mit UNTANGLE_QDRANT_URL, sonst startet `untangle` eine eigene Instanz auf 16333 mit eigenem Volume.
+
+# ------------------------------------------------------------------------
+# EINBETTUNGEN
+#
+# Modell, Vektorbreite und Kontextfenster stammen aus dem, was der Anbieter
+# UEBER SICH SELBST meldet (/api/tags) — nichts davon ist geraten.
+#
+# WICHTIG: `dimensions` bestimmt die Breite der Collection. Wird das Modell
+# spaeter gewechselt, muss neu indiziert werden — `untangle` erkennt den
+# Widerspruch vor dem ersten Schreiben und bricht ab, statt Muell zu mischen.
+# ------------------------------------------------------------------------
+[embeddings]
+provider = "ollama"
+mode = "external"
+url = "http://127.0.0.1:11434"
+# Gewaehlt weil: groesstes Kontextfenster unter 2 gemeldeten Einbettungsmodellen.
+# Ebenfalls verfuegbar: embeddinggemma:300m
+model = "qwen3-embedding:0.6b"
+# Vom Anbieter gemeldete Vektorbreite (embedding_length), nicht angenommen.
+dimensions = 1024
+# Vom Anbieter gemeldetes Kontextfenster (context_length).
+contextLength = 32768
+
+# ------------------------------------------------------------------------
+# SUCHE — PROFILGEBUNDENE ABWESENHEITSAUSSAGE
+#
+# Diese Werte stammen aus dem reproduzierbaren Fragenkatalog in
+# packages/search/benchmark. Sie gelten NUR fuer die darunter genannte,
+# vollstaendige Profil-ID; ein anderes Modell oder Praeparationsformat erbt
+# keine rohe Cosinus-Schwelle. `untangle query` meldet die Messwerte im
+# Ergebnis, wenn die Evidenz nicht fuer einen Treffer reicht.
+# ------------------------------------------------------------------------
+[search.relevancePolicies."0dc5c26f80e48129a4a4dc29cf946f280dbff05273afcefad2e9c840ed0e163e"]
+workspaceId = "85706254-8995-585b-bcb0-50fba3624f17"
+collection = "untangle_untangle_code_0dc5c26f_v1"
+
+[search.relevancePolicies."0dc5c26f80e48129a4a4dc29cf946f280dbff05273afcefad2e9c840ed0e163e".policy]
+calibrationId = "qwen3-embedding:0.6b/untangle-self-index-2026-09-05"
+minimumDenseScore = 0.45
+minimumDenseSpread = 0.061
+denseReferenceRank = 50
+minimumCandidateIdfCoverage = 0.291
+
+# ------------------------------------------------------------------------
+# INDEX
+#
+# Nur die beiden Werte, ueber die man wirklich nachdenkt. Alles Weitere
+# (Chunk-Groessen, Nebenlaeufigkeit, Checkpoint-Abstand — z. B.
+# targetChunkTokens = 900, scanConcurrency = 8)
+# kommt aus den Produktvorgaben und darf hier ergaenzt werden.
+# ------------------------------------------------------------------------
+[index]
+# Dateien darueber werden gar nicht erst gelesen — mit Eintrag im Skip-Ledger.
+maxFileSizeMb = 5
+# Aenderungen im Dateisystem verfolgen, statt auf den naechsten Lauf zu warten.
+watch = true
+
+# ------------------------------------------------------------------------
+# GRAPH
+#
+# Dieses Projekt hat mehrere Teilprojekte (20 Pakete, 2 Dienste); der Graph
+# beantwortet damit auch die Frage, welches Teilprojekt an welchem haengt.
+# ------------------------------------------------------------------------
+[graph]
+enabled = true
+
+# ------------------------------------------------------------------------
+# TELEMETRIE
+#
+# Aus. Ausdruecklich hier hingeschrieben und nicht bloss vorgegeben, damit
+# man sieht, dass nichts das Geraet verlaesst (spec.md §24).
+# ------------------------------------------------------------------------
+[telemetry]
+enabled = false
+
+# ------------------------------------------------------------------------
+# NAECHSTER SCHRITT: Kein Vektorspeicher erreichbar. Naechster Schritt: eine EIGENE Instanz starten — `docker run -d --name untangle-qdrant -p 16333:6333 -v untangle-qdrant-data:/qdrant/storage qdrant/qdrant` — dann `untangle index`.
+# ------------------------------------------------------------------------

@@ -1,0 +1,32 @@
+{
+  "languageId": "javascript",
+  "path": "basic.js",
+  "source": "const EventEmitterLike = require(\"./emitter\");\n\nexport class Logger {\n  #level = \"info\";\n\n  log(message) {\n    if (this.#level === \"info\" || this.#level === \"debug\") {\n      console.log(message);\n    }\n  }\n}\n\nexport function createLogger() {\n  return new Logger();\n}\n",
+  "expectedSymbols": [
+    { "name": "Logger", "kind": "class", "qualifiedName": "Logger", "exportedNames": ["Logger"] },
+    {
+      "name": "#level",
+      "kind": "property",
+      "qualifiedName": "Logger.#level",
+      "exportedNames": [],
+      "visibility": "private"
+    },
+    {
+      "name": "log",
+      "kind": "method",
+      "qualifiedName": "Logger.log",
+      "normalizedSignature": "log(message)",
+      "exportedNames": []
+    },
+    {
+      "name": "createLogger",
+      "kind": "function",
+      "qualifiedName": "createLogger",
+      "normalizedSignature": "createLogger()",
+      "exportedNames": ["createLogger"]
+    }
+  ],
+  "expectedImports": [{ "specifier": "./emitter", "importKind": "import" }],
+  "expectedCalls": [{ "calleeName": "log", "qualifier": "console" }, { "calleeName": "Logger" }],
+  "expectedDecisionKinds": ["if", "logical_or"]
+}

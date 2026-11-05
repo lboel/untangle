@@ -1,0 +1,39 @@
+{
+  // Solution-style root config. It has no source of its own — it only wires the
+  // TypeScript project-reference graph so `tsc -b tsconfig.json` can typecheck and
+  // incrementally build every registered package/app/plugin in dependency order.
+  //
+  // HOW TO REGISTER A NEW PACKAGE:
+  // 1. Give the new package its own `tsconfig.json` that extends
+  //    "../../tsconfig.base.json" and sets "composite": true (inherited already),
+  //    plus "outDir"/"rootDir" and a "references" array for its own workspace deps.
+  // 2. Add a `{ "path": "<relative-path-to-package>" }` entry to the "references"
+  //    array below, e.g. { "path": "packages/domain" }.
+  // 3. Run `tsc -b tsconfig.json` (or `pnpm run typecheck`) from the repo root.
+  //
+  // This file intentionally has no "compilerOptions" beyond disabling emit-from-here
+  // and no "include" — it must never compile files directly, only orchestrate refs.
+  "files": [],
+  "references": [
+    { "path": "packages/domain" },
+    { "path": "packages/config" },
+    { "path": "packages/observability" },
+    { "path": "packages/scanner" },
+    { "path": "packages/parser-registry" },
+    { "path": "packages/chunker" },
+    { "path": "packages/complexity" },
+    { "path": "packages/symbol-graph" },
+    { "path": "packages/testkit" },
+    { "path": "packages/context-artifacts" },
+    { "path": "packages/embeddings-ollama" },
+    { "path": "packages/jobs" },
+    { "path": "packages/storage-local" },
+    { "path": "packages/search" },
+    { "path": "packages/storage-qdrant" },
+    { "path": "packages/watcher" },
+    { "path": "packages/extension-runtime" },
+    { "path": "packages/file-graph" },
+    { "path": "packages/core" },
+    { "path": "apps/cli" }
+  ]
+}

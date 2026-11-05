@@ -1,0 +1,17 @@
+{
+  // Typecheck-only fuer die TypeScript-Tests unter `scripts/`. Sie gehoeren
+  // keinem Workspace-Paket und wuerden von `pnpm -r typecheck` sonst gar nicht
+  // erfasst — ein ungetypter Test in einem "TypeScript strict"-Repo waere ein
+  // blinder Fleck. Eingebunden im Root-Skript `typecheck`.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": false,
+    "incremental": false,
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
+    "types": ["node"]
+  },
+  "include": ["scripts/**/*.test.ts"]
+}

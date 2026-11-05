@@ -1,0 +1,90 @@
+# NOTICE
+
+Copyright (C) 2026 Luke Bölling and contributors.
+
+This attribution covers original Untangle work. Contributors retain copyright in
+their contributions. Third-party packages, grammars and other materials retain
+their own copyright holders, licenses and notices; this line does not replace them.
+
+## License — binding decision
+
+Untangle is licensed under the **GNU Affero General Public License, Version 3
+(AGPL-3.0-only)**. See [`LICENSE`](./LICENSE).
+
+This decision is **final, not provisional**, and was explicitly instructed by
+the project owner. No contributor, agent or tool may change it without a new
+explicit instruction.
+
+The repository-wide license covers Untangle's first-party source code, scripts,
+tests, fixtures, configuration, documentation, website and brand artwork, including
+the logo and 3D yarn illustrations. Every workspace `package.json` declares
+`"license": "AGPL-3.0-only"`. There is no separately licensed enterprise component
+or separate permissive license for documentation or brand assets.
+
+Third-party code, embedded grammars, dependency assets and their notices retain
+their original licenses. Their inclusion does not relicense those works. The
+repository license does not grant trademark rights or change the license of a
+repository analyzed with Untangle. See the repository's `docs/LICENSING.md` for
+scope and verification details.
+
+This resolves the license question left open in `vision.md` §14 and completes
+`product.md` §16, item 2.
+
+## Rationale
+
+- **Network copyleft fits the intended product model.** AGPL §13 sets source
+  availability requirements for modified versions used through a computer network.
+  The current local CLI/stdio-MCP entry and future shared-server modes share the
+  same license.
+- **Local-first analysis has a clear boundary.** Running Untangle against a codebase
+  does not replace that codebase's own license with Untangle's license.
+- **First-party components share one license.** Implemented components and future
+  official plugins use this repository's licensing policy. Planned integrations do
+  not establish implemented or published products.
+
+## Deliberately accepted consequence
+
+The project deliberately chooses AGPL rather than a permissive embedding license.
+Redistribution, modifications and combined works must be assessed against the
+actual terms in `LICENSE`, including applicable Corresponding Source requirements.
+No permissive exception, commercial dual license or special contract-only package
+license is granted or promised by this notice.
+
+## Dependencies
+
+Third-party runtime dependencies are checked against the allowlist in
+`scripts/check-licenses.mjs`. Their licenses and copyright notices remain unchanged
+and traceable through package `THIRD_PARTY_LICENSES.md` files, grammar provenance,
+the lockfile and release SBOM. The allowlist includes MIT / Apache-2.0 / BSD / ISC
+and other explicitly listed licenses; it is not a license grant for dependencies.
+
+The allowlist in `scripts/check-licenses.mjs` applies to **dependencies**, not
+workspace packages. Untangle's own packages carry AGPL-3.0-only and are excluded
+from that check.
+
+## Clean room
+
+Untangle is an independent implementation with its own data models, APIs, tool
+names, tests and sources. Feature ideas may be derived from publicly observable
+behavior and generally known techniques. Third-party source code is not copied,
+including from AGPL projects even where the license would permit it.
+
+## Contribution terms
+
+Pull requests are welcome under the repository's existing AGPL-3.0-only license.
+No separate CLA, copyright assignment or DCO sign-off is required. Contributors
+must have the right to submit their work under those terms. See CONTRIBUTING.md.
+
+## Release decisions
+
+- [x] Copyright attribution: Luke Bölling, with contributors retaining their rights.
+- [x] Contributions use AGPL-3.0-only without an additional CLA or DCO gate.
+
+## Open legal items before public beta
+
+- [ ] Trademark search for the product name `Untangle`.
+- [ ] Registration and legal review of the npm scope `@untangle-code`.
+- [ ] Verify source availability and notices for each released network daemon/server
+  mode (WP-59). The current stdio MCP `untangle_about` already reports the license,
+  source repository and build commit when supplied; metadata alone does not prove
+  that a concrete deployed version's source is available.

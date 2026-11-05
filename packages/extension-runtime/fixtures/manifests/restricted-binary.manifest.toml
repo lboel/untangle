@@ -1,0 +1,41 @@
+# Ein Werkzeug mit einschraenkender Lizenz, das als PROGRAMM aufgerufen wird.
+# Genau diese Kombination macht sichtbar, dass schon die Versionsabfrage ein
+# Prozessstart ist — und deshalb unter das Lizenz-Gate faellt (X5).
+schemaVersion = 1
+id = "restricted-binary"
+displayName = "Restricted Binary Analyzer"
+category = "sast"
+invocation = ["binary"]
+languages = ["typescript"]
+outputFormat = "sarif"
+networkAccess = "none"
+requiresLicenseAcknowledgment = true
+
+[binary]
+command = "restricted-analyzer"
+versionArgs = ["--version"]
+versionPattern = "([0-9]+\\.[0-9]+\\.[0-9]+)"
+analyzeArgs = ["scan", "--sarif", "{target}"]
+
+[resources]
+minMemoryMb = 256
+recommendedMemoryMb = 512
+recommendedCpus = 2
+
+[license]
+spdxId = "LicenseRef-source-available-1.0"
+usageRestriction = "restricted"
+restrictionSummary = "The analyzer may only be used under the vendor's source-available terms."
+
+[severityMapping]
+mappingVersion = "untangle-severity-map-v1"
+fallback = "medium"
+caseInsensitive = true
+rules = [
+  { from = "warning", to = "medium" },
+  { from = "error", to = "high" },
+]
+
+[telemetry]
+sendsTelemetry = false
+disabledByDefault = true

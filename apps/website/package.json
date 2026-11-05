@@ -1,0 +1,29 @@
+{
+  "name": "@untangle-code/website",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Dependency-free static landing page for Untangle's Dynamic Product Complexity thesis.",
+  "license": "AGPL-3.0-only",
+  "homepage": "https://github.com/lboel/untangle",
+  "bugs": {
+    "url": "https://github.com/lboel/untangle/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lboel/untangle.git",
+    "directory": "apps/website"
+  },
+  "engines": {
+    "node": "^22.13.0 || >=24.0.0"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs && node scripts/check.mjs dist",
+    "check": "node scripts/check.mjs src",
+    "serve": "node scripts/serve.mjs",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "3.2.7"
+  }
+}

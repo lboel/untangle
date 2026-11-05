@@ -1,0 +1,1207 @@
+/**
+ * FIXTURE fuer WP-215 — bewusst UEBER 32 KiB.
+ *
+ * Die native tree-sitter-Bindung puffert die Eingabe in einem Puffer fester
+ * Groesse. Ohne `bufferSize` sind das 32.768 Bytes; alles darueber wird mit
+ * `Invalid argument` abgewiesen. Diese Datei liegt DARUEBER und ist damit der
+ * Regressionsnachweis: parst sie, ist der Puffer proportional gesetzt.
+ *
+ * ERZEUGT, NICHT GESCHRIEBEN — deterministisch, ohne Zufall und ohne Zeit.
+ * Wer sie kuerzt, macht den Test wertlos: die Groesse IST die Aussage.
+ */
+
+export interface Reading {
+  readonly id: number;
+  readonly label: string;
+  readonly value: number;
+}
+
+/** Deterministic accessor number 0. */
+export function readingOf0(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 2 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 1. */
+export function readingOf1(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 3 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 2. */
+export function readingOf2(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 4 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 3. */
+export function readingOf3(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 5 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 4. */
+export function readingOf4(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 6 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 5. */
+export function readingOf5(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 7 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 6. */
+export function readingOf6(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 8 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 7. */
+export function readingOf7(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 2 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 8. */
+export function readingOf8(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 3 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 9. */
+export function readingOf9(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 4 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 10. */
+export function readingOf10(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 5 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 11. */
+export function readingOf11(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 6 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 12. */
+export function readingOf12(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 7 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 13. */
+export function readingOf13(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 8 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 14. */
+export function readingOf14(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 2 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 15. */
+export function readingOf15(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 3 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 16. */
+export function readingOf16(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 4 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 17. */
+export function readingOf17(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 5 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 18. */
+export function readingOf18(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 6 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 19. */
+export function readingOf19(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 7 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 20. */
+export function readingOf20(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 8 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 21. */
+export function readingOf21(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 2 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 22. */
+export function readingOf22(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 3 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 23. */
+export function readingOf23(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 4 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 24. */
+export function readingOf24(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 5 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 25. */
+export function readingOf25(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 6 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 26. */
+export function readingOf26(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 7 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 27. */
+export function readingOf27(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 8 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 28. */
+export function readingOf28(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 2 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 29. */
+export function readingOf29(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 3 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 30. */
+export function readingOf30(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 4 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 31. */
+export function readingOf31(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 5 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 32. */
+export function readingOf32(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 6 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 33. */
+export function readingOf33(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 7 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 34. */
+export function readingOf34(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 8 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 35. */
+export function readingOf35(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 2 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 36. */
+export function readingOf36(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 3 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 37. */
+export function readingOf37(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 4 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 38. */
+export function readingOf38(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 5 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 39. */
+export function readingOf39(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 6 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 40. */
+export function readingOf40(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 7 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 41. */
+export function readingOf41(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 8 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 42. */
+export function readingOf42(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 2 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 43. */
+export function readingOf43(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 3 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 44. */
+export function readingOf44(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 4 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 45. */
+export function readingOf45(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 5 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 46. */
+export function readingOf46(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 6 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 47. */
+export function readingOf47(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 7 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 48. */
+export function readingOf48(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 8 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 49. */
+export function readingOf49(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 2 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 50. */
+export function readingOf50(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 3 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 51. */
+export function readingOf51(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 4 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 52. */
+export function readingOf52(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 5 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 53. */
+export function readingOf53(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 6 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 54. */
+export function readingOf54(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 7 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 55. */
+export function readingOf55(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 8 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 56. */
+export function readingOf56(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 2 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 57. */
+export function readingOf57(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 3 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 58. */
+export function readingOf58(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 4 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 59. */
+export function readingOf59(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 5 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 60. */
+export function readingOf60(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 6 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 61. */
+export function readingOf61(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 7 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 62. */
+export function readingOf62(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 8 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 63. */
+export function readingOf63(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 2 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 64. */
+export function readingOf64(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 3 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 65. */
+export function readingOf65(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 4 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 66. */
+export function readingOf66(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 5 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 67. */
+export function readingOf67(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 6 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 68. */
+export function readingOf68(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 7 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 69. */
+export function readingOf69(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 8 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 70. */
+export function readingOf70(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 2 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 71. */
+export function readingOf71(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 3 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 72. */
+export function readingOf72(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 4 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 73. */
+export function readingOf73(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 5 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 74. */
+export function readingOf74(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 6 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 75. */
+export function readingOf75(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 7 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 76. */
+export function readingOf76(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 8 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 77. */
+export function readingOf77(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 2 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 78. */
+export function readingOf78(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 3 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 79. */
+export function readingOf79(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 4 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 80. */
+export function readingOf80(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 5 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 81. */
+export function readingOf81(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 6 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 82. */
+export function readingOf82(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 7 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 83. */
+export function readingOf83(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 8 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}
+
+/** Deterministic accessor number 84. */
+export function readingOf84(input: readonly Reading[]): Reading | null {
+  let best: Reading | null = null;
+  for (const item of input) {
+    if (item.id % 2 !== 0) continue;
+    if (best === null || item.value > best.value) {
+      best = item;
+    } else if (item.value === best.value && item.label < best.label) {
+      best = item;
+    }
+  }
+  return best;
+}

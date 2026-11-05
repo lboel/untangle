@@ -1,0 +1,37 @@
+{
+  "languageId": "typescript",
+  "path": "basic.ts",
+  "source": "import { readFile } from \"node:fs\";\nexport { helper } from \"./helper\";\n\n/** Adds two numbers together. */\nexport function add(a: number, b: number = 1): number {\n  if (a > 0 && b > 0) {\n    return a + b;\n  } else if (a < 0) {\n    return -1;\n  }\n  return 0;\n}\n\nexport interface Point {\n  x: number;\n  y: number;\n}\n\nexport class Box {\n  private width: number = 0;\n\n  resize(value: number): void {\n    this.width = value;\n  }\n}\n",
+  "expectedSymbols": [
+    {
+      "name": "add",
+      "kind": "function",
+      "qualifiedName": "add",
+      "normalizedSignature": "add(a: number, b: number): number",
+      "exportedNames": ["add"],
+      "hasDocRange": true
+    },
+    { "name": "Point", "kind": "interface", "qualifiedName": "Point", "exportedNames": ["Point"] },
+    { "name": "Box", "kind": "class", "qualifiedName": "Box", "exportedNames": ["Box"] },
+    {
+      "name": "width",
+      "kind": "property",
+      "qualifiedName": "Box.width",
+      "normalizedSignature": "private width: number",
+      "exportedNames": []
+    },
+    {
+      "name": "resize",
+      "kind": "method",
+      "qualifiedName": "Box.resize",
+      "normalizedSignature": "resize(value: number): void",
+      "exportedNames": []
+    }
+  ],
+  "expectedImports": [
+    { "specifier": "node:fs", "importKind": "import", "importedNames": ["readFile"] },
+    { "specifier": "./helper", "importKind": "re_export", "importedNames": ["helper"] }
+  ],
+  "expectedCallCount": 0,
+  "expectedDecisionKinds": ["if", "logical_and", "else_if"]
+}

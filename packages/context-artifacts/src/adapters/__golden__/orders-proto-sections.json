@@ -1,0 +1,57 @@
+[
+  {
+    "content": "message Order {\n  string id = 1;\n  string customer_id = 2;\n  int64 total_cents = 3;\n}\n",
+    "kind": "protobuf_message",
+    "range": {
+      "endByte": 126,
+      "endLine": 9,
+      "startByte": 40,
+      "startLine": 5
+    },
+    "title": "Order"
+  },
+  {
+    "content": "message OrderItem {\n  string sku = 1;\n  int32 qty = 2;\n}\n",
+    "kind": "protobuf_message",
+    "range": {
+      "endByte": 184,
+      "endLine": 14,
+      "startByte": 127,
+      "startLine": 11
+    },
+    "title": "OrderItem"
+  },
+  {
+    "content": "service OrderService {\n  rpc GetOrder(GetOrderRequest) returns (Order);\n  rpc CreateOrder(CreateOrderRequest)\n      returns (Order);\n}\n",
+    "kind": "protobuf_service",
+    "range": {
+      "endByte": 320,
+      "endLine": 20,
+      "startByte": 185,
+      "startLine": 16
+    },
+    "title": "OrderService"
+  },
+  {
+    "content": "  rpc GetOrder(GetOrderRequest) returns (Order);\n",
+    "kind": "protobuf_rpc",
+    "range": {
+      "endByte": 257,
+      "endLine": 17,
+      "startByte": 208,
+      "startLine": 17
+    },
+    "title": "OrderService.GetOrder"
+  },
+  {
+    "content": "  rpc CreateOrder(CreateOrderRequest)\n      returns (Order);\n",
+    "kind": "protobuf_rpc",
+    "range": {
+      "endByte": 318,
+      "endLine": 19,
+      "startByte": 257,
+      "startLine": 18
+    },
+    "title": "OrderService.CreateOrder"
+  }
+]

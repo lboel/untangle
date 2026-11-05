@@ -1,0 +1,24 @@
+[
+  {
+    "content": "      operationId: onOrderCreated\n      summary: Emitted when a new order is placed\n",
+    "kind": "asyncapi_operation",
+    "range": {
+      "endByte": 190,
+      "endLine": 9,
+      "startByte": 106,
+      "startLine": 8
+    },
+    "title": "order.created subscribe (onOrderCreated)"
+  },
+  {
+    "content": "      operationId: publishOrderCancelled\n",
+    "kind": "asyncapi_operation",
+    "range": {
+      "endByte": 263,
+      "endLine": 12,
+      "startByte": 222,
+      "startLine": 12
+    },
+    "title": "order.cancelled publish (publishOrderCancelled)"
+  }
+]

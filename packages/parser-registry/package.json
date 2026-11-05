@@ -1,0 +1,129 @@
+{
+  "name": "@untangle-code/parser-registry",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "description": "Untangle parser registry: lazy-loaded LanguageAdapter registry plus TypeScript/JavaScript/TSX/JSX tree-sitter adapters.",
+  "license": "AGPL-3.0-only",
+  "homepage": "https://github.com/lboel/untangle",
+  "bugs": {
+    "url": "https://github.com/lboel/untangle/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lboel/untangle.git",
+    "directory": "packages/parser-registry"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": "^22.13.0 || >=24.0.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.test.*",
+    "!dist/**/test-helpers.*",
+    "!dist/**/test-support.*",
+    "!dist/**/test-support/**",
+    "!dist/**/testing/**",
+    "!dist/**/__tests__/**",
+    "src",
+    "!src/**/*.test.ts",
+    "!src/**/test-helpers.ts",
+    "!src/**/test-support.ts",
+    "!src/**/test-support/**",
+    "!src/**/testing/**",
+    "LICENSE",
+    "NOTICE",
+    "README.md",
+    "THIRD_PARTY_LICENSES.md"
+  ],
+  "scripts": {
+    "prepack": "node ../../scripts/prepack-guard.mjs",
+    "build": "node ../../scripts/tsc-build.mjs tsconfig.json",
+    "typecheck": "tsc -p tsconfig.typecheck.json",
+    "test": "vitest run",
+    "clean": "rm -rf dist *.tsbuildinfo"
+  },
+  "dependencies": {
+    "@ast-grep/lang-python": "0.0.6",
+    "@ast-grep/napi": "0.45.3",
+    "@untangle-code/domain": "workspace:*",
+    "@vue/compiler-sfc": "3.5.44",
+    "tree-sitter": "0.21.1",
+    "tree-sitter-javascript": "0.23.1",
+    "tree-sitter-typescript": "0.23.2"
+  },
+  "devDependencies": {
+    "@ast-grep/lang-bash": "0.0.8",
+    "@ast-grep/lang-c": "0.0.6",
+    "@ast-grep/lang-cpp": "0.0.6",
+    "@ast-grep/lang-csharp": "0.0.6",
+    "@ast-grep/lang-go": "0.0.6",
+    "@ast-grep/lang-java": "0.0.7",
+    "@ast-grep/lang-kotlin": "0.0.7",
+    "@ast-grep/lang-php": "0.0.7",
+    "@ast-grep/lang-ruby": "0.0.7",
+    "@ast-grep/lang-rust": "0.0.7",
+    "@ast-grep/lang-swift": "0.0.8",
+    "@types/node": "22.19.7",
+    "@untangle-code/testkit": "workspace:*",
+    "typescript": "5.9.3",
+    "vitest": "3.2.7"
+  },
+  "peerDependencies": {
+    "@ast-grep/lang-bash": "0.0.8",
+    "@ast-grep/lang-c": "0.0.6",
+    "@ast-grep/lang-cpp": "0.0.6",
+    "@ast-grep/lang-csharp": "0.0.6",
+    "@ast-grep/lang-go": "0.0.6",
+    "@ast-grep/lang-java": "0.0.7",
+    "@ast-grep/lang-kotlin": "0.0.7",
+    "@ast-grep/lang-php": "0.0.7",
+    "@ast-grep/lang-ruby": "0.0.7",
+    "@ast-grep/lang-rust": "0.0.7",
+    "@ast-grep/lang-swift": "0.0.8"
+  },
+  "peerDependenciesMeta": {
+    "@ast-grep/lang-go": {
+      "optional": true
+    },
+    "@ast-grep/lang-java": {
+      "optional": true
+    },
+    "@ast-grep/lang-rust": {
+      "optional": true
+    },
+    "@ast-grep/lang-csharp": {
+      "optional": true
+    },
+    "@ast-grep/lang-ruby": {
+      "optional": true
+    },
+    "@ast-grep/lang-php": {
+      "optional": true
+    },
+    "@ast-grep/lang-kotlin": {
+      "optional": true
+    },
+    "@ast-grep/lang-c": {
+      "optional": true
+    },
+    "@ast-grep/lang-cpp": {
+      "optional": true
+    },
+    "@ast-grep/lang-swift": {
+      "optional": true
+    },
+    "@ast-grep/lang-bash": {
+      "optional": true
+    }
+  }
+}

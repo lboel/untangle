@@ -1,0 +1,108 @@
+name: Website Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/website/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: website-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: read
+    steps:
+      - name: Checkout the deployment source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24.x"
+          package-manager-cache: false
+
+      - name: Check and build the static website
+        run: |
+          node apps/website/scripts/check.mjs src
+          node apps/website/scripts/build.mjs
+          node apps/website/scripts/check.mjs dist
+
+      - name: Include the website license and notice
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import { constants, copyFileSync, lstatSync } from 'node:fs';
+          import path from 'node:path';
+          for (const name of ['LICENSE', 'NOTICE']) {
+            const source = path.join('apps/website', name);
+            const stat = lstatSync(source);
+            assert(stat.isFile() && !stat.isSymbolicLink(), 'License documents must be regular package files.');
+            copyFileSync(source, path.join('apps/website/dist', name), constants.COPYFILE_EXCL);
+          }
+          NODE
+
+      - name: Verify the public artifact boundary and record its source
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import { createHash } from 'node:crypto';
+          import { appendFileSync, lstatSync, readFileSync, readdirSync } from 'node:fs';
+          import path from 'node:path';
+          const names = ['LICENSE', 'NOTICE', 'index.html', 'site.js', 'story.js', 'styles.css', 'untangle-example.html', 'untangle-example.json', 'untangle-logo.svg', 'untangle-yarn-3d.png', 'yarn-scene.js'];
+          const source = 'apps/website/src';
+          const output = 'apps/website/dist';
+          assert.deepEqual(readdirSync(output).sort(), names);
+          const records = names.map(name => {
+            const input = path.join(name === 'LICENSE' || name === 'NOTICE' ? 'apps/website' : source, name);
+            const file = path.join(output, name);
+            for (const selected of [input, file]) {
+              const stat = lstatSync(selected);
+              assert(stat.isFile() && !stat.isSymbolicLink(), 'Only regular website assets may be published.');
+            }
+            const bytes = readFileSync(file);
+            assert(bytes.equals(readFileSync(input)), 'Published bytes must match the selected source commit.');
+            return `${name}: ${createHash('sha256').update(bytes).digest('hex')}`;
+          });
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY, `Website source: ${process.env.GITHUB_SHA}\n\n${records.join('\n\n')}\n`);
+          NODE
+
+      - name: Read GitHub Pages configuration
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+
+      - name: Upload only the checked website
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: apps/website/dist
+          retention-days: 1
+          include-hidden-files: false
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish the checked artifact
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

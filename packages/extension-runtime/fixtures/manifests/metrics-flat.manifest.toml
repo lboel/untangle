@@ -1,0 +1,55 @@
+# Ein Kennzahlwerkzeug, das seine Zahlen als FLACHES Objekt schreibt und dem
+# Manifest die Bedeutung jedes Schluessels ueberlaesst.
+#
+# Der Werkzeugname ist eine Nutzerangabe; hier steht ein Platzhalter. Untangle
+# kennt die Ausgabeform und die Bedeutungen, nicht das Produkt (X9, E2).
+schemaVersion = 1
+id = "metrics-flat"
+displayName = "Example Structural Metrics Tool"
+category = "complexity"
+invocation = ["binary"]
+languages = []
+outputFormat = "generic-metrics"
+networkAccess = "none"
+requiresLicenseAcknowledgment = false
+
+[binary]
+command = "example-metrics"
+versionArgs = ["--version"]
+versionPattern = "([0-9]+\\.[0-9]+\\.[0-9]+)"
+analyzeArgs = ["gate", "{workspace}"]
+
+[outputMapping]
+shape = "flat-object"
+
+# Was die Zahlen BEDEUTEN. Ohne diese Tabelle bleiben sie Schluessel und Zahl.
+[[complexitySignals]]
+key = "quality_signal"
+kind = "proprietary-composite"
+scope = "repository"
+
+[[complexitySignals]]
+key = "cycle_count"
+kind = "dependency-cycles"
+scope = "repository"
+comparableTo = "untangle-metrics-v1"
+
+[[complexitySignals]]
+key = "max_depth"
+kind = "dependency-depth"
+scope = "repository"
+comparableTo = "untangle-metrics-v1"
+
+[resources]
+minMemoryMb = 128
+recommendedMemoryMb = 256
+recommendedCpus = 1
+
+[license]
+spdxId = "MIT"
+usageRestriction = "none"
+
+[telemetry]
+sendsTelemetry = true
+disableMechanism = "analytics off"
+disabledByDefault = true

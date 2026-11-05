@@ -1,0 +1,44 @@
+# Ungueltig: das Image ist nicht auf einen vollstaendigen sha256-Digest gepinnt (X6).
+schemaVersion = 1
+id = "moving-tag"
+displayName = "Moving Tag Analyzer"
+category = "lint"
+invocation = ["container"]
+languages = []
+outputFormat = "generic-findings"
+networkAccess = "none"
+requiresLicenseAcknowledgment = false
+
+[container]
+image = "registry.example.invalid/moving"
+digest = "sha256:latest"
+
+[container.workspaceMount]
+mountPath = "/workspace"
+readOnly = true
+
+[container.healthcheck]
+kind = "command"
+command = ["true"]
+intervalMs = 1000
+timeoutMs = 500
+retries = 3
+
+[resources]
+minMemoryMb = 128
+recommendedMemoryMb = 256
+recommendedCpus = 1
+
+[license]
+spdxId = "MIT"
+usageRestriction = "none"
+
+[severityMapping]
+mappingVersion = "untangle-severity-map-v1"
+fallback = "low"
+caseInsensitive = true
+rules = []
+
+[telemetry]
+sendsTelemetry = false
+disabledByDefault = true

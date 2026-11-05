@@ -1,0 +1,25 @@
+# Dependencies and build output
+node_modules
+dist
+coverage
+.turbo
+*.tsbuildinfo
+
+# Lockfile is pnpm-managed, never hand-formatted
+pnpm-lock.yaml
+
+# Fixtures intentionally contain malformed, minified, or non-standard code as
+# ground truth for parser/chunker/complexity tests — must never be reformatted.
+fixtures/**
+
+# Normative and generated Markdown documents keep their own formatting; each
+# has exactly one owning agent/WP (see docs/BUILD_PLAN.md §4).
+*.md
+
+# Generated/managed data
+.untangle/
+
+# Frozen viewer exports retain deterministic generator bytes and CSP-hashed
+# inline runtime/style. Format the generator and tests, not these artifacts.
+apps/website/src/untangle-example.html
+apps/website/src/untangle-example.json

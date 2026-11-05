@@ -1,0 +1,21 @@
+{
+  // Teilprojekt WP-128: baut NUR den Komplexitaetswaechter
+  // (`src/commands/watch/**`) plus den `bin`-Einstiegspunkt.
+  //
+  // WARUM ES DIESES PROJEKT GIBT: `tsconfig.json` uebersetzt die ganze
+  // Anwendung, also auch die Befehle, die parallel im Entstehen sind. Der
+  // Waechter haengt an keiner Datei ausserhalb seines Verzeichnisses und soll
+  // deshalb auch dann baubar und vorfuehrbar bleiben, wenn ein Nachbarbefehl
+  // gerade nicht uebersetzt. Sobald der uebrige CLI-Rahmen steht, kann diese
+  // Datei ersatzlos entfallen — `tsconfig.json` baut denselben Code mit.
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": false,
+    "incremental": false,
+    "rootDir": "src",
+    "outDir": "dist",
+    "types": ["node"]
+  },
+  "include": ["src/commands/watch/**/*.ts"],
+  "exclude": ["src/commands/watch/**/*.test.ts"]
+}

@@ -1,0 +1,68 @@
+[
+  {
+    "content": "-- schema for the orders service\nCREATE TABLE IF NOT EXISTS orders (\n  id UUID PRIMARY KEY,\n  customer_id UUID NOT NULL,\n  total_cents INTEGER NOT NULL,\n  status TEXT NOT NULL DEFAULT 'pending' -- semicolons in comments; must not split statements\n);\n",
+    "kind": "sql_table",
+    "range": {
+      "endByte": 250,
+      "endLine": 7,
+      "startByte": 0,
+      "startLine": 1
+    },
+    "title": "orders"
+  },
+  {
+    "content": "\nCREATE TABLE order_items (\n  order_id UUID NOT NULL REFERENCES orders(id),\n  sku TEXT NOT NULL,\n  qty INTEGER NOT NULL\n);\n",
+    "kind": "sql_table",
+    "range": {
+      "endByte": 373,
+      "endLine": 13,
+      "startByte": 250,
+      "startLine": 8
+    },
+    "title": "order_items"
+  },
+  {
+    "content": "\nCREATE UNIQUE INDEX idx_orders_customer ON orders (customer_id);\n",
+    "kind": "sql_index",
+    "range": {
+      "endByte": 439,
+      "endLine": 15,
+      "startByte": 373,
+      "startLine": 14
+    },
+    "title": "idx_orders_customer ON orders"
+  },
+  {
+    "content": "\nCREATE VIEW open_orders AS\n  SELECT * FROM orders WHERE status <> 'closed';\n",
+    "kind": "sql_view",
+    "range": {
+      "endByte": 516,
+      "endLine": 18,
+      "startByte": 439,
+      "startLine": 16
+    },
+    "title": "open_orders"
+  },
+  {
+    "content": "\nALTER TABLE order_items ADD CONSTRAINT fk_order_items_order FOREIGN KEY (order_id) REFERENCES orders(id);\n",
+    "kind": "sql_constraint",
+    "range": {
+      "endByte": 623,
+      "endLine": 20,
+      "startByte": 516,
+      "startLine": 19
+    },
+    "title": "fk_order_items_order ON order_items"
+  },
+  {
+    "content": "\nINSERT INTO orders (id, customer_id, total_cents, status) VALUES ('seed', 'seed', 0, 'pending');\n",
+    "kind": "sql_statement",
+    "range": {
+      "endByte": 721,
+      "endLine": 22,
+      "startByte": 623,
+      "startLine": 21
+    },
+    "title": "INSERT"
+  }
+]

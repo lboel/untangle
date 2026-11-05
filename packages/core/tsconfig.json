@@ -1,0 +1,23 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "tsBuildInfoFile": "tsconfig.tsbuildinfo",
+    "types": ["node"]
+  },
+  "references": [
+    { "path": "../domain" },
+    { "path": "../config" },
+    { "path": "../scanner" },
+    { "path": "../parser-registry" },
+    { "path": "../chunker" },
+    { "path": "../complexity" },
+    { "path": "../jobs" },
+    { "path": "../storage-qdrant" },
+    { "path": "../file-graph" },
+    { "path": "../symbol-graph" }
+  ],
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.test.ts"]
+}

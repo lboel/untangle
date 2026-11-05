@@ -1,0 +1,5 @@
+{"path":"src/a.ts","startLine":10,"endLine":12,"ruleId":"style/indent","message":"Wrong indentation","severity":"warning","ruleset":"house-style","rulesetVersion":"2026.1"}
+{"path":"./src/b.ts","startLine":3,"ruleId":"security/hardcoded-secret","message":"Hardcoded credential","severity":"BLOCKER","confidence":0.4,"confidenceOriginal":"LOW","isHeuristic":true}
+not json at all
+{"path":"src/c.ts","ruleId":"style/indent","message":"missing startLine","severity":"warning"}
+{"startLine":1,"ruleId":"x","message":"missing path","severity":"info"}

@@ -1,0 +1,23 @@
+{
+  // Typecheck-only project: includes tests, emits nothing.
+  // `composite` must be off here because composite projects cannot use `noEmit`
+  // (mirrors packages/domain/tsconfig.typecheck.json).
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": false,
+    "incremental": false,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "types": ["node"],
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false
+  },
+  "references": [
+    { "path": "../domain" },
+    { "path": "../parser-registry" },
+    { "path": "../scanner" },
+    { "path": "../testkit" }
+  ],
+  "include": ["src/**/*.ts", "vitest.config.ts"]
+}
