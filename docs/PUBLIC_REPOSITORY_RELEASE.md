@@ -9,9 +9,10 @@ of this source release; package publication follows [RELEASE.md](./RELEASE.md).
 The 5 November 2026 migration starts the public Git history with a new root snapshot.
 The earlier development repository is retained privately with its original history,
 Actions output and private verification records. It is not force-pushed or deleted.
-No old branches, tags, Git objects, Actions logs, artifacts, secrets or settings are
-copied into the new repository. Existing notices, contribution terms and upstream
-license attribution remain in the source snapshot.
+No earlier commits or refs are imported; only the tracked source snapshot is copied.
+Old Actions logs, artifacts, secrets and settings stay in the private repository.
+Existing notices, contribution terms and upstream license attribution remain in the
+source snapshot.
 
 The website's frozen example still identifies its original measurement and renderer
 revisions. Those revisions belong to the private development history and are not

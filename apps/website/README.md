@@ -19,8 +19,8 @@ English product copy describes implemented capabilities. The feature workflow us
 manifests, `product --path`, stdout-only `--draft` and explicit source-bound Vitest runs.
 Project-specific paths/IDs are replaceable examples. The first setup block runs in an
 available checkout; new users start from the visible repository link and `git clone`.
-Required repository access is disclosed until public release; no global npm path is
-advertised as available before publication.
+The source preview runs from a local checkout. No global npm installation is advertised
+as available before package publication.
 
 The landing-page feature diagram and clear/tangled search comparison are illustrative.
 The opening yarn image and scroll-driven 3D scene express the same idea: follow a

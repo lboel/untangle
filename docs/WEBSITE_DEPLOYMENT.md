@@ -104,9 +104,9 @@ recorded in workflow comments.
 
 The expected default project URL is `https://lboel.github.io/untangle/`. Treat that
 as an expectation until the actual deployment returns it. Relative stylesheet,
-script and logo URLs support this project subpath. The landing page continues to
-disclose required repository access and unavailable public npm installation until
-those release actions actually occur.
+script and logo URLs support this project subpath. The landing page describes the
+source-preview checkout workflow and states that npm packages are not published yet.
+Repository access and package publication remain separate release actions.
 
 The same public artifact includes the complete license and notice at
 `https://lboel.github.io/untangle/LICENSE` and
