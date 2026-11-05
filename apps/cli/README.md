@@ -13,6 +13,23 @@ The [agent workflow](https://github.com/lboel/untangle/blob/main/docs/AGENT_WORK
 connects MCP, search, complete feature scopes and real tests, with a copyable task brief for
 spec-driven development and agentic engineering.
 
+## Installed CLI — after registry publication
+
+After `@untangle-code/cli@0.1.0` and its Untangle dependencies are published to npm, use
+this version-pinned entry point without a global installation. Replace the project path:
+
+```bash
+npm exec --yes --package=@untangle-code/cli@0.1.0 -- \
+  untangle complexity --root=/absolute/path/to/project --format=json
+
+npm exec --yes --package=@untangle-code/cli@0.1.0 -- \
+  untangle init --root=/absolute/path/to/project --offline --dry-run --format=json
+```
+
+`npm exec` may download the package. Direct complexity analysis needs no search services;
+the offline init dry-run previews configuration without writing files or probing services.
+The checkout helper below is a separate way to build and try an unpublished version.
+
 ## First checkout result
 
 From the checkout root with **pnpm 10.34.5**:
