@@ -233,8 +233,8 @@ executes no tests and loads no external browser resources. Missing declarations 
 unmapped; declared/unresolved edges are not runtime calls. Spatial proximity is a layout
 choice, not a semantic-distance metric.
 
-Direct analysis works before service setup. Indexed retrieval needs Qdrant; service
-embeddings additionally need the configured model. Noninteractive init starts no services
+Direct analysis and offline indexed retrieval need no services. Indexed retrieval defaults to
+embedded LanceDB, with Qdrant available as an alternative; service embeddings need the configured model. Noninteractive init starts no services
 and downloads no models; guided setup does so only after deliberate selection/confirmation.
 The optional pinned Compose setup binds loopback ports:
 
@@ -256,6 +256,9 @@ project**, run `untangle init --no-interactive` and edit existing `untangle.toml
 your selected setup; do not duplicate tables:
 
 ```toml
+[storage]
+backend = "qdrant"
+
 [qdrant]
 mode = "external"
 url = "http://127.0.0.1:16333"
@@ -281,7 +284,7 @@ untangle query "lookupAccount" --mode=symbol --require-fresh --context --linked
 untangle query "find an account by its identifier" --mode=hybrid --require-fresh --context --linked --explain
 ```
 
-With Qdrant but no embedding service:
+With either storage backend and no embedding service:
 
 ```bash
 untangle index --embedder=offline

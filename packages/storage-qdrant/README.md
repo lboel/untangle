@@ -65,9 +65,10 @@ and client TF vectors produced the expected hybrid ranking.
 - Additional tests cover byte budgets triggering before point count, `POINT_TOO_LARGE`, partial
   failure isolation, timeout versus missing collection, side-effect-free status reads, multipart
   roundtrip, incomplete shards producing `GRAPH_INCOMPLETE`, and profile separation (§13.4).
-- `qdrant.integration.test.ts` uses real Qdrant (`UNTANGLE_QDRANT_URL`, default
-  `http://127.0.0.1:6333`), **self-skips** when unreachable, creates only randomly test-prefixed
-  collections (`untangle_it_<random>_`) and guarantees their deletion in `afterAll`.
+- `qdrant.integration.test.ts` uses real Qdrant only when the invoker explicitly sets
+  `UNTANGLE_QDRANT_INTEGRATION_URL`; it has no default endpoint and skips without a
+  network probe when unset. With an explicit endpoint, it skips when unreachable, creates
+  only randomly test-prefixed collections (`untangle_it_<random>_`) and deletes them in `afterAll`.
 
 <a id="entscheidungen"></a>
 

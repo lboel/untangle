@@ -20,7 +20,7 @@ legacy Qdrant selections are preserved. Init and doctor do not create database t
 
 With LanceDB, the Qdrant/Ollama Compose offer is hidden. Symbol and lexical search can use
 `index --embedder=offline`; language-model semantics require a separately configured embedder.
-For service-backed search, select an owned or external Qdrant service. Switching storage
+For a server-backed index, select an owned or external Qdrant service. Switching storage
 requires indexing that backend; old databases are preserved and never silently migrated.
 
 ## Offers

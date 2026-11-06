@@ -7,6 +7,9 @@ required approvals are documented in the [release guide](./docs/RELEASE.md).
 
 ### Repository context for coding agents
 
+- Embedded LanceDB is the default for new local indices; Qdrant remains selectable.
+  Backend and path changes select separate, freshness-checked indices without copying
+  or deleting the previous backend's data.
 - Independent symbol, lexical and semantic retrieval with hybrid fusion. Index/query
   share versioned identifier tokenization.
 - Inspectable index freshness, explicit `require-fresh`, refresh/reindex and visible
@@ -44,8 +47,8 @@ required approvals are documented in the [release guide](./docs/RELEASE.md).
 - A badge-based English README, light/dark yarn marks and a transparent 3D brand
   illustration, with repository-wide first-party AGPL licensing and asset provenance.
 - A separate GitHub Pages workflow publishes the checked static website and its license
-  notices while the source repository remains private. Website publication and npm
-  publication are independent actions.
+  notices. Website deployment, repository visibility and npm publication are independent
+  actions.
 - Checkout setup produces an initial index-free report and a project-specific stdio-MCP
   template, without automatically registering agent clients.
 - [Agent workflow](./docs/AGENT_WORKFLOW.md) with a copyable task brief, feature manifest,
