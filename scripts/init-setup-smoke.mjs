@@ -476,6 +476,7 @@ export async function runInitSetupSmoke(
           cwd: unrelated,
           actions: [
             readyMarker,
+            "Where should the search index live?",
             "Add an analyzer or local search service?",
             "Create a local feature/code map?",
             "Open the feature/code map after setup?",
@@ -490,7 +491,7 @@ export async function runInitSetupSmoke(
         const result = JSON.parse(r.stdout);
         assert.equal(result.timedOut, false, result.terminal);
         assert.equal(result.exitCode, 0, result.terminal);
-        assert.equal(result.actionsSent, 5);
+        assert.equal(result.actionsSent, 6);
         assert.equal(result.terminalRestored, true);
         assert.equal(result.stdout, `${path.join(root, "untangle.toml")}\n`);
         const after = captureQuickstartTree(root);
@@ -543,6 +544,7 @@ export async function runInitSetupSmoke(
           const before = captureQuickstartTree(root);
           const actions = [
             { marker: readyMarker, inputBase64: "G1tCDQ==" },
+            { marker: "Where should the search index live?", inputBase64: "DQ==" },
             ...["Vision document", "Specification document", "Feature manifest"].map((marker) => ({
               marker,
               inputBase64: "DQ==",
@@ -573,7 +575,7 @@ export async function runInitSetupSmoke(
           });
           assert.equal(result.timedOut, false, result.terminal);
           assert.equal(result.exitCode, 0, result.terminal);
-          assert.equal(result.actionsSent, 9);
+          assert.equal(result.actionsSent, 10);
           assert.equal(result.terminalRestored, true);
           assert.equal(result.stdout, `${path.join(root, "untangle.toml")}\n`);
           const after = captureQuickstartTree(root);

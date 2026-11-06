@@ -71,9 +71,12 @@ describe("init feature alignment integration", () => {
 
   afterEach(() => rmSync(temporary, { recursive: true, force: true }));
 
-  it("automatically inspects the default feature map and retains a single infrastructure next step", async () => {
+  it("automatically inspects the default feature map and retains the legacy Qdrant infrastructure next step", async () => {
     writeFileSync(path.join(root, "untangle.features.json"), JSON.stringify(MANIFEST));
-    const result = await runInit({ root, offline: true, dryRun: true, force: false }, { env: {} });
+    const result = await runInit(
+      { root, offline: true, dryRun: true, force: false, storageBackend: "qdrant" },
+      { env: {} },
+    );
     expect(result.findings.featureAlignment).toMatchObject({
       status: "needs_review",
       semanticConformance: "not_independently_proven",

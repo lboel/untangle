@@ -73,7 +73,14 @@ export function buildConfigDraft(findings: ProjectFindingsV1): ConfigDraftV1 {
         ]),
       },
     ],
-    qdrant: buildQdrantSection(findings),
+    ...(findings.storage?.backend === "lancedb"
+      ? {
+          storage: {
+            backend: "lancedb" as const,
+            ...(findings.storage.path === undefined ? {} : { path: findings.storage.path }),
+          },
+        }
+      : { storage: { backend: "qdrant" as const }, qdrant: buildQdrantSection(findings) }),
     embeddings: buildEmbeddingSection(findings),
     index: {
       // The only index knob `init` moves: a project whose sources are wider
@@ -94,7 +101,16 @@ export function buildConfigDraft(findings: ProjectFindingsV1): ConfigDraftV1 {
   const validation = validateEffectiveConfig(merged);
   return {
     layer,
-    warnings: validation.warnings.map((issue) => `${issue.path}: ${issue.message}`),
+    warnings: [
+      ...validation.warnings.map((issue) => `${issue.path}: ${issue.message}`),
+      ...(findings.storage?.configurationWarnings ?? []),
+      ...(findings.storage?.directoryStatus === "not-directory" ||
+      findings.storage?.directoryStatus === "unreadable"
+        ? [
+            `Local storage ${findings.storage.directory}: ${findings.storage.directoryStatus}${findings.storage.detail === undefined ? "" : ` (${findings.storage.detail})`}. Indexing cannot use this path.`,
+          ]
+        : []),
+    ],
     errors: validation.errors.map((issue) => `${issue.path}: ${issue.message} [${issue.code}]`),
   };
 }
@@ -124,6 +140,13 @@ function productContextArtifacts(
  * running is somebody else's (spec.md §3.2).
  */
 function buildQdrantSection(findings: ProjectFindingsV1): QdrantSection {
+  if (findings.storage?.qdrantMode !== undefined) {
+    return {
+      mode: findings.storage.qdrantMode,
+      ...(findings.storage.qdrantUrl === undefined ? {} : { url: findings.storage.qdrantUrl }),
+      collectionPrefix: collectionPrefixFor(findings),
+    };
+  }
   if (findings.qdrant.outcome === "reachable" && findings.qdrant.url !== undefined) {
     return {
       mode: "external",
@@ -177,13 +200,24 @@ function buildEmbeddingSection(findings: ProjectFindingsV1): EmbeddingSection {
  * nothing blocks it and the step is to index.
  */
 export function nextStepFor(findings: ProjectFindingsV1): string {
+  if (findings.storage?.backend === "lancedb") {
+    if (
+      findings.storage.directoryStatus === "not-directory" ||
+      findings.storage.directoryStatus === "unreadable"
+    )
+      return `Local storage path ${JSON.stringify(findings.storage.directory)} is ${findings.storage.directoryStatus}. Next step: choose an accessible directory with UNTANGLE_LANCEDB_PATH and rerun \`untangle init\`.`;
+    if (findings.ollama.outcome !== "reachable" || findings.ollama.chosenModel === undefined)
+      return "Local LanceDB storage needs no service. Next step: `untangle index --embedder=offline` (local vectors without semantic embeddings).";
+  }
   if (findings.ollama.outcome !== "reachable") {
     return `No embedding provider at ${findings.ollama.url}. Next step: start \`ollama serve\` and rerun \`untangle init\`.`;
   }
   if (findings.ollama.chosenModel === undefined) {
     return `${findings.ollama.url} is running but reports no embedding model. Next step: \`ollama pull ${DEFAULT_EMBEDDING_CONFIG.model}\`.`;
   }
-  if (findings.qdrant.outcome !== "reachable") {
+  if (findings.storage?.backend !== "lancedb" && findings.qdrant.outcome !== "reachable") {
+    if (findings.storage?.qdrantMode === "external")
+      return `The selected Qdrant server ${JSON.stringify(findings.storage.qdrantUrl)} is unreachable. Next step: check that server's URL and availability, then rerun \`untangle doctor\`.`;
     return "No vector store is reachable. Next step: start an owned instance with `docker run -d --name untangle-qdrant -p 16333:6333 -v untangle-qdrant-data:/qdrant/storage qdrant/qdrant`, then run `untangle index`.";
   }
   // WP-228: Der Anbieter laeuft, das Modell ist da, der Speicher steht — und

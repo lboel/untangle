@@ -82,6 +82,7 @@ export function renderUntangleToml(input: RenderInput): string {
   renderHeader(writer, findings, limits);
   renderIdentity(writer, draft.layer);
   renderRepositories(writer, findings, draft.layer);
+  renderStorage(writer, findings, draft.layer);
   renderQdrant(writer, findings, draft.layer);
   renderEmbeddings(writer, findings, draft.layer);
   renderIndex(writer, draft.layer);
@@ -187,15 +188,22 @@ function renderHeader(writer: TomlWriter, findings: ProjectFindingsV1, limits: I
   // benutzt. Er steht auch dann in der Datei, wenn er gut ausfiel — sonst
   // liesse sich spaeter nicht unterscheiden, ob er gut ausfiel oder fehlte.
   writer.comment(`  ${describeEmbedProbeForFile(ollama)}`);
-  const qdrant = findings.qdrant;
-  writer.comment(
-    qdrant.outcome === "reachable"
-      ? `  Vector store: reachable at ${qdrant.url ?? "?"}`
-      : `  Vector store: unreachable (checked: ${qdrant.probedUrls.join(", ")}); this is not an error.`,
-  );
-  for (const skipped of qdrant.skippedUrls) {
-    writer.comment(`  DELIBERATELY NOT CHECKED: ${skipped.url}`);
-    writer.comment(`     ${skipped.reason}`);
+  if (findings.storage?.backend === "lancedb") {
+    writer.comment(
+      `  Vector store: embedded LanceDB at ${findings.storage.directory} (directory ${findings.storage.directoryStatus}).`,
+    );
+    writer.comment("  No database was opened or created. Docker and Qdrant were not probed.");
+  } else {
+    const qdrant = findings.qdrant;
+    writer.comment(
+      qdrant.outcome === "reachable"
+        ? `  Vector store: reachable at ${qdrant.url ?? "?"}`
+        : `  Vector store: unreachable (checked: ${qdrant.probedUrls.join(", ")}); this is not an error.`,
+    );
+    for (const skipped of qdrant.skippedUrls) {
+      writer.comment(`  DELIBERATELY NOT CHECKED: ${skipped.url}`);
+      writer.comment(`     ${skipped.reason}`);
+    }
   }
 
   writer.comment("");
@@ -366,6 +374,37 @@ function renderRepositories(
   writer.blank();
 }
 
+function renderStorage(
+  writer: TomlWriter,
+  findings: ProjectFindingsV1,
+  layer: RawConfigLayer,
+): void {
+  const storage = layer.storage;
+  if (storage === undefined) return;
+  const backend = storage.backend ?? "lancedb";
+  writer.comments([
+    RULE,
+    "SEARCH STORAGE",
+    backend === "lancedb"
+      ? "Embedded LanceDB stores local search data without Docker or a running service."
+      : "Qdrant was explicitly selected; its server configuration follows below.",
+    "Changing backend selects a separate index. Rebuild it with `untangle index`.",
+    RULE,
+  ]);
+  writer.table(["storage"]);
+  writer.scalar("backend", backend);
+  if (backend === "lancedb" && storage.path !== undefined) {
+    writer.comment(
+      "Relative to this project root. The directory is created only when indexing writes data.",
+    );
+    writer.scalar("path", storage.path);
+    writer.comment(
+      `Inspection: ${findings.storage?.directoryStatus ?? "not inspected"}; no database was opened.`,
+    );
+  }
+  writer.blank();
+}
+
 function renderQdrant(
   writer: TomlWriter,
   findings: ProjectFindingsV1,
@@ -380,14 +419,16 @@ function renderQdrant(
     "VECTOR STORE",
     "",
     qdrant.mode === "external"
-      ? "`external`, because an instance actually responded at the address below."
-      : "`managed`, because no instance responded: `untangle` then starts an owned",
+      ? "An external Qdrant endpoint was selected at the address below."
+      : "An owned Qdrant endpoint was selected. Plain init starts no containers.",
     qdrant.mode === "external"
-      ? "Untangle never modifies a foreign instance (spec.md §3.2); it creates only"
-      : "instance with its own port and volume. A foreign instance is never",
+      ? findings.qdrant.outcome === "reachable"
+        ? "The server responded during discovery. Untangle writes only owned collections."
+        : "The server is not currently reachable; selecting it does not start a service."
+      : "Guided setup can prepare or explicitly execute an isolated service recipe.",
     qdrant.mode === "external"
-      ? "owned collections with the prefix below."
-      : "taken over (spec.md §3.2).",
+      ? "Only collections with the configured prefix belong to this project."
+      : "A foreign instance is never taken over (spec.md §3.2).",
     RULE,
   ]);
   writer.table(["qdrant"]);

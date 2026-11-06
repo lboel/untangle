@@ -32,6 +32,13 @@ export interface QdrantConfig {
   upsertBudgetBytes?: number;
 }
 
+/** Search backend selection. Relative local paths resolve against the repository root. */
+export interface StorageConfig {
+  backend: "lancedb" | "qdrant";
+  /** Embedded LanceDB directory; defaults to `.untangle/index/lancedb`. */
+  path?: string;
+}
+
 /** spec.md §4.5. */
 export interface EmbeddingConfig {
   provider: "ollama";
@@ -273,6 +280,7 @@ export interface UntangleConfigV1 {
   workspaceId?: string;
   projectId?: string;
   repositories?: RepositoryConfig[];
+  storage?: StorageConfig;
   qdrant?: QdrantConfig;
   embeddings?: EmbeddingConfig;
   index?: IndexConfig;
@@ -292,6 +300,7 @@ export const UNTANGLE_CONFIG_V1_KEYS = [
   "workspaceId",
   "projectId",
   "repositories",
+  "storage",
   "qdrant",
   "embeddings",
   "index",
@@ -343,6 +352,7 @@ export type RawConfigLayer = {
  */
 export interface EffectiveUntangleConfigV1 extends UntangleConfigV1 {
   schemaVersion: 1;
+  storage: StorageConfig;
   qdrant: QdrantConfig;
   embeddings: EmbeddingConfig;
   index: IndexConfig;

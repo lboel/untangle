@@ -37,6 +37,7 @@ import { buildLanguageCensus } from "./languages.js";
 import { assessProductContext } from "./product-context.js";
 import { renderUntangleToml } from "./render.js";
 import { DEFAULT_OLLAMA_URL, probeOllama, probeQdrant } from "./services.js";
+import { inspectInitStorage } from "./storage.js";
 import { detectTopology } from "./topology.js";
 import { DEFAULT_INIT_LIMITS } from "./types.js";
 import type {
@@ -45,6 +46,7 @@ import type {
   InitOutcome,
   InitResultV1,
   ProjectFindingsV1,
+  StorageFindingsV1,
 } from "./types.js";
 
 /** The file `init` writes. */
@@ -69,6 +71,8 @@ export interface InitOptionsV1 {
   dryRun: boolean;
   /** Skip every network probe; the infrastructure counts as absent. */
   offline: boolean;
+  /** Explicit selection; otherwise environment and existing configuration apply. */
+  storageBackend?: "lancedb" | "qdrant";
   preferredModel?: string;
   /** Product intent sources, relative to the chosen project root. */
   visionPath?: string;
@@ -89,6 +93,7 @@ export async function runInit(
   const limits: InitLimitsV1 = { ...DEFAULT_INIT_LIMITS, ...deps.limits };
 
   const root = await canonicalRoot(fs, options.root);
+  const storage = await inspectInitStorage(fs, root, options.storageBackend, env, deps.signal);
   const findings = await collectFindings({
     fs,
     http,
@@ -96,6 +101,7 @@ export async function runInit(
     env,
     limits,
     root,
+    storage,
     ...(options.preferredModel === undefined ? {} : { preferredModel: options.preferredModel }),
     ...(options.visionPath === undefined ? {} : { visionPath: options.visionPath }),
     ...(options.specPath === undefined ? {} : { specPath: options.specPath }),
@@ -173,6 +179,7 @@ interface CollectInput {
   env: Readonly<Record<string, string | undefined>>;
   limits: InitLimitsV1;
   root: string;
+  storage: StorageFindingsV1;
   preferredModel?: string;
   visionPath?: string;
   specPath?: string;
@@ -234,11 +241,19 @@ async function collectFindings(input: CollectInput): Promise<ProjectFindingsV1> 
     http,
     limits,
     ollamaUrl: env["UNTANGLE_OLLAMA_URL"] ?? env["UNTANGLE_EMBEDDINGS_URL"] ?? DEFAULT_OLLAMA_URL,
-    qdrantUrls: qdrantProbeList(env),
+    qdrantUrls: qdrantProbeList({
+      ...env,
+      ...(input.storage.qdrantUrl === undefined
+        ? {}
+        : { UNTANGLE_QDRANT_URL: input.storage.qdrantUrl }),
+    }),
     ...(input.preferredModel === undefined ? {} : { preferredModel: input.preferredModel }),
   };
   const ollama = await probeOllama(probeInput);
-  const qdrant = await probeQdrant(probeInput);
+  const qdrant =
+    input.storage.backend === "qdrant"
+      ? await probeQdrant(probeInput)
+      : { outcome: "not-probed" as const, probedUrls: [], skippedUrls: [] };
 
   return {
     schemaVersion: 1,
@@ -251,6 +266,7 @@ async function collectFindings(input: CollectInput): Promise<ProjectFindingsV1> 
     ignore,
     ollama,
     qdrant,
+    storage: input.storage,
     skipped: {
       schemaVersion: 1,
       generationId: "untangle-init",

@@ -58,5 +58,6 @@ export type {
   OllamaFindingsV1,
   ProjectFindingsV1,
   QdrantFindingsV1,
+  StorageFindingsV1,
   TopologyFindingsV1,
 } from "./types.js";

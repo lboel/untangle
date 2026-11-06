@@ -24,6 +24,7 @@ import path from "node:path";
 import { OfflineEmbeddingProvider } from "@untangle-code/core";
 import {
   compareCodepoints,
+  isUntangleError,
   embeddingProfileShortId,
   INDEX_CONTEXT_INCOMPLETE_WARNING_CODE,
   uniqueSortedByCodepoints,
@@ -86,6 +87,8 @@ import {
   wireEmbedder,
   wireSearchEngine,
   wireStorage,
+  matchesStoredBackend,
+  storageIndexScope,
 } from "../cli/workspace.js";
 
 /**
@@ -271,7 +274,10 @@ export const queryCommand: Command = {
       [EXIT.ok, "Search completed, including zero-hit results."],
       [EXIT.operational, "Invalid configuration or a storage error."],
       [EXIT.usage, "Invalid arguments."],
-      [EXIT.environment, "No index for this profile, or Qdrant/Ollama is unreachable."],
+      [
+        EXIT.environment,
+        "No compatible index, or the selected storage/embedding provider is unavailable.",
+      ],
       [EXIT.cancelled, "Cancelled."],
     ],
   },
@@ -329,7 +335,7 @@ export const queryCommand: Command = {
         selectedRepoIds,
       }),
       view.workspaceId,
-      { repoIds: selectedRepoIds, refs: selectedRefIds },
+      { repoIds: selectedRepoIds, refs: selectedRefIds, ...storageIndexScope(wiring) },
     );
     if (indexStateResolution.kind === "invalid") {
       const details = indexStateResolution.diagnostics
@@ -354,7 +360,7 @@ export const queryCommand: Command = {
         }
       : view;
     const collection = useOffline
-      ? codeCollectionName(wiring.qdrantConfig.collectionPrefix, searchView.profileShortId)
+      ? codeCollectionName(wiring.collectionPrefix, searchView.profileShortId)
       : wiring.codeCollection;
     const foundIndexStates = queryIndexStatesFromResolution(
       indexStateResolution,
@@ -364,7 +370,7 @@ export const queryCommand: Command = {
       ({ state }) =>
         state.embeddingProfileId === searchView.profileId &&
         state.collection === collection &&
-        state.qdrantUrl === wiring.qdrantConfig.url,
+        matchesStoredBackend(state, wiring),
     );
     const freshnessCheck = await withDeadline(
       (signal) =>
@@ -437,8 +443,8 @@ export const queryCommand: Command = {
       ctx.signal.throwIfAborted();
       throw new EnvironmentError(
         probe.timedOut
-          ? `Qdrant at ${wiring.qdrantConfig.url} did not answer within ${String(timeoutMs)}ms.`
-          : `Qdrant at ${wiring.qdrantConfig.url} is unreachable: ${errorMessage(probe.error)}`,
+          ? `${wiring.backend === "qdrant" ? "Qdrant" : "LanceDB"} at ${wiring.storeUrl} did not answer within ${String(timeoutMs)}ms.`
+          : `${wiring.backend === "qdrant" ? "Qdrant" : "LanceDB"} at ${wiring.storeUrl} is unreachable: ${errorMessage(probe.error)}`,
         "Run `untangle doctor` for the next step specific to this failure.",
         { cause: probe.error },
       );
@@ -458,7 +464,7 @@ export const queryCommand: Command = {
       }
       throw new EnvironmentError(
         `No index exists for this embedding profile: collection "${collection}" ` +
-          `is absent from ${wiring.qdrantConfig.url}. Nothing was searched; this does not ` +
+          `is absent from ${wiring.storeUrl}. Nothing was searched; this does not ` +
           `mean there are no results.`,
         useOffline
           ? "Run `untangle index --embedder=offline` to build this collection."
@@ -486,12 +492,12 @@ export const queryCommand: Command = {
       );
       if (!outcome.ok) {
         ctx.signal.throwIfAborted();
-        throw toRuntimeError(outcome, wiring.qdrantConfig.url, timeoutMs, "grep", useOffline);
+        throw toRuntimeError(outcome, wiring.storeUrl, timeoutMs, "grep", useOffline);
       }
       outcome.value.indexFreshness = indexFreshness;
       addFreshnessWarning(outcome.value, indexFreshness);
       renderGrep(ctx, outcome.value, format);
-      assertEverythingWasSearched(ctx, outcome.value.skipped);
+      assertEverythingWasSearched(ctx, outcome.value.skipped, wiring.backend);
       return EXIT.ok;
     }
 
@@ -508,12 +514,12 @@ export const queryCommand: Command = {
     );
     if (!outcome.ok) {
       ctx.signal.throwIfAborted();
-      throw toRuntimeError(outcome, wiring.qdrantConfig.url, timeoutMs, request, useOffline);
+      throw toRuntimeError(outcome, wiring.storeUrl, timeoutMs, request, useOffline);
     }
     outcome.value.indexFreshness = indexFreshness;
     addFreshnessWarning(outcome.value, indexFreshness);
     renderSearch(ctx, outcome.value, format, boolFlag(args, "explain"));
-    assertEverythingWasSearched(ctx, outcome.value.skipped);
+    assertEverythingWasSearched(ctx, outcome.value.skipped, wiring.backend);
     return EXIT.ok;
   },
 };
@@ -724,6 +730,7 @@ export function failedTargets(skipped: readonly SkipLedgerEntryV1[]): readonly S
 function assertEverythingWasSearched(
   ctx: CommandContext,
   skipped: readonly SkipLedgerEntryV1[],
+  backend: "lancedb" | "qdrant",
 ): void {
   const failed = failedTargets(skipped);
   if (failed.length === 0) return;
@@ -733,7 +740,7 @@ function assertEverythingWasSearched(
   throw new EnvironmentError(
     `${String(failed.length)} search target(s) did not respond. The result above is ` +
       "incomplete; this does not mean nothing was found.",
-    "Run `untangle doctor` to check Ollama and Qdrant independently with separate deadlines.",
+    `Run \`untangle doctor\` to check Ollama and ${backend === "lancedb" ? "LanceDB" : "Qdrant"} independently with separate deadlines.`,
   );
 }
 
@@ -973,21 +980,22 @@ export function toRuntimeError(
   request: Pick<UntangleSearchRequestV1, "mode" | "includeContext" | "includeLinked"> | "grep",
   useOffline: boolean,
 ): Error {
+  const backendLabel = qdrantUrl.startsWith("file:") ? "LanceDB" : "Qdrant";
   if (outcome.timedOut) {
     const mode = request === "grep" ? "grep" : (request.mode ?? "hybrid");
     const usesEmbedding = mode === "semantic" || mode === "hybrid";
-    const stages = [`Search retrieval from Qdrant at ${qdrantUrl}`];
+    const stages = [`Search retrieval from ${backendLabel} at ${qdrantUrl}`];
     if (usesEmbedding)
       stages.push(useOffline ? "local query embedding" : "Query embedding through Ollama");
     const graphFlags: string[] = [];
     if (request !== "grep" && request.includeContext) graphFlags.push("--context");
     if (request !== "grep" && request.includeLinked) graphFlags.push("--linked");
     if (graphFlags.length > 0)
-      stages.push(`Graph enrichment (${graphFlags.join(" ")}) from Qdrant`);
+      stages.push(`Graph enrichment (${graphFlags.join(" ")}) from ${backendLabel}`);
     return new EnvironmentError(
       `The query was cancelled after ${String(timeoutMs)}ms; no result is available. ` +
         `Mode "${mode}" covers ${stages.join("; ")}.`,
-      `Run \`untangle doctor\` to check Qdrant${usesEmbedding && !useOffline ? " and Ollama" : ""} with separate deadlines.` +
+      `Run \`untangle doctor\` to check ${backendLabel}${usesEmbedding && !useOffline ? " and Ollama" : ""} with separate deadlines.` +
         (graphFlags.length > 0
           ? " Compare the runtime with the same query without graph enrichment."
           : ""),
@@ -996,10 +1004,18 @@ export function toRuntimeError(
   }
   const error = outcome.error;
   const message = errorMessage(error);
-  if (/QDRANT_UNAVAILABLE|fetch failed|ECONNREFUSED|ENOTFOUND|timed out/iu.test(message)) {
+  if (
+    (isUntangleError(error) &&
+      (error.code === "QDRANT_UNAVAILABLE" ||
+        error.code === "LANCEDB_UNAVAILABLE" ||
+        error.code === "LANCEDB_SCHEMA_INCOMPATIBLE")) ||
+    /QDRANT_UNAVAILABLE|LANCEDB_UNAVAILABLE|fetch failed|ECONNREFUSED|ENOTFOUND|timed out/iu.test(
+      message,
+    )
+  ) {
     return new EnvironmentError(
       `The store at ${qdrantUrl} did not answer the query: ${message}`,
-      "Run `untangle doctor` to check Qdrant and Ollama independently.",
+      `Run \`untangle doctor\` to check ${backendLabel} and Ollama independently.`,
       { cause: error },
     );
   }

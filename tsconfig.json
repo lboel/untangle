@@ -30,6 +30,7 @@
     { "path": "packages/storage-local" },
     { "path": "packages/search" },
     { "path": "packages/storage-qdrant" },
+    { "path": "packages/storage-lancedb" },
     { "path": "packages/watcher" },
     { "path": "packages/extension-runtime" },
     { "path": "packages/file-graph" },

@@ -30,6 +30,14 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+/** URI-backed and network locations are outside the embedded backend contract. */
+function isLocalStoragePath(value: unknown): value is string {
+  if (typeof value !== "string" || value.trim() === "" || value.includes("\0")) return false;
+  if (/^[\\/]{2}/u.test(value)) return false;
+  if (/^[A-Za-z]:[\\/]/u.test(value)) return true;
+  return !/^[A-Za-z][A-Za-z0-9+.-]*:/u.test(value);
+}
+
 function checkEnum(
   value: unknown,
   allowed: readonly string[],
@@ -194,6 +202,27 @@ export function validateEffectiveConfig(config: Record<string, unknown>): Valida
       message: `unsupported "schemaVersion" ${JSON.stringify(config["schemaVersion"])}; only 1 is understood without migration`,
       path: "schemaVersion",
     });
+  }
+
+  const storage = config["storage"];
+  if (storage !== undefined) {
+    if (!isRecord(storage)) {
+      errors.push({
+        code: "CONFIG_INVALID",
+        message: '"storage" must be an object',
+        path: "storage",
+      });
+    } else {
+      checkEnum(storage["backend"], ["lancedb", "qdrant"], "storage.backend", errors);
+      if (storage["path"] !== undefined && !isLocalStoragePath(storage["path"])) {
+        errors.push({
+          code: "CONFIG_INVALID",
+          message:
+            '"storage.path" must be a non-empty local filesystem path, not a URI or network path',
+          path: "storage.path",
+        });
+      }
+    }
   }
 
   const qdrant = config["qdrant"];

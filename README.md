@@ -140,7 +140,7 @@ stays separate. Pause, resume or return to the tangle without changing code or m
 Open **Groups** for complete group names and visible/total snapshot-node counts at readable
 text size, independently of the diagram's zoom.
 
-Setup offers Qdrant/Ollama, a pinned local SonarQube server or existing Sonar project metrics,
+Setup defaults to an embedded LanceDB index and offers Qdrant/Ollama, a pinned local SonarQube server or existing Sonar project metrics,
 a hash-verified Sentrux binary with an MCP template, and custom analyzer formats. Installing
 a server or preparing an MCP entry does not establish a successful scan.
 [Setup and integration details →](./docs/INIT_INTEGRATIONS.md)
@@ -259,30 +259,63 @@ budgets can exit 5 while preserving the report.
 
 ## Local search with inspectable freshness
 
-Qdrant stores the index. Semantic search additionally uses a configured embedding service,
-for example `qwen3-embedding:0.6b` through Ollama. With reachable, configured services:
+New projects use **LanceDB**, stored in `.untangle/index/lancedb`. No database server or
+Docker is needed. Qdrant remains available for an owned local service or an existing server.
+Semantic search separately needs a configured embedding service, such as Ollama.
+
+Start with symbol and lexical search, without an embedding service:
 
 ```bash
 untangle init --no-interactive
 untangle doctor
-untangle index
+untangle index --embedder=offline
 
 untangle query "lookupAccount" --mode=symbol --require-fresh --context --linked
 untangle query "lookup_account" --mode=lexical --require-fresh --context --linked
-untangle query "find an account by its identifier" --mode=semantic --require-fresh --context --linked
-untangle query "find an account by its identifier" --mode=hybrid --require-fresh --context --linked --explain
 ```
 
 Symbol, lexical and semantic paths are independent; hybrid fuses them. Indexing and queries
 share versioned identifier tokenization: whole names and components of `getUserById`,
 `user_id` and `HTTPServer` stay searchable. Scores, provenance, coverage and omissions remain visible.
 
-| Capability | Qdrant | Embedding service |
+| Capability | Storage | Embedding service |
 |---|---|---|
 | Direct complexity, feature and HTTP-boundary analysis | Not required | Not required |
-| Index with `--embedder=offline` | Required | Not required; deterministic vectors without language-model semantics |
-| Symbol/lexical query against a compatible index | Required | Not required for the query |
-| Semantic/hybrid query with a service profile | Required | Required |
+| Index with `--embedder=offline` | LanceDB or Qdrant | Not required; deterministic vectors without language-model semantics |
+| Symbol/lexical query against a compatible index | LanceDB or Qdrant | Not required for the query |
+| Semantic/hybrid query with a service profile | LanceDB or Qdrant | Required |
+
+To use semantic search, configure and start your embedding provider, run `untangle index`
+with its service profile, then query with `--mode=semantic` or `--mode=hybrid`. Offline and
+service profiles remain separate indices.
+
+Choose storage during `untangle init --interactive`, pass `init --storage=lancedb` or
+`init --storage=qdrant`, or set it explicitly in the project configuration:
+
+```toml
+[storage]
+backend = "lancedb"
+path = ".untangle/index/lancedb" # Relative to the repository root
+```
+
+For Qdrant, set `storage.backend = "qdrant"` and retain the project's `[qdrant]` settings.
+Existing configurations with a Qdrant section keep using Qdrant. For older zero-configuration
+Qdrant indices, explicitly select Qdrant to access that backend again. Environment overrides are
+`UNTANGLE_STORAGE_BACKEND` and `UNTANGLE_LANCEDB_PATH`. For example, choose LanceDB for
+one invocation without rewriting an existing Qdrant configuration:
+
+```bash
+UNTANGLE_STORAGE_BACKEND=lancedb untangle index --embedder=offline
+UNTANGLE_STORAGE_BACKEND=lancedb untangle query "lookupAccount" --mode=symbol --require-fresh
+```
+
+**Switching selects a separate index; it does not copy or delete data.** Run `untangle index`
+for the selected backend and embedding profile. Switching back can reuse its prior index
+once freshness checks pass. Each index state is bound to its backend and canonical location.
+
+The first LanceDB adapter uses bounded, exact scans for vector and identifier-token ranking.
+It stores real Lance tables; it does not promise Qdrant-equivalent scores, approximate-nearest-
+neighbor indexing, or performance on large repositories. [Storage details →](./packages/storage-lancedb/README.md)
 
 <details>
 <summary>Refresh, watch and partial-search contracts</summary>
@@ -412,7 +445,8 @@ pnpm e2e:release
 pnpm e2e:search
 ```
 
-Unit tests need no search services; live search acceptance uses Qdrant/Ollama. `e2e:release`
+Unit tests need no search services. LanceDB persistence is checked locally; live semantic
+search acceptance uses an embedding service, and Qdrant has separate integration coverage. `e2e:release`
 installs unchanged original tarballs through isolated npm and pnpm consumers. The configured
 release matrix covers Linux/macOS × Node 22/24; only actual runs at the candidate commit
 establish platform evidence. Local checks do not prove an unrun matrix or public installation.

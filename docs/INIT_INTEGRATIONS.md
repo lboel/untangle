@@ -11,17 +11,29 @@ and symlink paths are not overwritten. Cancellation records a partial receipt wh
 metadata path can be written safely and propagates the abort. Already started owned
 services are not silently deleted.
 
+## Search storage
+
+New projects default to embedded LanceDB under `.untangle/index/lancedb`. The TUI asks where
+the index should live before offering analyzers. `init --storage=lancedb` or
+`init --storage=qdrant` sets the backend in scriptable setup. Existing explicit storage and
+legacy Qdrant selections are preserved. Init and doctor do not create database tables.
+
+With LanceDB, the Qdrant/Ollama Compose offer is hidden. Symbol and lexical search can use
+`index --embedder=offline`; language-model semantics require a separately configured embedder.
+For service-backed search, select an owned or external Qdrant service. Switching storage
+requires indexing that backend; old databases are preserved and never silently migrated.
+
 ## Offers
 
 | Selection | Actual effect | Remaining step |
 |---|---|---|
-| Local search | Owned Compose recipe with digest-pinned Qdrant 1.12.1 and Ollama 0.5.4; optionally start and pull `nomic-embed-text`. | `doctor`, indexing and a real query; no index is claimed. |
+| Qdrant local search | Owned Compose recipe with digest-pinned Qdrant 1.12.1 and Ollama 0.5.4; optionally start and pull `nomic-embed-text`. | `doctor`, indexing and a real query; no index is claimed. |
 | Local SonarQube | Digest-pinned Community evaluation server, loopback port 19000, owned volumes, telemetry disabled. | Account/password, project, scanner and token setup. |
 | Existing SonarQube | Generate a declared HTTP manifest for prior project metrics, explicitly import/enable it and attempt an actual numeric read. | Missing credentials/analysis remain `needs_configuration`; remote source freshness is unverified. |
 | Sentrux | Install hash-verified release binary 0.5.7 locally, check `--version`, save an MCP template. | Explicitly import the entry in your agent host; this is a separate MCP service, not a normalized Untangle adapter. |
 | Other analyzers | Import an explicitly reviewed external manifest through the existing extension command. | Enable the ID, acknowledge applicable licenses/rules, then execute explicitly. |
 
-The two Sonar modes are mutually exclusive in a single setup selection. Local search binds
+The two Sonar modes are mutually exclusive in a single setup selection. The Qdrant recipe binds
 only to `127.0.0.1`: Qdrant 16333/16334, Ollama 11435. An occupied port is no reason to stop
 or take over a foreign service. The default model profile is `nomic-embed-text`, 768 dimensions,
 context 2048; the pinned older Ollama image is not configured with an incompatible Qwen3 model.

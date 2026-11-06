@@ -18,6 +18,7 @@ import type {
   QualityGateConfig,
   RawConfigLayer,
   SearchConfig,
+  StorageConfig,
   TelemetryConfig,
 } from "./types.js";
 
@@ -61,6 +62,12 @@ export const DEFAULT_QDRANT_CONFIG: QdrantConfig = {
   maxRetries: 3,
   upsertMaxPoints: 256,
   upsertBudgetBytes: 4 * 1024 * 1024,
+};
+
+/** Embedded search for new projects; explicit legacy Qdrant layers retain their backend. */
+export const DEFAULT_STORAGE_CONFIG: StorageConfig = {
+  backend: "lancedb",
+  path: ".untangle/index/lancedb",
 };
 
 /** spec.md §4.6; numeric defaults are an Untangle decision, chosen conservatively. */
@@ -186,6 +193,7 @@ export const CURRENT_SCHEMA_VERSION = 1 as const;
  */
 export const PRODUCT_DEFAULT_CONFIG: RawConfigLayer = {
   schemaVersion: CURRENT_SCHEMA_VERSION,
+  storage: DEFAULT_STORAGE_CONFIG,
   qdrant: DEFAULT_QDRANT_CONFIG,
   embeddings: DEFAULT_EMBEDDING_CONFIG,
   index: DEFAULT_INDEX_CONFIG,

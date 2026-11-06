@@ -40,7 +40,10 @@ export interface IndexStateV1 {
   readonly embedder: EmbedderChoice;
   readonly embeddingProfileId: string;
   readonly collection: string;
-  readonly qdrantUrl: string;
+  /** Legacy Qdrant endpoint. Absent for embedded records. */
+  readonly qdrantUrl?: string;
+  readonly storageBackend?: "lancedb" | "qdrant";
+  readonly storeUrl?: string;
   /** Generation des Indexlaufs; fehlt nur in vor Welle 9 geschriebenen Zuständen. */
   readonly generationId?: string;
   /** SHA-256 fingerprint of the complete confirmed file/content manifest. */
@@ -57,10 +60,17 @@ export interface IndexStateV1 {
 export type IndexStateRecordIdentity = Pick<
   IndexStateV1,
   "workspaceId" | "repoId" | "refId" | "embeddingProfileId"
->;
+> &
+  StorageStateIdentity;
 
 /** Identitaet des aktuellen Profils eines Repo/Ref-Paares. */
-export type IndexStateCurrentIdentity = Pick<IndexStateV1, "workspaceId" | "repoId" | "refId">;
+interface StorageStateIdentity {
+  readonly storageBackend?: "lancedb" | "qdrant";
+  readonly storeUrl?: string;
+}
+
+export type IndexStateCurrentIdentity = Pick<IndexStateV1, "workspaceId" | "repoId" | "refId"> &
+  StorageStateIdentity;
 
 /**
  * Index-Report-Daten, aus denen der CLI-Adapter einen persistierbaren Zustand
@@ -116,6 +126,7 @@ export function indexStateRecordKey(identity: IndexStateRecordIdentity): string 
     identity.repoId,
     identity.refId,
     identity.embeddingProfileId,
+    ...storageIdentitySuffix(identity),
   ]);
 }
 
@@ -125,10 +136,16 @@ export function indexStateCurrentKey(identity: IndexStateCurrentIdentity): strin
     identity.workspaceId,
     identity.repoId,
     identity.refId,
+    ...storageIdentitySuffix(identity),
   ]);
 }
 
-/** Lock key shared by every profile publication for one repo/ref pointer. */
+/** Preserve old Qdrant keys; embedded paths get independent publication namespaces. */
+function storageIdentitySuffix(identity: StorageStateIdentity): string[] {
+  return identity.storageBackend === "lancedb" ? ["lancedb", identity.storeUrl ?? ""] : [];
+}
+
+/** Lock key shared by every profile publication for one repo/ref/backend pointer. */
 export function indexStateLockKey(identity: IndexStateCurrentIdentity): string {
   return `index-state:${indexStateCurrentKey(identity)}`;
 }
@@ -177,7 +194,7 @@ export interface IndexStatePublicationOptions {
   readonly assertOwnership?: () => Promise<void>;
 }
 
-interface CurrentPointerV1 {
+interface CurrentPointerV1 extends StorageStateIdentity {
   readonly schemaVersion: 1;
   readonly workspaceId: string;
   readonly repoId: string;
@@ -284,7 +301,8 @@ function isRunningStateFor(current: IndexStateV1, terminal: IndexStateV1): boole
     current.embedder === terminal.embedder &&
     current.embeddingProfileId === terminal.embeddingProfileId &&
     current.collection === terminal.collection &&
-    current.qdrantUrl === terminal.qdrantUrl &&
+    (current.storageBackend ?? "qdrant") === (terminal.storageBackend ?? "qdrant") &&
+    (current.storeUrl ?? current.qdrantUrl) === (terminal.storeUrl ?? terminal.qdrantUrl) &&
     current.generationId !== undefined &&
     current.generationId === terminal.generationId
   );
@@ -333,7 +351,6 @@ export function parseIndexState(text: string): IndexStateV1 | null {
     "refName",
     "embeddingProfileId",
     "collection",
-    "qdrantUrl",
   ] as const;
   const values: Record<string, string> = {};
   for (const key of strings) {
@@ -341,6 +358,8 @@ export function parseIndexState(text: string): IndexStateV1 | null {
     if (!isBoundedString(value)) return null;
     values[key] = value;
   }
+  const storage = parseStorageIdentity(record, true);
+  if (storage === null) return null;
   const generationId = record["generationId"];
   if (generationId !== undefined && !isBoundedString(generationId)) return null;
   const corpusRevisionFingerprint = record["corpusRevisionFingerprint"];
@@ -376,7 +395,7 @@ export function parseIndexState(text: string): IndexStateV1 | null {
     embedder,
     embeddingProfileId: values["embeddingProfileId"] as string,
     collection: values["collection"] as string,
-    qdrantUrl: values["qdrantUrl"] as string,
+    ...storage,
     ...(generationId === undefined ? {} : { generationId }),
     ...(corpusRevisionFingerprint === undefined ? {} : { corpusRevisionFingerprint }),
     ...(indexedAt === undefined ? {} : { indexedAt }),
@@ -400,6 +419,8 @@ export interface IndexStateScope {
   readonly repoIds?: readonly string[];
   /** Accepts human ref names as well as canonical repo-qualified ref IDs. */
   readonly refs?: readonly string[];
+  readonly storageBackend?: "lancedb" | "qdrant";
+  readonly storeUrl?: string;
 }
 
 export interface IndexStateDiagnostic {
@@ -476,7 +497,8 @@ async function collectScopedIndexStates(
       continue;
     }
     for (const entry of registry.entries) {
-      if (!stateMatchesScope(entry.state, workspaceId, selectedRepoIds, selectedRefs)) continue;
+      if (!stateMatchesScope(entry.state, workspaceId, selectedRepoIds, selectedRefs, scope))
+        continue;
       found.push({ repoRoot, ...entry });
     }
   }
@@ -488,9 +510,13 @@ function stateMatchesScope(
   workspaceId: string,
   selectedRepoIds: ReadonlySet<string>,
   selectedRefs: ReadonlySet<string>,
+  scope: IndexStateScope,
 ): boolean {
   return (
     state.workspaceId === workspaceId &&
+    (scope.storageBackend === undefined ||
+      (state.storageBackend ?? "qdrant") === scope.storageBackend) &&
+    (scope.storeUrl === undefined || (state.storeUrl ?? state.qdrantUrl) === scope.storeUrl) &&
     (selectedRepoIds.size === 0 || selectedRepoIds.has(state.repoId)) &&
     (selectedRefs.size === 0 || selectedRefs.has(state.refId) || selectedRefs.has(state.refName))
   );
@@ -841,6 +867,46 @@ async function readBoundedRegularFile(filePath: string): Promise<BoundedFileRead
   }
 }
 
+/** Embedded state identities must be canonical absolute local file URLs. */
+function isLocalStoreUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return (
+      url.protocol === "file:" &&
+      url.hostname === "" &&
+      url.search === "" &&
+      url.hash === "" &&
+      url.href === value &&
+      !url.pathname.includes("%00")
+    );
+  } catch {
+    return false;
+  }
+}
+
+function parseStorageIdentity(
+  record: Record<string, unknown>,
+  requireEndpoint: boolean,
+): (StorageStateIdentity & { qdrantUrl?: string }) | null {
+  const backend = record["storageBackend"];
+  const storeUrl = record["storeUrl"];
+  const qdrantUrl = record["qdrantUrl"];
+  if (backend !== undefined && backend !== "qdrant" && backend !== "lancedb") return null;
+  if (backend === "lancedb") {
+    if (!isBoundedString(storeUrl) || !isLocalStoreUrl(storeUrl)) return null;
+    if (qdrantUrl !== undefined) return null;
+    return { storageBackend: "lancedb", storeUrl };
+  }
+  if (storeUrl !== undefined && (!isBoundedString(storeUrl) || storeUrl !== qdrantUrl)) return null;
+  if (requireEndpoint && !isBoundedString(qdrantUrl)) return null;
+  if (qdrantUrl !== undefined && !isBoundedString(qdrantUrl)) return null;
+  return {
+    ...(backend === undefined ? {} : { storageBackend: backend }),
+    ...(storeUrl === undefined ? {} : { storeUrl }),
+    ...(qdrantUrl === undefined ? {} : { qdrantUrl }),
+  };
+}
+
 function parseCurrentPointer(text: string): CurrentPointerV1 | null {
   if (Buffer.byteLength(text, "utf8") > MAX_INDEX_STATE_FILE_BYTES) return null;
   let raw: unknown;
@@ -852,6 +918,8 @@ function parseCurrentPointer(text: string): CurrentPointerV1 | null {
   if (typeof raw !== "object" || raw === null || Array.isArray(raw)) return null;
   const record = raw as Record<string, unknown>;
   if (record["schemaVersion"] !== 1) return null;
+  const storage = parseStorageIdentity(record, false);
+  if (storage === null) return null;
   const workspaceId = record["workspaceId"];
   const repoId = record["repoId"];
   const refId = record["refId"];
@@ -871,6 +939,7 @@ function parseCurrentPointer(text: string): CurrentPointerV1 | null {
   }
   return {
     schemaVersion: 1,
+    ...storage,
     workspaceId,
     repoId,
     refId,
@@ -892,6 +961,9 @@ function currentPointerFor(state: IndexStateV1): CurrentPointerV1 {
     embeddingProfileId: state.embeddingProfileId,
     generationId: state.generationId,
     recordKey: indexStateRecordKey(state),
+    ...(state.storageBackend === "lancedb"
+      ? ({ storageBackend: "lancedb", storeUrl: state.storeUrl } as const)
+      : {}),
   };
 }
 
@@ -902,7 +974,8 @@ function pointerMatchesState(pointer: CurrentPointerV1, state: IndexStateV1): bo
     pointer.refId === state.refId &&
     pointer.embeddingProfileId === state.embeddingProfileId &&
     pointer.generationId === state.generationId &&
-    pointer.recordKey === indexStateRecordKey(state)
+    pointer.recordKey === indexStateRecordKey(state) &&
+    indexStateCurrentKey(pointer) === indexStateCurrentKey(state)
   );
 }
 
@@ -1035,10 +1108,7 @@ function legacyMustBeInvalidated(
   state: IndexStateV1,
   pointerInvalidation: PointerInvalidation,
 ): boolean {
-  const sameGroup =
-    legacy.workspaceId === state.workspaceId &&
-    legacy.repoId === state.repoId &&
-    legacy.refId === state.refId;
+  const sameGroup = indexStateCurrentKey(legacy) === indexStateCurrentKey(state);
   return (
     sameGroup &&
     (pointerInvalidation === "unconditional" ||

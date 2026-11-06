@@ -22,7 +22,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { performance } from "node:perf_hooks";
 import { createInterface } from "node:readline";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import {
   checkPublishable,
@@ -30,6 +30,7 @@ import {
   startOwnedChild,
   terminateOwnedChild,
 } from "./check-publishable.mjs";
+import { localSearchCommandArgs } from "./release-local-search-consumer.mjs";
 
 export { runOwnedCommand } from "./check-publishable.mjs";
 
@@ -41,6 +42,7 @@ const OUTPUT_LIMIT = 16 * 1024 * 1024;
 const NATIVE_BUILDS = ["tree-sitter", "tree-sitter-javascript", "tree-sitter-typescript"];
 const PRODUCT_PROBE = fileURLToPath(new URL("./release-product-consumer.mjs", import.meta.url));
 const FRONTEND_PROBE = fileURLToPath(new URL("./release-frontend-consumer.mjs", import.meta.url));
+const LOCAL_SEARCH_PROBE = fileURLToPath(new URL("./release-local-search-consumer.mjs", import.meta.url));
 
 function compare(a, b) {
   return a < b ? -1 : a > b ? 1 : 0;
@@ -533,6 +535,33 @@ async function probeInstalledFrontend(binary, commandOptions) {
   return { ...prepared, cli };
 }
 
+/** Real local tables and fresh search in separate installed CLI processes. */
+async function probeInstalledLocalSearch(binary, commandOptions) {
+  let guardPath;
+  function localOptions() {
+    const options = commandOptions();
+    const env = Object.fromEntries(Object.entries(options.env).filter(([key]) => !key.startsWith("UNTANGLE_")));
+    if (guardPath !== undefined) env.NODE_OPTIONS = `--import=${pathToFileURL(guardPath).href}`;
+    return { ...options, env };
+  }
+  async function stage(name, executionPath) {
+    const args = [LOCAL_SEARCH_PROBE, name];
+    if (executionPath !== undefined) args.push(executionPath);
+    const result = await runOwnedCommand(process.execPath, args, localOptions());
+    assert.equal(result.stderr, "");
+    return JSON.parse(result.stdout);
+  }
+  const prepared = await stage("prepare");
+  guardPath = prepared.guardPath;
+  const cli = {};
+  for (const [name, args] of Object.entries(localSearchCommandArgs(prepared.root))) {
+    cli[name] = await runExpectedCommand(binary, args, localOptions());
+  }
+  const executionPath = path.join(prepared.root, ".untangle/acceptance-execution.json");
+  writeFileSync(executionPath, JSON.stringify(cli), { flag: "wx" });
+  return stage("verify", executionPath);
+}
+
 async function probeInstalledProduct(binary, commandOptions) {
   const prepared = await productStage("prepare", commandOptions);
   const testArgs = ["--test", "--test-reporter=tap", path.join(prepared.root, "main.test.js")];
@@ -662,6 +691,7 @@ async function probeInstalledRuntime(
   }
   const product = await probeInstalledProduct(binary, commandOptions);
   const frontend = await probeInstalledFrontend(binary, commandOptions);
+  const localSearch = await probeInstalledLocalSearch(binary, commandOptions);
   const mcp = await probeMcp(binary, commandOptions(), product, frontend);
   if (mcp.about.data?.version !== cliVersionExpected)
     throw new Error("MCP about version differs from the inspected CLI artifact.");
@@ -676,6 +706,7 @@ async function probeInstalledRuntime(
     complexity,
     mcp,
     frontend: frontendProof,
+    localSearch,
     product: {
       ...product,
       mcp: mcp.product,

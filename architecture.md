@@ -63,7 +63,7 @@ Clock
 Logger
 ```
 
-Adapters implement these ports for Qdrant, Ollama, Git CLI, Node filesystem, MCP and IDEs.
+Adapters implement these ports for LanceDB, Qdrant, Ollama, Git CLI, Node filesystem, MCP and IDEs.
 
 <a id="22-event-getriebene-jobs"></a>
 
@@ -243,6 +243,7 @@ untangle/
 │  ├─ symbol-graph/
 │  ├─ context-artifacts/
 │  ├─ embeddings-ollama/
+│  ├─ storage-lancedb/
 │  ├─ storage-qdrant/
 │  ├─ storage-local/
 │  ├─ jobs/
@@ -2070,11 +2071,23 @@ limits, but defaults protect agents from unbounded context volume.
 
 <a id="adr-001-qdrant-als-primärer-persistenter-store"></a>
 
-### ADR-001: Qdrant as the primary persistent store
+### ADR-001: Selectable persistent storage; LanceDB by default
 
-**Decision:** Qdrant stores search points, metadata, graph shards and history indexes.  
-**Rationale:** One operating component, payload filtering, vector search and local/remote operation.  
-**Consequence:** Dummy vectors and multipart logic are needed for non-vector data.
+**Decision:** New projects use embedded LanceDB. Explicit and legacy Qdrant configurations
+keep Qdrant. Both implement VectorStore, MetadataStore and GraphStore through the same core
+and search engine. The Qdrant-specific architecture sections document the service adapter.
+
+**Rationale:** Local search should work without a database service. Qdrant remains an option
+for service deployments; changing storage must not redefine feature, graph or search contracts.
+
+**Consequence:** Lance tables persist the actual vectors, metadata and multipart graphs.
+The first adapter uses bounded exact scans; it has explicit corpus limits and no assumed
+performance or score parity with Qdrant. A kernel-released SQLite transaction serializes
+mutations across processes without stale PID locks. Native operations release their handles;
+read-only missing-index checks load no native SDK and create no files. Each backend/location
+has separate generation pointers; old Qdrant identities remain unchanged. There is no automatic
+data migration. Embedding providers and all identifier tokenization remain independent.
+
 
 <a id="adr-002-ollama-als-erster-und-standardmäßiger-embedding-provider"></a>
 

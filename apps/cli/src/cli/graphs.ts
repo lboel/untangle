@@ -91,7 +91,7 @@ export async function loadGraphs(options: LoadGraphsOptions): Promise<LoadedGrap
     store,
     view.workspaceId,
     options.signal,
-    storage.qdrantConfig.url,
+    storage.storeUrl,
   );
   const scope = { workspaceId: view.workspaceId, generationId };
 

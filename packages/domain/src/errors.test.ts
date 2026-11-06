@@ -5,6 +5,7 @@ import {
   ERROR_CODES,
   EXTENSION_ERROR_CODES,
   PORTFOLIO_ERROR_CODES,
+  STORAGE_ERROR_CODES,
   UntangleError,
   isErrorCode,
   isUntangleError,
@@ -15,8 +16,9 @@ describe("error codes", () => {
     expect(CORE_ERROR_CODES).toHaveLength(19);
     expect(PORTFOLIO_ERROR_CODES).toHaveLength(12);
     expect(EXTENSION_ERROR_CODES).toHaveLength(5);
-    expect(ERROR_CODES).toHaveLength(36);
-    expect(new Set(ERROR_CODES).size).toBe(36);
+    expect(STORAGE_ERROR_CODES).toEqual(["LANCEDB_UNAVAILABLE", "LANCEDB_SCHEMA_INCOMPATIBLE"]);
+    expect(ERROR_CODES).toHaveLength(38);
+    expect(new Set(ERROR_CODES).size).toBe(38);
   });
 
   it("recognizes known codes and rejects unknown values", () => {

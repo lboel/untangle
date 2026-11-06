@@ -130,6 +130,8 @@ export interface ScrollRequestV1 {
  *   (architecture.md §11.5).
  */
 export interface VectorStore {
+  /** Optional adapter identity for backend-specific failure diagnostics. */
+  readonly backend?: "lancedb" | "qdrant";
   collectionExists(name: string, options?: PortCallOptions): Promise<boolean>;
   ensureCollection(spec: CollectionSpecV1, options?: PortCallOptions): Promise<void>;
   ensurePayloadIndexes(

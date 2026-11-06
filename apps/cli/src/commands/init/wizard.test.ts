@@ -1,6 +1,5 @@
-import { describe, expect, it, vi } from "vitest";
-
 import { discoverSddArtifacts } from "@untangle-code/core";
+import { describe, expect, it, vi } from "vitest";
 
 import { parseArgs } from "../../cli/args.js";
 import type { CommandContext } from "../../cli/command.js";
@@ -183,8 +182,77 @@ function mapArtifact(): FeatureMapWriteResultV1 {
 }
 
 describe("guided init orchestration", () => {
+  it("offers LanceDB first and prepares local-only setup without a Qdrant service plan or probe", async () => {
+    const http = silentProbe();
+    const get = vi.spyOn(http, "getJson");
+    const h = harness(["quick", "lancedb", "done", "no", "prepare"], [], http);
+    const choose = vi.spyOn(h.script.terminal, "choose");
+    const result = await runInitWizard(h.ctx, OPTIONS, h.initDeps, h.deps);
+    expect(result.exitCode).toBe(0);
+    const backend = choose.mock.calls.find(
+      ([question]) => question === "Where should the search index live?",
+    );
+    expect(backend?.[1].map((choice) => choice.value)).toEqual([
+      "lancedb",
+      "qdrant",
+      "qdrant-external",
+    ]);
+    const tools = choose.mock.calls.find(
+      ([question]) => question === "Add an analyzer or local search service?",
+    );
+    expect(tools?.[1].map((choice) => choice.value)).not.toContain("local-search");
+    expect(h.apply.mock.calls[0]?.[0].items).toEqual([]);
+    expect(h.apply.mock.calls[0]?.[1]?.execute).toBe(false);
+    expect(get.mock.calls.every(([url]) => url.startsWith("http://127.0.0.1:11434/"))).toBe(true);
+    expect(result.result?.findings.storage?.backend).toBe("lancedb");
+    expect(await h.fs.stat(`${ROOT}/.untangle/index/lancedb`)).toBeNull();
+    expect(h.script.remaining).toEqual([]);
+  });
+
+  it("connects an explicitly selected existing Qdrant server without provisioning local services", async () => {
+    const h = harness(
+      ["quick", "qdrant-external", "done", "no", "prepare"],
+      ["https://vectors.example.invalid"],
+    );
+    const result = await runInitWizard(h.ctx, OPTIONS, h.initDeps, h.deps);
+    expect(result.exitCode).toBe(0);
+    expect(result.result?.findings.storage).toMatchObject({
+      backend: "qdrant",
+      qdrantMode: "external",
+      qdrantUrl: "https://vectors.example.invalid",
+    });
+    expect(h.apply.mock.calls[0]?.[0].items).toEqual([]);
+    expect(h.apply.mock.calls[0]?.[1]?.execute).toBe(false);
+    expect(await h.fs.readTextFile(`${ROOT}/untangle.toml`)).toContain(
+      '[qdrant]\nmode = "external"\nurl = "https://vectors.example.invalid"',
+    );
+    expect(h.script.remaining).toEqual([]);
+    expect(h.script.entered).toEqual([]);
+  });
+
+  it("switches an existing Qdrant setup to LanceDB only after replacement approval and never probes its server", async () => {
+    const http = silentProbe();
+    const get = vi.spyOn(http, "getJson");
+    const h = harness(["quick", "lancedb", "replace", "done", "no", "prepare"], [], http);
+    h.fs.seedFile(
+      `${ROOT}/untangle.toml`,
+      '[qdrant]\nmode = "external"\nurl = "https://old-vectors.example.invalid"\n',
+    );
+    h.fs.seedFile(`${ROOT}/qdrant-data/previous.json`, '{"preserved":true}\n');
+    const result = await runInitWizard(h.ctx, OPTIONS, h.initDeps, h.deps);
+    expect(result.exitCode).toBe(0);
+    expect(result.result?.outcome).toBe("overwritten");
+    expect(result.result?.findings.storage?.backend).toBe("lancedb");
+    expect(get.mock.calls.some(([url]) => url.includes("old-vectors"))).toBe(false);
+    expect(await h.fs.readTextFile(`${ROOT}/qdrant-data/previous.json`)).toBe(
+      '{"preserved":true}\n',
+    );
+    expect(h.apply.mock.calls[0]?.[0].items).toEqual([]);
+    expect(h.script.remaining).toEqual([]);
+  });
+
   it("previews detected Spec Kit without writing when the final setup is cancelled", async () => {
-    const h = harness(["spec", "spec-kit", "done", "no", "cancel"], ["", "", ""]);
+    const h = harness(["spec", "lancedb", "spec-kit", "done", "no", "cancel"], ["", "", ""]);
     seedSpecKit(h.fs);
     const writes = watchWrites(h.fs);
     const writeSdd = vi.fn<NonNullable<InitWizardDepsV1["writeSdd"]>>();
@@ -200,7 +268,10 @@ describe("guided init orchestration", () => {
   });
 
   it("uses the explicitly confirmed SDD draft for final init and the map without confirming implementation", async () => {
-    const h = harness(["spec", "spec-kit", "done", "yes", "no", "prepare"], ["", "", ""]);
+    const h = harness(
+      ["spec", "lancedb", "spec-kit", "done", "yes", "no", "prepare"],
+      ["", "", ""],
+    );
     seedSpecKit(h.fs);
     const manifestPath = `${ROOT}/.untangle/sdd/fixture/untangle.features.json`;
     const writeSdd = vi
@@ -243,7 +314,7 @@ describe("guided init orchestration", () => {
   });
 
   it("rejects stale SDD previews before configuration, analyzer or connector actions", async () => {
-    const h = harness(["spec", "spec-kit"], ["", "", ""]);
+    const h = harness(["spec", "lancedb", "spec-kit"], ["", "", ""]);
     seedSpecKit(h.fs);
     const writes = watchWrites(h.fs);
     const writeSdd = vi.fn<NonNullable<InitWizardDepsV1["writeSdd"]>>();
@@ -263,7 +334,7 @@ describe("guided init orchestration", () => {
   });
 
   it("cancels at final review without any filesystem write or integration/map/browser action", async () => {
-    const h = harness(["quick", "done", "yes", "yes", "cancel"]);
+    const h = harness(["quick", "lancedb", "done", "yes", "yes", "cancel"]);
     const writes = watchWrites(h.fs);
     const result = await runInitWizard(h.ctx, OPTIONS, h.initDeps, h.deps);
     expect(result).toEqual({ result: null, exitCode: EXIT.cancelled });
@@ -279,7 +350,7 @@ describe("guided init orchestration", () => {
 
   it("passes selected spec paths into the real preview and final initializer and map", async () => {
     const h = harness(
-      ["spec", "done", "yes", "no", "prepare"],
+      ["spec", "lancedb", "done", "yes", "no", "prepare"],
       ["docs/vision.md", "docs/spec.md", ".untangle/features.json"],
     );
     h.fs.seedFile(`${ROOT}/docs/vision.md`, "# Intent\nLocal declared intent.\n");
@@ -332,7 +403,7 @@ describe("guided init orchestration", () => {
   });
 
   it("keeps stdout to the configuration path while routing setup and detection reports to diagnostics", async () => {
-    const h = harness(["quick", "done", "no", "prepare"]);
+    const h = harness(["quick", "lancedb", "done", "no", "prepare"]);
     const command = createInitCommand({ ...h.initDeps, wizard: h.deps });
     const exit = await command.run(h.ctx, parseArgs(["--interactive"], command.spec.flags));
     expect(exit).toBe(0);
@@ -345,7 +416,7 @@ describe("guided init orchestration", () => {
   });
 
   it("clears explicitly supplied context paths when the user requests discovery with blank answers", async () => {
-    const h = harness(["spec", "done", "yes", "no", "prepare"], ["", "", ""]);
+    const h = harness(["spec", "lancedb", "done", "yes", "no", "prepare"], ["", "", ""]);
     h.fs.seedFile(`${ROOT}/vision.md`, "# Vision\nKeep code easy to find.\n");
     h.fs.seedFile(`${ROOT}/spec.md`, "# Contract\nReport missing evidence honestly.\n");
     h.fs.seedFile(
@@ -389,7 +460,7 @@ describe("guided init orchestration", () => {
     "keeps tool selection %s distinct from its displayed installation plan",
     async (action) => {
       const h = harness(
-        ["quick", "sonarqube-existing", "yes", "done", "no", action],
+        ["quick", "lancedb", "sonarqube-existing", "yes", "done", "no", action],
         ["https://sonar.example.invalid", "demo-project", "DEMO_SONAR_TOKEN"],
       );
       const result = await runInitWizard(h.ctx, OPTIONS, h.initDeps, h.deps);
@@ -420,7 +491,7 @@ describe("guided init orchestration", () => {
         id === "sonarqube-existing"
           ? ["https://sonar.example.invalid", "demo-project", "DEMO_SONAR_TOKEN"]
           : ["demo-project", "DEMO_SONAR_TOKEN"];
-      const h = harness(["quick", id, "yes", "done", "no", "prepare"], inputs);
+      const h = harness(["quick", "qdrant", id, "yes", "done", "no", "prepare"], inputs);
       const choose = vi.spyOn(h.script.terminal, "choose");
       const result = await runInitWizard(h.ctx, OPTIONS, h.initDeps, h.deps);
       const menus = choose.mock.calls.filter(
@@ -458,7 +529,7 @@ describe("guided init orchestration", () => {
       },
       probeEmbedding: vi.fn(async () => ({ ok: true as const, dimensions: 1024 })),
     };
-    const h = harness(["quick", "local-search", "done", "no", "execute"], [], http);
+    const h = harness(["quick", "qdrant", "local-search", "done", "no", "execute"], [], http);
     h.apply.mockImplementation(async () => {
       installed = true;
       return setupReport([
@@ -488,7 +559,7 @@ describe("guided init orchestration", () => {
   });
 
   it("does not rewrite config when a selected setup action fails", async () => {
-    const h = harness(["quick", "local-search", "done", "no", "execute"]);
+    const h = harness(["quick", "qdrant", "local-search", "done", "no", "execute"]);
     const writes = watchWrites(h.fs);
     h.apply.mockResolvedValue(
       setupReport([
@@ -512,7 +583,7 @@ describe("guided init orchestration", () => {
   });
 
   it("preserves a generated map and successful config when the optional browser launcher fails", async () => {
-    const h = harness(["quick", "done", "yes", "yes", "prepare"]);
+    const h = harness(["quick", "lancedb", "done", "yes", "yes", "prepare"]);
     h.writeMap.mockResolvedValue(mapArtifact());
     h.openBrowser.mockRejectedValue(new Error("No desktop browser"));
     const result = await runInitWizard(h.ctx, OPTIONS, h.initDeps, h.deps);
@@ -529,7 +600,7 @@ describe("guided init orchestration", () => {
   });
 
   it("allows keeping an existing differing config before any integration or map action", async () => {
-    const h = harness(["quick", "keep"]);
+    const h = harness(["quick", "lancedb", "keep"]);
     h.fs.seedFile(`${ROOT}/untangle.toml`, "# maintained by its owner\n");
     const writes = watchWrites(h.fs);
     const result = await runInitWizard(h.ctx, OPTIONS, h.initDeps, h.deps);
@@ -542,7 +613,7 @@ describe("guided init orchestration", () => {
   });
 
   it("cannot offer execution in explicitly offline interactive setup", async () => {
-    const h = harness(["quick", "local-search", "done", "no", "prepare"]);
+    const h = harness(["quick", "qdrant", "local-search", "done", "no", "prepare"]);
     const result = await runInitWizard(h.ctx, { ...OPTIONS, offline: true }, h.initDeps, h.deps);
     expect(result.exitCode).toBe(0);
     expect(h.apply.mock.calls[0]![0].offline).toBe(true);

@@ -18,7 +18,7 @@ licenses and copyright notices continue to apply unchanged. Workspace
 packages (`@untangle-code/*`) are not listed here; they belong to the same
 work and use the same AGPL-3.0-only license.
 
-## Production dependencies (transitive, 38)
+## Production dependencies (transitive, 66)
 
 | Package | Version | License | Project |
 | --- | --- | --- | --- |
@@ -30,20 +30,40 @@ work and use the same AGPL-3.0-only license.
 | `@babel/parser` | 7.29.9 | MIT | <https://babel.dev/docs/en/next/babel-parser> |
 | `@babel/types` | 7.29.8 | MIT | <https://babel.dev/docs/en/next/babel-types> |
 | `@jridgewell/sourcemap-codec` | 1.6.0 | MIT | <https://github.com/jridgewell/sourcemaps/tree/main/packages/sourcemap-codec> |
+| `@lancedb/lancedb` | 0.30.0 | Apache-2.0 | <https://github.com/lancedb/lancedb> |
 | `@modelcontextprotocol/core` | 2.0.0 | MIT | <https://modelcontextprotocol.io> |
 | `@modelcontextprotocol/server` | 2.0.0 | MIT | <https://modelcontextprotocol.io> |
 | `@nodable/entities` | 3.0.0 | MIT | <https://github.com/nodable/val-parsers> |
+| `@swc/helpers` | 0.5.24 | Apache-2.0 | <https://swc.rs> |
+| `@types/command-line-args` | 5.2.3 | MIT | <https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/command-line-args> |
+| `@types/command-line-usage` | 5.0.4 | MIT | <https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/command-line-usage> |
+| `@types/node` | 20.19.43 | MIT | <https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/node> |
 | `@vue/compiler-core` | 3.5.44 | MIT | <https://github.com/vuejs/core/tree/main/packages/compiler-core#readme> |
 | `@vue/compiler-dom` | 3.5.44 | MIT | <https://github.com/vuejs/core/tree/main/packages/compiler-dom#readme> |
 | `@vue/compiler-sfc` | 3.5.44 | MIT | <https://github.com/vuejs/core/tree/main/packages/compiler-sfc#readme> |
 | `@vue/compiler-ssr` | 3.5.44 | MIT | <https://github.com/vuejs/core/tree/main/packages/compiler-ssr#readme> |
 | `@vue/shared` | 3.5.44 | MIT | <https://github.com/vuejs/core/tree/main/packages/shared#readme> |
+| `ansi-styles` | 4.3.0 | MIT | `chalk/ansi-styles` |
 | `anynum` | 1.0.1 | MIT | <https://github.com/NaturalIntelligence/anynum> |
+| `apache-arrow` | 18.1.0 | Apache-2.0 | <https://github.com/apache/arrow/blob/main/js/README.md> |
+| `array-back` | 3.1.0 | MIT | <https://github.com/75lb/array-back> |
+| `array-back` | 6.2.3 | MIT | <https://github.com/75lb/array-back> |
+| `chalk` | 4.1.2 | MIT | `chalk/chalk` |
+| `chalk-template` | 0.4.0 | MIT | `chalk/chalk-template` |
+| `color-convert` | 2.0.1 | MIT | `Qix-/color-convert` |
+| `color-name` | 1.1.4 | MIT | <https://github.com/colorjs/color-name> |
+| `command-line-args` | 5.2.1 | MIT | <https://github.com/75lb/command-line-args> |
+| `command-line-usage` | 7.0.4 | MIT | <https://github.com/75lb/command-line-usage> |
 | `entities` | 7.0.1 | BSD-2-Clause | <https://github.com/fb55/entities> |
 | `estree-walker` | 2.0.2 | MIT | <https://github.com/Rich-Harris/estree-walker> |
 | `fast-xml-builder` | 1.3.1 | MIT | <https://github.com/NaturalIntelligence/fast-xml-builder> |
 | `fast-xml-parser` | 5.11.1 | MIT | <https://github.com/NaturalIntelligence/fast-xml-parser> |
+| `find-replace` | 3.0.0 | MIT | <https://github.com/75lb/find-replace> |
+| `flatbuffers` | 24.12.23 | Apache-2.0 | <https://google.github.io/flatbuffers/> |
+| `has-flag` | 4.0.0 | MIT | `sindresorhus/has-flag` |
 | `is-unsafe` | 2.0.2 | MIT | <https://github.com/NaturalIntelligence/is-unsafe> |
+| `json-bignum` | 0.0.3 | MIT | <https://github.com/datalanche/json-bignum> |
+| `lodash.camelcase` | 4.3.0 | MIT | <https://lodash.com/> |
 | `magic-string` | 0.30.21 | MIT | <https://github.com/Rich-Harris/magic-string> |
 | `nanoid` | 3.3.20 | MIT | `ai/nanoid` |
 | `node-addon-api` | 8.9.2 | MIT | <https://github.com/nodejs/node-addon-api> |
@@ -51,12 +71,20 @@ work and use the same AGPL-3.0-only license.
 | `path-expression-matcher` | 1.6.2 | MIT | <https://github.com/NaturalIntelligence/path-expression-matcher#readme> |
 | `picocolors` | 1.1.1 | ISC | `alexeyraspopov/picocolors` |
 | `postcss` | 8.5.31 | MIT | <https://postcss.org/> |
+| `reflect-metadata` | 0.2.2 | Apache-2.0 | <http://rbuckton.github.io/reflect-metadata> |
 | `smol-toml` | 1.8.0 | BSD-3-Clause | `github:squirrelchat/smol-toml` |
 | `source-map-js` | 1.2.2 | BSD-3-Clause | <https://github.com/7rulnik/source-map-js> |
 | `strnum` | 2.4.2 | MIT | <https://github.com/NaturalIntelligence/strnum> |
+| `supports-color` | 7.2.0 | MIT | `chalk/supports-color` |
+| `table-layout` | 4.1.1 | MIT | <https://github.com/75lb/table-layout> |
 | `tree-sitter` | 0.21.1 | MIT | <http://github.com/tree-sitter/node-tree-sitter> |
 | `tree-sitter-javascript` | 0.23.1 | MIT | <https://github.com/tree-sitter/tree-sitter-javascript> |
 | `tree-sitter-typescript` | 0.23.2 | MIT | <https://github.com/tree-sitter/tree-sitter-typescript> |
+| `tslib` | 2.8.1 | 0BSD | <https://www.typescriptlang.org/> |
+| `typical` | 4.0.0 | MIT | <https://github.com/75lb/typical> |
+| `typical` | 7.3.0 | MIT | <https://github.com/75lb/typical> |
+| `undici-types` | 6.21.0 | MIT | <https://undici.nodejs.org> |
+| `wordwrapjs` | 5.1.1 | MIT | <https://github.com/75lb/wordwrapjs> |
 | `xml-naming` | 0.3.0 | MIT | <https://github.com/NaturalIntelligence/xml-naming> |
 | `yaml` | 2.9.0 | ISC | <https://eemeli.org/yaml/> |
 | `zod` | 4.5.4 | MIT | <https://zod.dev> |
@@ -102,3 +130,23 @@ Packages marked *optional* are not included in an Untangle installation:
 they are optional `peerDependencies`, which npm
 does not install automatically. They are listed for users who
 add them to enable the corresponding language.
+
+## LanceDB platform-native runtime packages
+
+The SDK declares the following native optional dependencies. Package names, pinned versions
+and SPDX license declarations come from the published version manifests recorded with hashes
+in `scripts/lancedb-native-provenance.json`. Every native variant actually resolved on the
+generating platform is checked against that metadata; its dependencies are included above.
+This table is a declaration inventory, not a claim that all seven binaries were installed or
+inspected. The release's installed production SBOM records the actual platform selection.
+Upstream package license files and notices continue to apply and remain distributed by npm.
+
+| Native package | Version | Declared license | Published manifest |
+| --- | --- | --- | --- |
+| `@lancedb/lancedb-darwin-arm64` | 0.30.0 | Apache-2.0 | <https://registry.npmjs.org/%40lancedb%2Flancedb-darwin-arm64/0.30.0> |
+| `@lancedb/lancedb-linux-arm64-gnu` | 0.30.0 | Apache-2.0 | <https://registry.npmjs.org/%40lancedb%2Flancedb-linux-arm64-gnu/0.30.0> |
+| `@lancedb/lancedb-linux-arm64-musl` | 0.30.0 | Apache-2.0 | <https://registry.npmjs.org/%40lancedb%2Flancedb-linux-arm64-musl/0.30.0> |
+| `@lancedb/lancedb-linux-x64-gnu` | 0.30.0 | Apache-2.0 | <https://registry.npmjs.org/%40lancedb%2Flancedb-linux-x64-gnu/0.30.0> |
+| `@lancedb/lancedb-linux-x64-musl` | 0.30.0 | Apache-2.0 | <https://registry.npmjs.org/%40lancedb%2Flancedb-linux-x64-musl/0.30.0> |
+| `@lancedb/lancedb-win32-arm64-msvc` | 0.30.0 | Apache-2.0 | <https://registry.npmjs.org/%40lancedb%2Flancedb-win32-arm64-msvc/0.30.0> |
+| `@lancedb/lancedb-win32-x64-msvc` | 0.30.0 | Apache-2.0 | <https://registry.npmjs.org/%40lancedb%2Flancedb-win32-x64-msvc/0.30.0> |

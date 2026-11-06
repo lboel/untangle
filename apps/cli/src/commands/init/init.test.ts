@@ -124,8 +124,9 @@ describe("Infrastruktur", () => {
     expect(result.exitCode).toBe(0);
     expect(result.outcome).toBe("created");
     expect(result.findings.ollama.outcome).toBe("unreachable");
-    expect(result.findings.qdrant.outcome).toBe("unreachable");
-    expect(result.nextStep).toMatch(/ollama serve/u);
+    expect(result.findings.qdrant.outcome).toBe("not-probed");
+    expect(result.findings.storage?.backend).toBe("lancedb");
+    expect(result.nextStep).toContain("untangle index --embedder=offline");
     expect(await fs.readTextFile(result.configPath)).toContain("[embeddings]");
   });
 
@@ -149,7 +150,8 @@ describe("Infrastruktur", () => {
     expect(written).toContain('model = "wide-embed:0.6b"');
     expect(written).toContain("dimensions = 1024");
     expect(written).toContain("contextLength = 32768");
-    expect(result.nextStep).toMatch(/untangle-qdrant/u);
+    expect(result.nextStep).toContain("untangle index");
+    expect(result.nextStep).not.toContain("docker");
   });
 
   it("prueft den Standardport einer fremden Instanz bewusst NICHT", async () => {
@@ -163,7 +165,10 @@ describe("Infrastruktur", () => {
       probeEmbedding: (): Promise<EmbedProbeResult> =>
         Promise.resolve({ ok: false, timedOut: false, detail: "no provider" }),
     };
-    const result = await runInit({ ...OFFLINE, offline: false }, demoDeps(fs, http));
+    const result = await runInit(
+      { ...OFFLINE, offline: false, storageBackend: "qdrant" },
+      demoDeps(fs, http),
+    );
     expect(probed.some((url) => url.includes(":6333"))).toBe(false);
     expect(result.findings.qdrant.skippedUrls.map((entry) => entry.url)).toEqual(
       FOREIGN_DEFAULT_QDRANT_URLS.map((entry) => entry.url),
@@ -388,7 +393,10 @@ describe("Bausteine", () => {
   });
 
   it("nextStepFor bevorzugt die erste Bremse", async () => {
-    const result = await runInit({ ...OFFLINE }, demoDeps(seedDemoProject(), silentProbe()));
+    const result = await runInit(
+      { ...OFFLINE, storageBackend: "qdrant" },
+      demoDeps(seedDemoProject(), silentProbe()),
+    );
     const findings = result.findings;
     expect(nextStepFor(findings)).toMatch(/ollama serve/u);
     expect(

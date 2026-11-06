@@ -17,6 +17,7 @@
     { "path": "../../packages/complexity" },
     { "path": "../../packages/search" },
     { "path": "../../packages/storage-qdrant" },
+    { "path": "../../packages/storage-lancedb" },
     { "path": "../../packages/storage-local" },
     { "path": "../../packages/embeddings-ollama" },
     { "path": "../../packages/extension-runtime" },

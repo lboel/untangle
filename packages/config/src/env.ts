@@ -53,6 +53,9 @@ export const ENV_MAPPING: readonly EnvMappingEntry[] = [
   { env: "UNTANGLE_WORKSPACE_ID", path: ["workspaceId"], parse: parseString },
   { env: "UNTANGLE_PROJECT_ID", path: ["projectId"], parse: parseString },
 
+  { env: "UNTANGLE_STORAGE_BACKEND", path: ["storage", "backend"], parse: parseString },
+  { env: "UNTANGLE_LANCEDB_PATH", path: ["storage", "path"], parse: parseString },
+
   { env: "UNTANGLE_QDRANT_MODE", path: ["qdrant", "mode"], parse: parseString },
   { env: "UNTANGLE_QDRANT_URL", path: ["qdrant", "url"], parse: parseString },
   { env: "UNTANGLE_QDRANT_API_KEY_ENV", path: ["qdrant", "apiKeyEnv"], parse: parseString },

@@ -122,7 +122,7 @@ describe("init -> doctor (WP-222 a)", () => {
   });
 
   it("doctor meldet den fremden Standardport NICHT mehr als in Ordnung (WP-222 b, am ganzen Befehl)", async () => {
-    await invoke(["init", "--offline"]);
+    await invoke(["init", "--offline", "--storage=qdrant"]);
     const doctor = await invoke(["doctor", "--skip-embeddings", "--timeout=1500", "--format=json"]);
     const report = JSON.parse(doctor.io.outText) as {
       checks: { id: string; status: string; detail: string; facts?: Record<string, unknown> }[];

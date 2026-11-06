@@ -225,10 +225,13 @@ describe("init product context integration", () => {
     expect(existsSync(`${dry.configPath}${TEMP_SUFFIX}`)).toBe(false);
   });
 
-  it("reports missing product context while preserving exactly one infrastructure next step in actual text output", async () => {
+  it("reports missing product context while preserving the legacy Qdrant infrastructure next step in actual text output", async () => {
     const command = createInitCommand();
     const io = new BufferIo();
-    const parsed = parseArgs([project, "--offline", "--dry-run"], command.spec.flags);
+    const parsed = parseArgs(
+      [project, "--offline", "--dry-run", "--storage=qdrant"],
+      command.spec.flags,
+    );
     const exitCode = await command.run(
       { io, cwd, env: {}, signal: new AbortController().signal },
       parsed,

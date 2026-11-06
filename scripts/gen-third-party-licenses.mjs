@@ -120,12 +120,65 @@ function normalizeHomepage(pkg) {
  *
  * @returns {{rows: {name:string,version:string,license:string,homepage:string}[], unresolved: string[]}}
  */
-function collectProductionClosure(record, workspaceByName) {
+export function collectProductionClosure(record, workspaceByName) {
   const rows = new Map();
   const unresolved = new Set();
   const seenWorkspace = new Set();
   const seenExternal = new Set();
   const optionalPeers = new Set();
+  const nativeVariants = new Map();
+  const resolvedNativeVariants = new Map();
+
+  function visitLanceNativeVariants(pkg, installDir) {
+    const provenance = readJson(path.join(REPO_ROOT, "scripts/lancedb-native-provenance.json"));
+    if (
+      provenance.package !== pkg.name ||
+      provenance.version !== pkg.version ||
+      provenance.schemaVersion !== 1
+    )
+      throw new Error("LanceDB native optional provenance does not match the installed SDK.");
+    const declarations = Object.entries(pkg.optionalDependencies ?? {}).sort(([a], [b]) =>
+      compareCodepoints(a, b),
+    );
+    const expected = provenance.variants
+      .map((variant) => [variant.name, variant.version])
+      .sort(([a], [b]) => compareCodepoints(a, b));
+    if (JSON.stringify(declarations) !== JSON.stringify(expected))
+      throw new Error(
+        "LanceDB optional dependency declarations changed; refresh source-bound native provenance before releasing.",
+      );
+    for (const variant of provenance.variants) {
+      if (
+        !/^[a-f0-9]{64}$/.test(variant.manifestSha256) ||
+        variant.source !==
+          `https://registry.npmjs.org/${encodeURIComponent(variant.name)}/${variant.version}` ||
+        typeof variant.license !== "string"
+      )
+        throw new Error("Invalid published LanceDB native package provenance.");
+      nativeVariants.set(`${variant.name}@${variant.version}`, variant);
+      const nativeDir = resolveInstalledPackage(variant.name, installDir);
+      if (nativeDir === undefined) continue;
+      const installed = readJson(path.join(nativeDir, "package.json"));
+      if (
+        installed.name !== variant.name ||
+        installed.version !== variant.version ||
+        normalizeLicense(installed) !== variant.license ||
+        JSON.stringify(installed.dependencies ?? {}) !== JSON.stringify(variant.dependencies) ||
+        JSON.stringify(installed.optionalDependencies ?? {}) !==
+          JSON.stringify(variant.optionalDependencies)
+      )
+        throw new Error(
+          `Installed native metadata differs from published provenance: ${variant.name}`,
+        );
+      resolvedNativeVariants.set(variant.name, {
+        name: installed.name,
+        version: installed.version,
+        license: normalizeLicense(installed),
+      });
+      for (const dependency of Object.keys(installed.dependencies ?? {}).sort(compareCodepoints))
+        visitExternal(dependency, nativeDir);
+    }
+  }
 
   /** @param {string} depName @param {string} fromDir */
   function visitExternal(depName, fromDir) {
@@ -148,6 +201,10 @@ function collectProductionClosure(record, workspaceByName) {
     for (const next of Object.keys(pkg.dependencies ?? {}).sort(compareCodepoints)) {
       visitExternal(next, installDir);
     }
+    // The SDK's optional dependencies are platform-native runtime packages,
+    // not optional peer integrations. Keep all declarations deterministic,
+    // verify every installed variant and retain its transitive attribution.
+    if (pkg.name === "@lancedb/lancedb") visitLanceNativeVariants(pkg, installDir);
   }
 
   function visitWorkspace(current) {
@@ -185,7 +242,35 @@ function collectProductionClosure(record, workspaceByName) {
     ),
     unresolved: [...unresolved].sort(compareCodepoints),
     optionalPeers: [...optionalPeers].sort(compareCodepoints),
+    nativeVariants: [...nativeVariants.values()].sort((a, b) => compareCodepoints(a.name, b.name)),
+    resolvedNativeVariants: [...resolvedNativeVariants.values()].sort((a, b) =>
+      compareCodepoints(a.name, b.name),
+    ),
   };
+}
+
+export function renderLanceNativeSection(variants) {
+  if (variants.length === 0) return "";
+  return [
+    "",
+    "## LanceDB platform-native runtime packages",
+    "",
+    "The SDK declares the following native optional dependencies. Package names, pinned versions",
+    "and SPDX license declarations come from the published version manifests recorded with hashes",
+    "in `scripts/lancedb-native-provenance.json`. Every native variant actually resolved on the",
+    "generating platform is checked against that metadata; its dependencies are included above.",
+    "This table is a declaration inventory, not a claim that all seven binaries were installed or",
+    "inspected. The release's installed production SBOM records the actual platform selection.",
+    "Upstream package license files and notices continue to apply and remain distributed by npm.",
+    "",
+    "| Native package | Version | Declared license | Published manifest |",
+    "| --- | --- | --- | --- |",
+    ...variants.map(
+      (variant) =>
+        `| \`${variant.name}\` | ${variant.version} | ${variant.license} | <${variant.source}> |`,
+    ),
+    "",
+  ].join("\n");
 }
 
 /**
@@ -341,10 +426,28 @@ function renderMarkdown(packageName, rows, grammarSection) {
 
 function main(argv) {
   const checkOnly = argv.includes("--check");
+  const selectors = argv.filter((arg) => arg.startsWith("--package="));
+  if (
+    selectors.length > 1 ||
+    argv.some((arg) => arg !== "--check" && !arg.startsWith("--package="))
+  ) {
+    process.stderr.write(
+      "third-party-licenses: use --check and at most one --package=<public-package-name>.\n",
+    );
+    return 1;
+  }
+  const selectedName = selectors[0]?.slice("--package=".length);
   const { byName, dirs } = collectWorkspacePackages();
-  const publishable = dirs.filter((record) => record.pkg.private !== true);
+  const publishable = dirs.filter(
+    (record) =>
+      record.pkg.private !== true && (selectedName === undefined || record.name === selectedName),
+  );
   if (publishable.length === 0) {
-    process.stderr.write("third-party-licenses: no publishable package found.\n");
+    process.stderr.write(
+      selectedName === undefined
+        ? "third-party-licenses: no publishable package found.\n"
+        : `third-party-licenses: unknown or private package ${JSON.stringify(selectedName)}.\n`,
+    );
     return 1;
   }
 
@@ -363,7 +466,10 @@ function main(argv) {
   }
 
   for (const record of publishable) {
-    const { rows, unresolved, optionalPeers } = collectProductionClosure(record, byName);
+    const { rows, unresolved, optionalPeers, nativeVariants } = collectProductionClosure(
+      record,
+      byName,
+    );
 
     // Eine nicht aufloesbare Abhaengigkeit darf NICHT stillschweigend aus der
     // Liste fallen — die Datei behauptete sonst Vollstaendigkeit, die sie
@@ -382,7 +488,8 @@ function main(argv) {
     const markdown = renderMarkdown(
       record.name,
       rows,
-      renderGrammarSection(provenance, optionalPeers, closureNames),
+      renderGrammarSection(provenance, optionalPeers, closureNames) +
+        renderLanceNativeSection(nativeVariants),
     );
     const target = path.join(REPO_ROOT, record.dir, FILE_NAME);
     const current = existsSync(target) ? readFileSync(target, "utf8") : undefined;
@@ -427,4 +534,6 @@ function main(argv) {
   return 0;
 }
 
-process.exitCode = main(process.argv.slice(2));
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  process.exitCode = main(process.argv.slice(2));
+}

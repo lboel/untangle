@@ -59,11 +59,15 @@ export const EXTENSION_ERROR_CODES = [
   "EXTENSION_IMAGE_MISMATCH",
 ] as const;
 
+/** Embedded storage adapter failures; existing server error codes stay stable. */
+export const STORAGE_ERROR_CODES = ["LANCEDB_UNAVAILABLE", "LANCEDB_SCHEMA_INCOMPATIBLE"] as const;
+
 /** All error codes as one shared enum (docs/BUILD_PLAN.md §3.3). */
 export const ERROR_CODES = [
   ...CORE_ERROR_CODES,
   ...PORTFOLIO_ERROR_CODES,
   ...EXTENSION_ERROR_CODES,
+  ...STORAGE_ERROR_CODES,
 ] as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[number];

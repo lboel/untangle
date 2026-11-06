@@ -14,6 +14,7 @@ import { fileURLToPath } from "node:url";
 import { gunzipSync } from "node:zlib";
 
 import { assertFrontendConsumerProof } from "./release-frontend-consumer.mjs";
+import { assertLocalSearchConsumerProof } from "./release-local-search-consumer.mjs";
 import { orderReleasePackages, validateProductionSbom } from "./release-smoke.mjs";
 
 export const PUBLIC_PACKAGES = Object.freeze(
@@ -35,10 +36,11 @@ export const PUBLIC_PACKAGES = Object.freeze(
     "scanner",
     "search",
     "storage-local",
+    "storage-lancedb",
     "storage-qdrant",
     "symbol-graph",
     "watcher",
-  ].map((name) => `@untangle-code/${name}`),
+  ].map((name) => `@untangle-code/${name}`).sort(),
 );
 const GATES = [
   "install",
@@ -647,6 +649,11 @@ function verifyConsumers(report, executable) {
     );
     verifyProduct(runtime, executable);
     try {
+      assertLocalSearchConsumerProof(runtime.localSearch);
+    } catch (error) {
+      throw new Error(`Installed LanceDB search consumer proof is missing or invalid: ${error.message}`);
+    }
+    try {
       requireThat(
         runtime.mcp.toolNames.includes("untangle_boundaries"),
         "Missing boundaries tool.",
@@ -694,10 +701,10 @@ function verifyBundle(evidence, read, commit) {
   );
   requireThat(
     Array.isArray(report.packages) &&
-      report.packages.length === 20 &&
+      report.packages.length === 21 &&
       equal(report.packages.map((p) => p.name).sort(compare), PUBLIC_PACKAGES) &&
       equal(bundle.packages, report.packages),
-    "Expected exactly 20 bound public packages.",
+    "Expected exactly 21 bound public packages.",
   );
   requireThat(
     report.publishable?.packed === true &&
@@ -1047,7 +1054,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       const result = verifyReleaseCandidates(options);
       writeCompatibilityManifest(options.out, result, options.artifactsDir);
       process.stdout.write(
-        `Verified four candidate contexts and 20 original ${VERSION} packages. Canonical: ubuntu-latest / Node 22.\n`,
+        `Verified four candidate contexts and 21 original ${VERSION} packages. Canonical: ubuntu-latest / Node 22.\n`,
       );
     }
   } catch (error) {

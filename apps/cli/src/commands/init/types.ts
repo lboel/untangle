@@ -233,6 +233,18 @@ export interface QdrantFindingsV1 {
   skippedUrls: { url: string; reason: string }[];
 }
 
+/** Local storage inspection is read-only; init never creates an index directory. */
+export interface StorageFindingsV1 {
+  backend: "lancedb" | "qdrant";
+  path?: string;
+  directory?: string;
+  directoryStatus?: "present" | "missing" | "not-directory" | "unreadable";
+  detail?: string;
+  configurationWarnings?: string[];
+  qdrantMode?: "managed" | "external";
+  qdrantUrl?: string;
+}
+
 /** Everything `init` learned about a project. Pure data, no I/O. */
 export interface ProjectFindingsV1 {
   schemaVersion: 1;
@@ -249,6 +261,8 @@ export interface ProjectFindingsV1 {
   ignore: IgnoreFindingsV1;
   ollama: OllamaFindingsV1;
   qdrant: QdrantFindingsV1;
+  /** Absent only in older findings supplied through the library API. */
+  storage?: StorageFindingsV1;
   /** Everything skipped during discovery, with a reason (E4). */
   skipped: SkipLedgerV1;
 }

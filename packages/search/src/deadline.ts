@@ -6,6 +6,7 @@ export async function withSearchBranchDeadline<T>(
   timeoutMs: number | undefined,
   retrieve: (options: PortCallOptions) => Promise<T>,
   options?: PortCallOptions,
+  storeFailureCode: "QDRANT_UNAVAILABLE" | "LANCEDB_UNAVAILABLE" = "QDRANT_UNAVAILABLE",
 ): Promise<T> {
   options?.signal?.throwIfAborted();
   const controller = new AbortController();
@@ -22,7 +23,7 @@ export async function withSearchBranchDeadline<T>(
     if (timeoutMs !== undefined) {
       timer = setTimeout(() => {
         timeoutError = new UntangleError(
-          branch === "dense" ? "EMBEDDING_UNAVAILABLE" : "QDRANT_UNAVAILABLE",
+          branch === "dense" ? "EMBEDDING_UNAVAILABLE" : storeFailureCode,
           `retrieval branch "${branch}" exceeded its ${String(timeoutMs)}ms deadline`,
           {
             operation: "search_branch",

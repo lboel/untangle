@@ -534,7 +534,7 @@
     },
     {
       "id": "untangle.storage",
-      "title": "Qdrant and local persistent storage ports",
+      "title": "LanceDB, Qdrant and local persistent storage ports",
       "stage": "implemented",
       "review": "proposed",
       "intent": [
@@ -546,16 +546,21 @@
         {
           "role": "specification",
           "path": "spec.md",
-          "heading": "10. Qdrant storage"
+          "heading": "10. Persistent storage"
         }
       ],
       "owners": ["role.wp-11", "role.wp-12"],
       "code": {
-        "include": ["packages/storage-qdrant/src/**/*.ts", "packages/storage-local/src/**/*.ts"],
+        "include": [
+          "packages/storage-lancedb/src/**/*.ts",
+          "packages/storage-qdrant/src/**/*.ts",
+          "packages/storage-local/src/**/*.ts"
+        ],
         "exclude": ["**/*.test.ts", "**/test-support/**", "**/testing/**"]
       },
       "tests": {
         "include": [
+          "packages/storage-lancedb/src/**/*.test.ts",
           "packages/storage-qdrant/src/**/*.test.ts",
           "packages/storage-local/src/**/*.test.ts"
         ]
@@ -565,6 +570,9 @@
           "id": "storage.regression-files",
           "description": "Complete regression-file contract: every reported case in these files passes without skips.",
           "tests": [
+            "packages/storage-lancedb/src/contract.test.ts",
+            "packages/storage-lancedb/src/vector-store.test.ts",
+            "packages/storage-lancedb/src/process.test.ts",
             "packages/storage-qdrant/src/vector-store.test.ts",
             "packages/storage-qdrant/src/bm25-text.test.ts",
             "packages/storage-local/src/storage.test.ts"

@@ -67,6 +67,7 @@ export const FOREIGN_DEFAULT_QDRANT_URLS: readonly {
 
 /** Woher die Adresse kommt — das ist der ganze Unterschied. */
 export type VectorStoreOrigin =
+  | "embedded"
   /** Aus `qdrant.url` einer Konfigurationsdatei. Der Nutzer hat sie hingeschrieben. */
   | "configured"
   /** Aus `UNTANGLE_QDRANT_URL`. Der Nutzer hat sie benannt. */

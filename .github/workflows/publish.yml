@@ -148,7 +148,7 @@ jobs:
           const root = process.env.RELEASE_BUNDLE;
           const report = JSON.parse(readFileSync(path.join(root, 'release-report.json')));
           const order = JSON.parse(readFileSync(path.join(root, 'publish-order.json')));
-          assert.equal(order.length, 20);
+          assert.equal(order.length, 21);
           const verified = new Map(report.packages.map(item => [item.name, item]));
           // Check every immutable file and registry version before any mutation.
           for (const entry of order) {

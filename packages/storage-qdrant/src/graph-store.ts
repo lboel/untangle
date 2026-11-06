@@ -55,6 +55,7 @@ import { canonicalJson, sha256Hex } from "@untangle-code/domain";
 import {
   graphIncompleteError,
   lockHeldError,
+  lanceDbUnavailableError,
   qdrantUnavailableError,
 } from "@untangle-code/observability";
 
@@ -122,9 +123,12 @@ export class QdrantGraphStore implements GraphStore {
     this.prefix = options.collectionPrefix ?? "untangle_";
     this.partBudgetBytes = options.partBudgetBytes ?? 1024 * 1024;
     if (this.partBudgetBytes <= 0) {
-      throw qdrantUnavailableError("partBudgetBytes must be a positive integer", {
-        context: { partBudgetBytes: this.partBudgetBytes },
-      });
+      throw (this.store.backend === "lancedb" ? lanceDbUnavailableError : qdrantUnavailableError)(
+        "partBudgetBytes must be a positive integer",
+        {
+          context: { partBudgetBytes: this.partBudgetBytes },
+        },
+      );
     }
     // Validate the prefix eagerly.
     graphCollectionName(this.prefix, "graph_meta");
@@ -429,7 +433,7 @@ export class QdrantGraphStore implements GraphStore {
         return parts;
       }
       if (page.nextOffset === offset) {
-        throw qdrantUnavailableError(
+        throw (this.store.backend === "lancedb" ? lanceDbUnavailableError : qdrantUnavailableError)(
           `Graph scroll cursor did not advance (collection "${collectionName}")`,
           { operation: "graph_store_scroll", context: { collection: collectionName } },
         );
