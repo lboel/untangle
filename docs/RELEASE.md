@@ -230,4 +230,5 @@ retrieval, AST/graph evidence, Vue/HTTP boundaries, declared feature complexity,
 Search Journeys, format-based analyzers, guided setup, English product text, the local 3D map
 and native SDD connectors. Full change/policy gates, confirmed ownership, independent semantic
 conformance and complete Sonar parity remain open. Direct analysis/offline init need no
-services; indexed search needs Qdrant and service embeddings need their configured provider.
+services. Indexed search defaults to embedded LanceDB, with Qdrant available as an alternative;
+service embeddings need their configured provider.
