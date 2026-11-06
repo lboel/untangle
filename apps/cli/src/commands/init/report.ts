@@ -102,14 +102,21 @@ export function formatTextReport(result: InitResultV1): string[] {
   // WP-228: Die Zeile darueber sagt nur, dass /api/tags geantwortet hat.
   // Diese hier sagt, ob der Dienst das kann, wofuer er gebraucht wird.
   lines.push(`                ${describeEmbedProbe(ollama)}`);
-  const qdrant = findings.qdrant;
-  lines.push(
-    qdrant.outcome === "reachable"
-      ? `Vektorspeicher  ${qdrant.url ?? "?"} erreichbar`
-      : `Vector store    unreachable (${qdrant.probedUrls.join(", ")}); this is not an error`,
-  );
-  for (const skipped of qdrant.skippedUrls) {
-    lines.push(`                not checked: ${skipped.url}`);
+  if (findings.storage?.backend === "lancedb") {
+    lines.push(
+      `Vector store    LanceDB at ${findings.storage.directory}; directory ${findings.storage.directoryStatus}`,
+    );
+    lines.push("                Local storage only; no database opened, Docker or Qdrant probed.");
+  } else {
+    const qdrant = findings.qdrant;
+    lines.push(
+      qdrant.outcome === "reachable"
+        ? `Vector store    ${qdrant.url ?? "?"} reachable`
+        : `Vector store    unreachable (${qdrant.probedUrls.join(", ")}); this is not an error`,
+    );
+    for (const skipped of qdrant.skippedUrls) {
+      lines.push(`                not checked: ${skipped.url}`);
+    }
   }
 
   const ignore = findings.ignore;

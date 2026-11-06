@@ -76,20 +76,22 @@ untangle init --interactive          # Guided configuration and optional tool se
 untangle product connect auto --dry-run --format=json
 untangle graph features             # Local interactive 3D feature/code map
 untangle doctor                     # Inspect config, parsers, services and index
-untangle index                      # Index/graphs; Qdrant and selected embedder
+untangle index                      # Index/graphs; selected storage and embedder
 untangle query "..."                 # Hybrid, lexical, symbol, semantic or grep-like
 untangle graph visualize --out=graph.html
 untangle mcp --stdio                 # Local server for agent hosts
 ```
 
-Lexical/symbol retrieval needs a compatible Qdrant index but no query embedding.
+New projects store their index in LanceDB under `.untangle/index/lancedb`, without a database
+service. `init --storage=qdrant` selects Qdrant; existing Qdrant configurations keep that backend.
+Lexical/symbol retrieval needs a compatible index but no query embedding.
 `index --embedder=offline` builds one without Ollama; its deterministic vectors have no
 language-model semantics. Semantic retrieval needs its configured embedding provider.
 Noninteractive init starts no services/models. Explicit scan can run enabled analyzers;
 container provisioning requires separate consent.
 
 Guided init previews its file/command plan and separates preparation from execution. Offers
-include local Qdrant/Ollama, local/existing SonarQube, a hash-verified Sentrux binary/MCP
+include embedded LanceDB (default), local Qdrant/Ollama, local/existing SonarQube, a hash-verified Sentrux binary/MCP
 template and custom SARIF/JUnit/JSON extensions. Tokens use environment-variable names, not
 project-stored values. Existing files and foreign containers are preserved. Tool installation
 is not scan evidence.

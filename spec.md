@@ -54,6 +54,7 @@ The following public packages are planned for version 1:
 @untangle-code/config
 @untangle-code/plugin-sdk
 @untangle-code/testkit
+@untangle-code/storage-lancedb
 ```
 
 `@untangle-code/cli` MUST export the `untangle` binary and contain the MCP runtime.
@@ -64,7 +65,7 @@ The following public packages are planned for version 1:
 - Packages MUST support ESM.
 - Public library packages SHOULD ship TypeScript declaration files.
 - The CLI MUST support Linux, macOS and Windows.
-- Docker MUST be optional when external Qdrant and Ollama endpoints are configured.
+- Docker MUST be optional. The default local storage backend is embedded LanceDB; external Qdrant and Ollama endpoints remain supported.
 
 <a id="24-plugin-distribution"></a>
 
@@ -92,6 +93,11 @@ Every plugin MUST declare:
 Untangle MUST support the following operating modes.
 
 ### 3.1 Managed Local
+
+New projects MUST default to embedded LanceDB under `.untangle/index/lancedb`. This mode
+MUST need no database service or Docker. Embedding services are independent of storage;
+`--embedder=offline` supports indexing for lexical/symbol retrieval without model semantics.
+The following service mode is an explicit Qdrant option:
 
 - Qdrant runs in a container managed by Untangle.
 - Native Ollama is probed first; otherwise it is started in a managed container.
@@ -149,6 +155,7 @@ interface UntangleConfigV1 {
   workspaceId?: string;
   projectId?: string;
   repositories?: RepositoryConfig[];
+  storage?: { backend?: "lancedb" | "qdrant"; path?: string };
   qdrant?: QdrantConfig;
   embeddings?: EmbeddingConfig;
   index?: IndexConfig;
@@ -627,7 +634,29 @@ Unchanged prepared text MUST NOT be embedded again while the cache remains valid
 
 <a id="10-qdrant-speicher"></a>
 
-## 10. Qdrant storage
+## 10. Persistent storage
+
+LanceDB is the default for new setups. An explicit storage backend takes precedence; legacy
+configuration with an explicit Qdrant section or Qdrant environment override retains Qdrant.
+`storage.path` is a local, repository-root-relative path (or an absolute local path), never a
+remote database URI. Environment overrides are `UNTANGLE_STORAGE_BACKEND` and
+`UNTANGLE_LANCEDB_PATH`. Read/status methods MUST NOT create directories or tables.
+
+Both adapters implement the same vector, metadata and graph ports. Identifier tokenization,
+payload filters, generation publication, cancellation and index freshness remain shared.
+LanceDB stores vectors, payloads, metadata and graph parts in real persistent Lance tables.
+Its initial implementation uses bounded exact ranking rather than promising native ANN
+performance or score equality with Qdrant. A local SQLite transaction is solely a mutation
+mutex; SQLite is not an alternative index or metadata store.
+
+Index records and current pointers MUST bind the storage backend and canonical location.
+Old Qdrant record identities and configuration hashes MUST remain compatible. Switching
+backends MUST select an independent index; it MUST NOT delete or silently copy existing data.
+Index the selected backend before querying it; switching back may reuse its fresh generation.
+Storage-specific failures MUST identify the actual backend, never masquerade as empty results.
+
+The collection strategy and Qdrant-specific transport requirements below continue to apply
+to Qdrant. LanceDB preserves their logical collection/profile and payload contracts.
 
 <a id="101-collection-strategie"></a>
 

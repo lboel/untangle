@@ -225,6 +225,7 @@ export async function runPublicRegistrySmoke(options) {
       "release-smoke.mjs",
       "release-product-consumer.mjs",
       "release-frontend-consumer.mjs",
+      "release-local-search-consumer.mjs",
       "check-publishable.mjs",
       "verify-release-candidate.mjs",
     ].map((file) => binding(fileURLToPath(new URL(file, import.meta.url)))),

@@ -1,12 +1,14 @@
-/** Terminal-only orchestration; the noninteractive init library remains unchanged. */
+/** Terminal-only setup orchestration; the library also supports scriptable backend selection. */
 import { spawn } from "node:child_process";
 import { pathToFileURL } from "node:url";
 
 import { discoverSddArtifacts, type SddConnectionReportV1 } from "@untangle-code/core";
+import { NodeFileSystem } from "@untangle-code/scanner/node-fs";
 
 import type { CommandContext } from "../../cli/command.js";
 import { EXIT, OperationalError, UsageError } from "../../cli/exit.js";
 import { note } from "../../cli/io.js";
+import { MANAGED_QDRANT_URL } from "../../cli/vector-store-policy.js";
 import { writeFeatureMap } from "../graph/feature-map.js";
 import { writeSddConnection } from "../sdd.js";
 
@@ -18,6 +20,7 @@ import {
   type IntegrationSetupPlanV1,
 } from "./integrations.js";
 import { runInit, type InitDepsV1, type InitOptionsV1 } from "./run.js";
+import { inspectInitStorage } from "./storage.js";
 import type { InitResultV1 } from "./types.js";
 import type { WizardTerminal } from "./wizard-terminal.js";
 
@@ -72,7 +75,10 @@ async function optionalPath(
   );
 }
 
-async function collectSelections(terminal: WizardTerminal): Promise<IntegrationSelectionV1[]> {
+async function collectSelections(
+  terminal: WizardTerminal,
+  backend: "lancedb" | "qdrant",
+): Promise<IntegrationSelectionV1[]> {
   const selections: IntegrationSelectionV1[] = [];
   const offers = integrationCatalog();
   for (;;) {
@@ -82,6 +88,7 @@ async function collectSelections(terminal: WizardTerminal): Promise<IntegrationS
     const remaining = offers.filter(
       (offer) =>
         !selections.some((selection) => selection.id === offer.id) &&
+        (backend === "qdrant" || offer.id !== "local-search") &&
         !(sonarSelected && (offer.id === "sonarqube-local" || offer.id === "sonarqube-existing")),
     );
     if (remaining.length === 0) return selections;
@@ -149,7 +156,7 @@ function showPlan(
   map: boolean,
 ): void {
   terminal.message(
-    `\nSetup review\nProject: ${result.findings.root}\nConfiguration: ${result.configPath}\nConfiguration action: ${result.outcome}\nFeature/code map: ${map ? "create locally under .untangle/feature-map" : "skip"}`,
+    `\nSetup review\nProject: ${result.findings.root}\nConfiguration: ${result.configPath}\nConfiguration action: ${result.outcome}\nSearch storage: ${result.findings.storage?.backend ?? "qdrant"}${result.findings.storage?.directory === undefined ? "" : ` at ${result.findings.storage.directory}`}\nFeature/code map: ${map ? "create locally under .untangle/feature-map" : "skip"}`,
   );
   for (const item of plan.items) {
     terminal.message(`\n${item.label}`);
@@ -194,6 +201,56 @@ export async function runInitWizard(
     },
   ]);
   let options = { ...initialOptions };
+  const storage = await inspectInitStorage(
+    initDeps.fs ?? new NodeFileSystem(),
+    options.root,
+    options.storageBackend,
+    initDeps.env ?? ctx.env,
+    ctx.signal,
+  );
+  if (options.storageBackend === undefined) {
+    const choices = [
+      {
+        value: "lancedb",
+        label: "LanceDB — embedded local index (recommended)",
+        detail: "Local files in the configured index directory; no Docker or database service.",
+      },
+      {
+        value: "qdrant",
+        label: "Qdrant — owned local service",
+        detail: "Use or explicitly prepare isolated Qdrant/Ollama services.",
+      },
+      {
+        value: "qdrant-external",
+        label: "Qdrant — connect an existing server",
+        detail: "Choose your server URL explicitly; Untangle does not provision it.",
+      },
+    ];
+    const current =
+      storage.backend === "lancedb"
+        ? "lancedb"
+        : storage.qdrantMode === "external"
+          ? "qdrant-external"
+          : "qdrant";
+    choices.sort((left, right) => Number(right.value === current) - Number(left.value === current));
+    const choice = await terminal.choose("Where should the search index live?", choices);
+    options = { ...options, storageBackend: choice === "lancedb" ? "lancedb" : "qdrant" };
+    if (choice !== "lancedb") {
+      const external = choice === "qdrant-external";
+      const url = external
+        ? await terminal.input("Qdrant server URL", storage.qdrantUrl ?? "http://127.0.0.1:6333")
+        : MANAGED_QDRANT_URL;
+      initDeps = {
+        ...initDeps,
+        env: {
+          ...(initDeps.env ?? ctx.env),
+          UNTANGLE_STORAGE_BACKEND: "qdrant",
+          UNTANGLE_QDRANT_MODE: external ? "external" : "managed",
+          UNTANGLE_QDRANT_URL: url,
+        },
+      };
+    }
+  }
   if (mode === "spec") {
     const visionPath = await optionalPath(terminal, "Vision document", options.visionPath);
     const specPath = await optionalPath(terminal, "Specification document", options.specPath);
@@ -284,7 +341,7 @@ export async function runInitWizard(
     if (replace === "keep") return { result: null, exitCode: EXIT.ok };
     options = { ...options, force: true };
   }
-  const selections = await collectSelections(terminal);
+  const selections = await collectSelections(terminal, options.storageBackend ?? storage.backend);
   const map =
     (await terminal.choose("Create a local feature/code map?", [
       {
@@ -358,7 +415,7 @@ export async function runInitWizard(
     ? {
         ...initDeps,
         env: {
-          ...ctx.env,
+          ...(initDeps.env ?? ctx.env),
           UNTANGLE_QDRANT_URL: "http://127.0.0.1:16333",
           UNTANGLE_OLLAMA_URL: "http://127.0.0.1:11435",
         },

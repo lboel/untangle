@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "package": "@lancedb/lancedb",
+  "version": "0.30.0",
+  "scope": "Published native optional package declarations and SPDX metadata. The installed production SBOM records the actual platform selection; no claim that every variant is installed or its binary was inspected.",
+  "variants": [
+    {
+      "name": "@lancedb/lancedb-darwin-arm64",
+      "version": "0.30.0",
+      "license": "Apache-2.0",
+      "os": [
+        "darwin"
+      ],
+      "cpu": [
+        "arm64"
+      ],
+      "libc": [],
+      "dependencies": {},
+      "optionalDependencies": {},
+      "source": "https://registry.npmjs.org/%40lancedb%2Flancedb-darwin-arm64/0.30.0",
+      "manifestSha256": "8de9ff371bab14c407807c337a517daf65662a27580f08bbd526cf96f31e2b98",
+      "distIntegrity": "sha512-x6dmsjRIv0xumELYnFAEfyFDxqcO/n4rHYCJvC27RbRez0UmbByi6OMTgbSoSTatrQSPRCL7JJSa5pwNeawnIg=="
+    },
+    {
+      "name": "@lancedb/lancedb-linux-arm64-gnu",
+      "version": "0.30.0",
+      "license": "Apache-2.0",
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "arm64"
+      ],
+      "libc": [
+        "glibc"
+      ],
+      "dependencies": {},
+      "optionalDependencies": {},
+      "source": "https://registry.npmjs.org/%40lancedb%2Flancedb-linux-arm64-gnu/0.30.0",
+      "manifestSha256": "3b62afff0a148efce32f19fa46ba925da21037062ff07ae7a766d1d0a55915a0",
+      "distIntegrity": "sha512-CWUex7hRNiLkXFeTQlUGPyy5VktbXoUmQdZuiVCETZ6ggljEC7c7Qvzu2ge+jEZML+UE7tXL2lVC3klRFGczng=="
+    },
+    {
+      "name": "@lancedb/lancedb-linux-arm64-musl",
+      "version": "0.30.0",
+      "license": "Apache-2.0",
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "arm64"
+      ],
+      "libc": [
+        "musl"
+      ],
+      "dependencies": {},
+      "optionalDependencies": {},
+      "source": "https://registry.npmjs.org/%40lancedb%2Flancedb-linux-arm64-musl/0.30.0",
+      "manifestSha256": "d58ad655d7c7e214fa0de7b5aa0032fbdf1b47aa4fe13380338f7c0329f329fb",
+      "distIntegrity": "sha512-2MHmAS4tKePNVbwfgDrjCFj6BVuAgXlL2c9iWk7TfcwL+jcSxo52LFx03O0+ArpVCF2sI6aoDqZaQNre5zMniQ=="
+    },
+    {
+      "name": "@lancedb/lancedb-linux-x64-gnu",
+      "version": "0.30.0",
+      "license": "Apache-2.0",
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "x64"
+      ],
+      "libc": [
+        "glibc"
+      ],
+      "dependencies": {},
+      "optionalDependencies": {},
+      "source": "https://registry.npmjs.org/%40lancedb%2Flancedb-linux-x64-gnu/0.30.0",
+      "manifestSha256": "f33ace80a8039c43b4581bee3ee409324390e5630bd6a159add03d16e78f3d9c",
+      "distIntegrity": "sha512-0OpDNxsDE4OXD+PIFd7KdE42xhYIE+fZL+jCm1v3dTug4UEhumWBuSgbUIBP7t0yJZHwh62/QivVh/V1cPB2Bg=="
+    },
+    {
+      "name": "@lancedb/lancedb-linux-x64-musl",
+      "version": "0.30.0",
+      "license": "Apache-2.0",
+      "os": [
+        "linux"
+      ],
+      "cpu": [
+        "x64"
+      ],
+      "libc": [
+        "musl"
+      ],
+      "dependencies": {},
+      "optionalDependencies": {},
+      "source": "https://registry.npmjs.org/%40lancedb%2Flancedb-linux-x64-musl/0.30.0",
+      "manifestSha256": "be5ec802dfdbf69e35eea348058f5036054ea7af78634a49108736881092626c",
+      "distIntegrity": "sha512-4Bq7VngQt+lyxIcu79EN8nYJs8gvUnrIT6I/t2MSlpG/BXWHZG2A+PRii1Zq4GCUlRTTG+RlieCv8CBGSPm8bw=="
+    },
+    {
+      "name": "@lancedb/lancedb-win32-arm64-msvc",
+      "version": "0.30.0",
+      "license": "Apache-2.0",
+      "os": [
+        "win32"
+      ],
+      "cpu": [
+        "arm64"
+      ],
+      "libc": [],
+      "dependencies": {},
+      "optionalDependencies": {},
+      "source": "https://registry.npmjs.org/%40lancedb%2Flancedb-win32-arm64-msvc/0.30.0",
+      "manifestSha256": "70a1ea1108bb890e0eb6cadb031781e0c350c9616d4384b5107a83500b55e7e8",
+      "distIntegrity": "sha512-N2DQg2XBWZirn5jS6kRJUxF679t3sKcIxBwP9zY4Idq5OVLAj0yfLueWIKhYxv8en7pBFYWdgw5j9dTS7XajyQ=="
+    },
+    {
+      "name": "@lancedb/lancedb-win32-x64-msvc",
+      "version": "0.30.0",
+      "license": "Apache-2.0",
+      "os": [
+        "win32"
+      ],
+      "cpu": [
+        "x64"
+      ],
+      "libc": [],
+      "dependencies": {},
+      "optionalDependencies": {},
+      "source": "https://registry.npmjs.org/%40lancedb%2Flancedb-win32-x64-msvc/0.30.0",
+      "manifestSha256": "295a447db13d5ca7fc24ac1a88ad07d403197c2444f03d1a3cc1b5ee677e3c6d",
+      "distIntegrity": "sha512-CDgN/ZmYqSlVX2nBJAF2PYEwqBBxotCVORjagmvrd0k5D7RBLlAQUEAR4gDMum2BpYsUkzdTYQpquLjRCVbwbQ=="
+    }
+  ]
+}

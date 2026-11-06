@@ -94,12 +94,15 @@ import {
   describeConfigIssues,
   errorMessage,
   loadWorkspace,
+  matchesStoredBackend,
+  storageIndexScope,
   wireEmbedder,
   wireStorage,
   type WorkspaceView,
 } from "../cli/workspace.js";
 
 import { checkLanguages } from "./doctor.languages.js";
+import { inspectLanceDirectory, selectLanceIndexProfile } from "./doctor.storage.js";
 
 export type CheckStatus = "ok" | "warn" | "fail";
 
@@ -150,10 +153,10 @@ export const doctorCommand: Command = {
   spec: {
     name: "doctor",
     implementedBy: "commands/doctor.js",
-    summary: "Check configuration, Ollama, Qdrant, index state and language availability",
+    summary: "Check configuration, embeddings, selected search storage, index state and languages",
     usage: "untangle doctor [--root=<PATH>] [--format=text|json]",
     details: [
-      "Checks, in order: configuration, Ollama (reachability, model, dimensions), Qdrant (reachability), index state (this embedding profile's collection), analyzer extensions and languages.",
+      "Checks configuration, Ollama, the selected search backend, this embedding profile's index, analyzer extensions and languages. LanceDB inspects the local directory and existing index without creating either; it contacts no Qdrant or Docker service. Explicit Qdrant configurations retain their service and collection checks.",
       'Language availability is measured, not assumed: each adapter parses a word to load its actual grammar. This verifies which registered languages work on this machine. ast-grep language prebuilds support five platforms; a failed fallback build can still exit 0 during installation. Languages without a loadable grammar are reported as tier "text" with a reason, never as a claimed "deep" tier.',
       "The Ollama check exercises the endpoint indexing actually uses, ending with a probe embedding on /api/embed. An available /api/tags endpoint alone does not count as a pass.",
       "If Ollama misses the deadline, a follow-up checks whether it accepts HTTP connections. A responding service may still be loading its model (measured cold starts took 31–37 s); the check then waits up to --cold-start-timeout. A service accepting no connection fails immediately. This distinguishes an unresponsive service from a model still loading.",
@@ -628,8 +631,8 @@ async function checkStorage(
     // meldete und empfahl, dorthin zu indizieren.
     return [
       {
-        id: "qdrant",
-        title: "Qdrant",
+        id: view.config.storage.backend,
+        title: view.config.storage.backend === "lancedb" ? "LanceDB" : "Qdrant",
         status: "fail",
         detail:
           error instanceof CliError
@@ -638,13 +641,76 @@ async function checkStorage(
         nextStep:
           error instanceof CliError && error.nextStep !== undefined
             ? error.nextStep
-            : `Set \`qdrant.url\` in ${primaryConfigFile(view) ?? "untangle.toml"} to your own instance's address.`,
+            : view.config.storage.backend === "lancedb"
+              ? "Set storage.path to an accessible local directory."
+              : `Set \`qdrant.url\` in ${primaryConfigFile(view) ?? "untangle.toml"} to your own instance's address.`,
       },
     ];
   }
 
+  const local =
+    wiring.backend === "lancedb"
+      ? await inspectLanceDirectory(wiring.storagePath!, ctx.signal)
+      : undefined;
+  if (local !== undefined && !local.exists) {
+    return local.check.status === "fail"
+      ? [local.check]
+      : [
+          local.check,
+          {
+            id: "index",
+            title: "Index state",
+            status: "fail",
+            detail: `No local index exists for this embedding profile at ${wiring.storagePath}. Nothing is indexed.`,
+            nextStep:
+              "Run `untangle index` or `untangle index --embedder=offline` to create the local index.",
+            facts: {
+              backend: wiring.backend,
+              path: wiring.storagePath!,
+              collection: wiring.codeCollection,
+            },
+          },
+        ];
+  }
+
+  let indexView = view;
+  let collection = wiring.codeCollection;
+  let embedder: "service" | "offline" = "service";
+  if (local !== undefined) {
+    const current = await withDeadline(
+      () =>
+        resolveIndexState(
+          [
+            view.root,
+            ...(view.config.repositories ?? []).map((repo) => path.resolve(view.root, repo.path)),
+          ],
+          view.workspaceId,
+          storageIndexScope(wiring),
+        ),
+      timeoutMs,
+      ctx.signal,
+    );
+    ctx.signal.throwIfAborted();
+    if (!current.ok)
+      return [
+        local.check,
+        {
+          id: "index-profile",
+          title: "Current local index profile",
+          status: "fail",
+          detail: `Cannot inspect the current local profile: ${errorMessage(current.error)}`,
+          nextStep: "Rerun `untangle doctor` with a sufficient --timeout.",
+        },
+      ];
+    const selected = selectLanceIndexProfile(view, wiring, current.value);
+    if ("check" in selected) return [local.check, selected.check];
+    indexView = selected.view;
+    collection = selected.collection;
+    embedder = selected.embedder;
+  }
+
   const probe = await withDeadline<boolean>(
-    (signal) => wiring.vectorStore.collectionExists(wiring.codeCollection, { signal }),
+    (signal) => wiring.vectorStore.collectionExists(collection, { signal }),
     timeoutMs,
     ctx.signal,
   );
@@ -652,30 +718,33 @@ async function checkStorage(
   if (!probe.ok) {
     return [
       {
-        id: "qdrant",
-        title: "Qdrant",
+        id: wiring.backend,
+        title: wiring.backend === "lancedb" ? "LanceDB" : "Qdrant",
         status: "fail",
         detail: probe.timedOut
-          ? `${wiring.qdrantConfig.url} did not answer within ${String(timeoutMs)}ms without responding; the check was cancelled.`
-          : `${wiring.qdrantConfig.url} does not respond: ${errorMessage(probe.error)}`,
-        nextStep: `Start an owned Qdrant instance on ${wiring.qdrantConfig.url} with its own volume; a foreign instance on another port is not a substitute (spec.md §3.2).`,
-        facts: { url: wiring.qdrantConfig.url, collection: wiring.codeCollection },
+          ? `${wiring.storeUrl} did not answer within ${String(timeoutMs)}ms; the check was cancelled.`
+          : `${wiring.storeUrl} could not be read: ${errorMessage(probe.error)}`,
+        nextStep:
+          wiring.backend === "lancedb"
+            ? "Check the local storage directory permissions and reported LanceDB error."
+            : `Start an owned Qdrant instance on ${wiring.storeUrl} with its own volume; a foreign instance on another port is not a substitute (spec.md §3.2).`,
+        facts: { backend: wiring.backend, url: wiring.storeUrl, collection },
       },
     ];
   }
   const exists = probe.value;
 
-  const reachable: CheckResult = {
+  const reachable: CheckResult = local?.check ?? {
     id: "qdrant",
     title: "Qdrant",
     status: "ok",
     // Die Herkunft der Adresse steht dabei, nicht nur die Adresse. Ein
     // "[OK ] Qdrant" ohne die Angabe, WESSEN Qdrant, war der halbe Befund.
-    detail: `Reachable at ${wiring.qdrantConfig.url} — ${wiring.decision.reason}.`,
+    detail: `Reachable at ${wiring.storeUrl} — ${wiring.decision.reason}.`,
     facts: {
-      url: wiring.qdrantConfig.url,
+      url: wiring.storeUrl,
       herkunft: wiring.decision.origin,
-      collectionPrefix: wiring.qdrantConfig.collectionPrefix,
+      collectionPrefix: wiring.collectionPrefix,
     },
   };
 
@@ -684,10 +753,10 @@ async function checkStorage(
       reachable,
       {
         id: "index",
-        title: "Indexstand",
+        title: "Index state",
         status: "fail",
         detail:
-          `Collection "${wiring.codeCollection}" for this embedding profile does not exist. ` +
+          `Collection "${collection}" for this embedding profile does not exist. ` +
           "Nothing is indexed; search would inspect no data.",
         // Frueher stand hier „Achtung: dieser Befehl ist noch nicht
         // verfuegbar". Das war seit Welle 5 falsch — `index` ist gebaut und
@@ -695,14 +764,17 @@ async function checkStorage(
         // Veraltetes behauptet, ist genau die E4-Klasse an der Oberflaeche:
         // eine Aussage, die nichts mehr deckt.
         nextStep: "Run `untangle index` to create and populate the collection.",
-        facts: { collection: wiring.codeCollection },
+        facts: {
+          collection,
+          ...(local === undefined ? {} : { embeddingProfileId: indexView.profileId, embedder }),
+        },
       },
     ];
   }
 
   let points = -1;
   const counted = await withDeadline<number>(
-    (signal) => wiring.vectorStore.countByFilter(wiring.codeCollection, {}, { signal }),
+    (signal) => wiring.vectorStore.countByFilter(collection, {}, { signal }),
     timeoutMs,
     ctx.signal,
   );
@@ -723,18 +795,19 @@ async function checkStorage(
           ...(view.config.repositories ?? []).map((repo) => path.resolve(view.root, repo.path)),
         ],
         view.workspaceId,
+        storageIndexScope(wiring),
       );
       const states =
         resolved.kind === "resolved" || resolved.kind === "ambiguous"
           ? resolved.all.filter(
               ({ state, current }) =>
                 current &&
-                state.embeddingProfileId === view.profileId &&
-                state.collection === wiring.codeCollection &&
-                state.qdrantUrl === wiring.qdrantConfig.url,
+                state.embeddingProfileId === indexView.profileId &&
+                state.collection === collection &&
+                matchesStoredBackend(state, wiring),
             )
           : [];
-      return inspectIndexFreshness(view, states, { signal, expectedRepoIds: view.repoIds });
+      return inspectIndexFreshness(indexView, states, { signal, expectedRepoIds: view.repoIds });
     },
     timeoutMs,
     ctx.signal,
@@ -747,22 +820,26 @@ async function checkStorage(
     reachable,
     {
       id: "index",
-      title: "Indexstand",
+      title: "Index state",
       status: points === 0 ? "warn" : "ok",
       detail:
         points < 0
-          ? `Collection "${wiring.codeCollection}" exists; point count could not be queried.`
-          : `Collection "${wiring.codeCollection}" with ${String(points)} Punkten.`,
+          ? `Collection "${collection}" exists; point count could not be queried.`
+          : `Collection "${collection}" with ${String(points)} points.${embedder === "offline" ? " Current profile: offline; vectors carry no semantics." : ""}`,
       ...(points === 0
         ? {
             nextStep: "The collection is empty; run `untangle index` to populate it.",
           }
         : {}),
-      facts: { collection: wiring.codeCollection, points },
+      facts: {
+        collection,
+        points,
+        ...(local === undefined ? {} : { embeddingProfileId: indexView.profileId, embedder }),
+      },
     },
     {
       id: "index-freshness",
-      title: "Indexfrische",
+      title: "Index freshness",
       status:
         freshnessStatus === "fresh" ? "ok" : freshnessStatus === "incompatible" ? "fail" : "warn",
       detail: `Content hash check: ${freshnessStatus}. ${freshness?.repositories.map((entry) => `${entry.repoId}/${entry.refId}: ${entry.reason}`).join("; ") ?? "A full source check is unavailable."}`,

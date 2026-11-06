@@ -63,7 +63,7 @@ export interface LoadConfigResult {
   warnings: ConfigIssue[];
   errors: ConfigIssue[];
   sources: ConfigSources;
-  /** SHA-256 of the canonical JSON of `effectiveConfig` (architecture.md §6.3). */
+  /** Canonical effective-config hash; Qdrant excludes additive storage fields for legacy identity. */
   configHash: string;
   /** `buildWorkspaceId({ explicitId: effectiveConfig.workspaceId, configHash })` (spec.md §5.1). */
   workspaceId: string;
@@ -233,9 +233,21 @@ export function loadConfig(options: LoadConfigOptions = {}): LoadConfigResult {
     { layer: explicitLayer, baseDir: cwd },
   ];
 
-  const merged = mergeConfigLayers<Record<string, unknown>>(
-    namedLayers.map((named) => named.layer),
-  );
+  // Preserve existing Qdrant projects without letting the product-default
+  // qdrant section choose a backend for new projects. This compatibility
+  // default sits below every user layer: an explicit storage.backend at any
+  // priority overrides it, while storage.path alone never migrates an index.
+  const configuredLayers = namedLayers.slice(1).map((named) => named.layer);
+  const legacyStorageDefault: RawConfigLayer = configuredLayers.some(
+    (layer) => layer.qdrant !== undefined,
+  )
+    ? { storage: { backend: "qdrant" } }
+    : {};
+  const merged = mergeConfigLayers<Record<string, unknown>>([
+    PRODUCT_DEFAULT_CONFIG,
+    legacyStorageDefault,
+    ...configuredLayers,
+  ]);
 
   const configBaseDir = projectConfigPath
     ? dirname(projectConfigPath)

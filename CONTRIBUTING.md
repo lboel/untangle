@@ -37,7 +37,8 @@ pnpm run lint
 pnpm run test:unit
 ```
 
-Optional Qdrant/Ollama infrastructure for integration tests:
+Local LanceDB tests use native temporary tables without services. Qdrant/Ollama
+infrastructure remains optional for integration tests:
 [`docker/README.md`](./docker/README.md).
 
 ### Root scripts
@@ -55,6 +56,7 @@ Optional Qdrant/Ollama infrastructure for integration tests:
 | `pnpm run check-licenses` | Check the production dependency license allowlist. |
 | `pnpm run check-publishable` | Pack and inspect actual distribution tarballs, entry points, sources and licenses. |
 | `pnpm run e2e:smoke` | Check built adapters/graphs, real feature workflow, checkout/MCP entry and actual terminal setup without external services. |
+| `pnpm run e2e:lancedb` | Check real embedded search, reopen, backend/path switching, graph generations and freshness without external services. Add `-- --semantic` for the configured local Ollama acceptance. |
 | `pnpm run e2e:search` | Check local search with real Qdrant/Ollama, including freshness, outages, watch and migration. |
 | `pnpm run e2e:product` | Check built CLI/MCP on independent TypeScript/Python projects, including real Vitest reports, failures, skips and source changes. |
 | `pnpm run e2e:quickstart` | Check index-free entry and an unchanged usable MCP template on an external project without Git/configuration. |

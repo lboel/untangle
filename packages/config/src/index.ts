@@ -44,5 +44,8 @@ export * from "./migrations.js";
 // Top-level orchestration
 export * from "./load.js";
 
+// Parse an existing document without loading defaults or environment layers.
+export * from "./parse.js";
+
 // IndexConfig -> chunker token-budget wiring (spec.md §4.6)
 export * from "./chunker-budget.js";

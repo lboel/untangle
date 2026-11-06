@@ -217,7 +217,7 @@ pnpm exec untangle --version
 pnpm exec untangle --help
 ```
 
-Compare registry integrity for all 20 packages to the canonical report and repeat CLI-only
+Compare registry integrity for all 21 packages to the canonical report and repeat CLI-only
 resolution, native analysis, product/init/MCP and public-import checks. Only that run proves
 public installation. Create the GitHub release with signed tag, original tarballs, hashes,
 SBOM, compatibility/matrix/live evidence and version limits. Update README/website to the

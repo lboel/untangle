@@ -1097,7 +1097,7 @@ untangle scan --feature=accounts.lookup --format=json</code></pre>
           <details class="config-example">
             <summary>Enable local indexed search</summary>
             <p class="install-note">
-              Search needs Qdrant; service embeddings also need Ollama and the configured model.
+              Search uses embedded LanceDB by default, with Qdrant available as an option. Service embeddings need Ollama and the configured model.
               <code>--embedder=offline</code> avoids Ollama. It uses deterministic vectors, without
               language-model semantics; lexical and symbol search remain available.
               <code>init</code> checks services; it does not start them or download models.

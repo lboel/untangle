@@ -27,6 +27,7 @@ export {
   ERROR_CODES,
   CORE_ERROR_CODES,
   PORTFOLIO_ERROR_CODES,
+  STORAGE_ERROR_CODES,
   isErrorCode,
   isUntangleError,
   UntangleError,
@@ -68,6 +69,8 @@ export const embeddingUnavailableError = ERROR_FACTORIES.EMBEDDING_UNAVAILABLE;
 export const embeddingDimensionMismatchError = ERROR_FACTORIES.EMBEDDING_DIMENSION_MISMATCH;
 export const qdrantUnavailableError = ERROR_FACTORIES.QDRANT_UNAVAILABLE;
 export const qdrantSchemaIncompatibleError = ERROR_FACTORIES.QDRANT_SCHEMA_INCOMPATIBLE;
+export const lanceDbUnavailableError = ERROR_FACTORIES.LANCEDB_UNAVAILABLE;
+export const lanceDbSchemaIncompatibleError = ERROR_FACTORIES.LANCEDB_SCHEMA_INCOMPATIBLE;
 export const indexIncompleteError = ERROR_FACTORIES.INDEX_INCOMPLETE;
 export const indexProfileMismatchError = ERROR_FACTORIES.INDEX_PROFILE_MISMATCH;
 export const lockHeldError = ERROR_FACTORIES.LOCK_HELD;

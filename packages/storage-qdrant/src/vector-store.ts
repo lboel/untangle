@@ -87,6 +87,7 @@ const QDRANT_FIELD_SCHEMA: Record<PayloadIndexSpecV1["type"], string> = {
 };
 
 export class QdrantVectorStore implements VectorStore {
+  public readonly backend = "qdrant" as const;
   private readonly client: QdrantRestClient;
   private readonly upsertMaxPoints: number;
   private readonly upsertBudgetBytes: number;

@@ -14,6 +14,7 @@
       "type": "array",
       "items": { "$ref": "#/$defs/repositoryConfig" }
     },
+    "storage": { "$ref": "#/$defs/storageConfig" },
     "qdrant": { "$ref": "#/$defs/qdrantConfig" },
     "embeddings": { "$ref": "#/$defs/embeddingConfig" },
     "index": { "$ref": "#/$defs/indexConfig" },
@@ -44,6 +45,24 @@
         "exclude": { "type": "array", "items": { "type": "string" } },
         "packageAliases": { "type": "object", "additionalProperties": { "type": "string" } },
         "metadata": { "type": "object", "additionalProperties": { "type": "string" } }
+      },
+      "additionalProperties": false
+    },
+    "storageConfig": {
+      "type": "object",
+      "description": "Search backend. Defaults to embedded LanceDB unless a legacy qdrant section is explicitly configured. An explicit backend overrides that compatibility default.",
+      "properties": {
+        "backend": { "enum": ["lancedb", "qdrant"], "default": "lancedb" },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Local LanceDB directory, relative to the repository root or absolute; URI schemes and network paths are unsupported.",
+          "default": ".untangle/index/lancedb",
+          "anyOf": [
+            { "pattern": "^[A-Za-z]:[\\\\/][^\\u0000]*$" },
+            { "pattern": "^(?!\\s*$)(?![A-Za-z][A-Za-z0-9+.-]*:)(?![\\\\/]{2})[^\\u0000]+$" }
+          ]
+        }
       },
       "additionalProperties": false
     },

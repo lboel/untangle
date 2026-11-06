@@ -83,7 +83,13 @@ import {
 import { line, note } from "../../cli/io.js";
 import { withRenewingLease, type RenewingLeaseGuard } from "../../cli/renewing-lease.js";
 import { systemClock, systemRandom } from "../../cli/system.js";
-import { errorMessage, loadWorkspace, wireEmbedder, wireStorage } from "../../cli/workspace.js";
+import {
+  errorMessage,
+  loadWorkspace,
+  wireEmbedder,
+  wireStorage,
+  storageIndexScope,
+} from "../../cli/workspace.js";
 
 import {
   createIndexProgress,
@@ -100,6 +106,8 @@ const ENVIRONMENT_CODES = new Set([
   "EMBEDDING_DIMENSION_MISMATCH",
   "QDRANT_UNAVAILABLE",
   "QDRANT_SCHEMA_INCOMPATIBLE",
+  "LANCEDB_UNAVAILABLE",
+  "LANCEDB_SCHEMA_INCOMPATIBLE",
 ]);
 
 const INDEX_STATE_LOCK_WAIT_MS = 5_000;
@@ -293,7 +301,7 @@ export const indexCommand: Command = {
 
     const storage = wireStorage(view, ctx.env);
     const collection = codeCollectionName(
-      storage.qdrantConfig.collectionPrefix,
+      storage.collectionPrefix,
       embeddingProfileShortId(profileId),
     );
 
@@ -322,6 +330,7 @@ export const indexCommand: Command = {
 
     const stateRoot = stateRootOf(target.rootPath);
     const previous = await resolveIndexState([target.rootPath], view.workspaceId, {
+      ...storageIndexScope(storage),
       repoIds: [target.repoId],
       refs: [target.refId],
     });
@@ -381,7 +390,9 @@ export const indexCommand: Command = {
       embedder: (embedderChoice === "offline" ? "offline" : "service") satisfies EmbedderChoice,
       embeddingProfileId: profileId,
       collection,
-      qdrantUrl: storage.qdrantConfig.url,
+      ...(storage.backend === "lancedb"
+        ? { storageBackend: "lancedb" as const, storeUrl: storage.storeUrl }
+        : { qdrantUrl: storage.storeUrl }),
       indexConfigFingerprint: indexConfigFingerprint(view, target),
       lexicalTokenizerVersion: LEXICAL_TOKENIZER_VERSION,
     } satisfies Omit<IndexStateV1, "generationId" | "outcome">;
@@ -408,12 +419,12 @@ export const indexCommand: Command = {
       provisionCollection: async (options) => {
         await provisionCodeCollection(
           storage.vectorStore,
-          { prefix: storage.qdrantConfig.collectionPrefix, profile },
+          { prefix: storage.collectionPrefix, profile },
           options,
         );
       },
       sparseVectorizer: textToBm25SparseVector,
-      storeUrl: storage.qdrantConfig.url,
+      storeUrl: storage.storeUrl,
       configHash: sha256Hex(
         canonicalJson({
           configHash: view.load.configHash,

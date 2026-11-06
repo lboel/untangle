@@ -52,6 +52,14 @@ const frontendConsumer = (await import(
     incompleteRoot: string;
   };
 };
+const localSearchConsumer = (await import(
+  pathToFileURL(path.resolve("scripts/release-local-search-consumer.mjs")).href
+)) as {
+  LOCAL_SEARCH_CHECKS: string[];
+  localSearchSourceRecords(): { path: string; sha256: string }[];
+  localSearchCommandArgs(root: string): Record<string, string[]>;
+  createLocalSearchFixture(root: string): { root: string; guardPath: string; guardSha256: string };
+};
 const COMMIT = "a".repeat(40);
 const TREE = "b".repeat(40);
 const GATES = [
@@ -80,6 +88,90 @@ function json(file: string, value: unknown): void {
 function reference(root: string, file: string) {
   const bytes = readFileSync(path.join(root, file));
   return { path: file, sha256: hash(bytes), bytes: bytes.length };
+}
+
+function localSearchProofFixture() {
+  const prepared = localSearchConsumer.createLocalSearchFixture(directory());
+  const sources = localSearchConsumer.localSearchSourceRecords();
+  const index = {
+    outcome: "completed",
+    generationId: "local-generation",
+    embeddingProfileId: "local-profile",
+    workspaceId: "release-local-search",
+    counts: { filesAnalyzed: 2, fileGraphNodes: 2, fileGraphEdges: 1 },
+  };
+  const query = (mode: string) => ({
+    indexFreshness: { status: "fresh" },
+    warnings: [],
+    groups: [
+      {
+        embeddingProfileId: index.embeddingProfileId,
+        indexGenerations: [index.generationId],
+        hits: [
+          {
+            symbolName: "getUserById",
+            filePath: "src/users.ts",
+            rank: 1,
+            chunkId: "user-chunk",
+            symbolId: "user-symbol",
+            indexGeneration: index.generationId,
+          },
+        ],
+        retrieval: {
+          branchCandidateCounts: {
+            dense: 0,
+            sparse: mode === "lexical" ? 1 : 0,
+            symbol: mode === "lexical" ? 0 : 1,
+          },
+        },
+      },
+    ],
+  });
+  const reports: Record<string, unknown> = {
+    index,
+    symbol: query("symbol"),
+    lexical: query("lexical"),
+    reopened: query("symbol"),
+    graph: {
+      generationId: index.generationId,
+      workspaceId: index.workspaceId,
+      metrics: { nodeCount: 2, edgeCount: 1 },
+      unresolved: [],
+      nodes: [
+        { filePath: "src/main.ts", dependencies: 1 },
+        { filePath: "src/users.ts", dependents: 1 },
+      ],
+    },
+  };
+  return {
+    ...prepared,
+    verified: true,
+    checks: [...localSearchConsumer.LOCAL_SEARCH_CHECKS],
+    backend: "lancedb",
+    relativePath: ".untangle/index/lancedb",
+    storagePath: path.join(prepared.root, ".untangle/index/lancedb"),
+    configEntry: "node_modules/@untangle-code/config/dist/index.js",
+    storageEntry: "node_modules/@untangle-code/storage-lancedb/dist/index.js",
+    sources,
+    sourceBefore: hash(JSON.stringify(sources)),
+    sourceAfter: hash(JSON.stringify(sources)),
+    networkGuardEnabled: true,
+    externalServicesStarted: false,
+    lanceTables: ["code.lance", "graph.lance"],
+    cli: Object.fromEntries(
+      Object.entries(localSearchConsumer.localSearchCommandArgs(prepared.root)).map(
+        ([name, args]) => [
+          name,
+          {
+            command: ["/consumer/node_modules/.bin/untangle", ...args],
+            exitCode: 0,
+            stdout: JSON.stringify(reports[name]),
+            stderr: "",
+          },
+        ],
+      ),
+    ),
+  };
 }
 
 /** Explicit synthetic consumer evidence for testing the offline verifier, not a release run. */
@@ -411,7 +503,7 @@ function fixture(options: FixtureOptions = {}) {
       file: "sbom.cdx.json",
       format: "CycloneDX",
       specVersion: "1.5",
-      componentCount: 20,
+      componentCount: 21,
       generatedBy: {
         command: ["npm", "sbom", "--sbom-format=cyclonedx", "--omit=dev"],
         exitCode: 0,
@@ -549,6 +641,7 @@ function fixture(options: FixtureOptions = {}) {
             },
             product,
             frontend,
+            localSearch: localSearchProofFixture(),
           },
         },
         imports: { installed: names.map((name) => ({ name, version: "0.1.0" })) },
@@ -694,7 +787,34 @@ afterEach(() => {
 });
 
 describe("offline original release candidate verification", () => {
-  it("verifies all four contexts and 20 real archives, accepting distinct build bytes", () => {
+  it("retains every previous public package and adds the LanceDB adapter", () => {
+    expect(verifier.PUBLIC_PACKAGES).toEqual(
+      [
+        "chunker",
+        "cli",
+        "complexity",
+        "config",
+        "context-artifacts",
+        "core",
+        "domain",
+        "embeddings-ollama",
+        "extension-runtime",
+        "file-graph",
+        "graph-explorer",
+        "jobs",
+        "observability",
+        "parser-registry",
+        "scanner",
+        "search",
+        "storage-lancedb",
+        "storage-local",
+        "storage-qdrant",
+        "symbol-graph",
+        "watcher",
+      ].map((name) => `@untangle-code/${name}`),
+    );
+  });
+  it("verifies all four contexts and 21 real archives, accepting distinct build bytes", () => {
     const f = fixture();
     const result = verifier.verifyReleaseCandidates({
       artifactsDir: f.artifactsDir,
@@ -704,7 +824,7 @@ describe("offline original release candidate verification", () => {
     expect(result.matrix).toHaveLength(4);
     expect(new Set(result.matrix.map((m) => m.artifactTreeDigest)).size).toBe(4);
     expect(result.canonical).toMatchObject({ os: "ubuntu-latest", nodeMajor: 22 });
-    expect(result.canonical.tarballs).toHaveLength(20);
+    expect(result.canonical.tarballs).toHaveLength(21);
     expect(
       result.canonical.tarballs.every((entry) =>
         entry.file.startsWith("linux-22/bundle/tarballs/"),
@@ -912,6 +1032,99 @@ describe("offline original release candidate verification", () => {
       expect(() =>
         verifier.verifyReleaseCandidates({ artifactsDir: f.artifactsDir, commit: COMMIT }),
       ).toThrow("frontend/Vue/HTTP consumer proof");
+    },
+  );
+  const localSearchChanges: [string, (runtime: Record<string, unknown>) => void][] = [
+    [
+      "missing proof",
+      (runtime) => {
+        delete runtime["localSearch"];
+      },
+    ],
+    [
+      "bare verified flag",
+      (runtime) => {
+        runtime["localSearch"] = { verified: true };
+      },
+    ],
+    [
+      "wrong backend",
+      (runtime) => {
+        (runtime["localSearch"] as ReturnType<typeof localSearchProofFixture>).backend = "qdrant";
+      },
+    ],
+    [
+      "workspace import",
+      (runtime) => {
+        (runtime["localSearch"] as ReturnType<typeof localSearchProofFixture>).storageEntry =
+          "../workspace/packages/storage-lancedb/dist/index.js";
+      },
+    ],
+    [
+      "network guard absent",
+      (runtime) => {
+        (runtime["localSearch"] as ReturnType<typeof localSearchProofFixture>).networkGuardEnabled =
+          false;
+      },
+    ],
+    [
+      "fixture changed",
+      (runtime) => {
+        (runtime["localSearch"] as ReturnType<typeof localSearchProofFixture>).sourceAfter =
+          "0".repeat(64);
+      },
+    ],
+    [
+      "no native Lance tables",
+      (runtime) => {
+        (runtime["localSearch"] as ReturnType<typeof localSearchProofFixture>).lanceTables = [];
+      },
+    ],
+    ...[
+      "failed index",
+      "stale lexical results",
+      "changed reopened generation",
+      "wrong graph generation",
+      "missing import edge",
+    ].map((name): [string, (runtime: Record<string, unknown>) => void] => [
+      name,
+      (runtime) => {
+        const proof = runtime["localSearch"] as ReturnType<typeof localSearchProofFixture>;
+        const stage =
+          name === "failed index"
+            ? "index"
+            : name === "stale lexical results"
+              ? "lexical"
+              : name === "changed reopened generation"
+                ? "reopened"
+                : "graph";
+        const execution = proof.cli[stage]!;
+        const report = JSON.parse(execution.stdout);
+        if (name === "failed index") report.outcome = "failed";
+        if (name === "stale lexical results") report.indexFreshness.status = "stale";
+        if (name === "changed reopened generation")
+          report.groups[0].indexGenerations = ["another-generation"];
+        if (name === "wrong graph generation") report.generationId = "another-generation";
+        if (name === "missing import edge") report.metrics.edgeCount = 0;
+        execution.stdout = JSON.stringify(report);
+      },
+    ]),
+  ];
+  it.each(localSearchChanges)(
+    "rejects incomplete installed embedded-search evidence: %s",
+    (_name, change) => {
+      const f = fixture();
+      const root = f.dirs[0]!;
+      const file = path.join(root, "bundle/release-report.json");
+      const report = JSON.parse(readFileSync(file, "utf8")) as {
+        consumers: { cliOnly: { runtime: Record<string, unknown> } }[];
+      };
+      change(report.consumers[0]!.cliOnly.runtime);
+      json(file, report);
+      rebindReport(root, "release");
+      expect(() =>
+        verifier.verifyReleaseCandidates({ artifactsDir: f.artifactsDir, commit: COMMIT }),
+      ).toThrow("LanceDB search consumer proof");
     },
   );
   it.each(["version", "private", "workspace", "range"])(

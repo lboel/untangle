@@ -9,6 +9,10 @@
  * echtes Qdrant.
  */
 
+import { realpathSync } from "node:fs";
+import path from "node:path";
+import { pathToFileURL } from "node:url";
+
 import {
   assertConfigValid,
   deriveEmbeddingProfile,
@@ -24,6 +28,8 @@ import {
   type EmbeddingProfile,
   type EmbeddingProvider,
   type VectorStore,
+  type MetadataStore,
+  type GraphStore,
 } from "@untangle-code/domain";
 import { OllamaEmbeddingProvider } from "@untangle-code/embeddings-ollama";
 import {
@@ -32,17 +38,19 @@ import {
   type ProfileTargetV1,
   type SearchGraphEnrichmentPort,
 } from "@untangle-code/search";
+import { createLanceDbStorage } from "@untangle-code/storage-lancedb";
 import {
   FetchQdrantTransport,
   codeCollectionName,
   createQdrantStorage,
   resolveQdrantStorageConfig,
   textToBm25SparseVector,
-  type QdrantStorage,
+  QDRANT_STORAGE_DEFAULTS,
   type QdrantStorageConfig,
 } from "@untangle-code/storage-qdrant";
 
 import { OperationalError } from "./exit.js";
+import type { IndexStateScope, IndexStateV1 } from "./index-state.js";
 import { systemClock, systemRandom } from "./system.js";
 import { assertVectorStoreAllowed, decideVectorStore } from "./vector-store-policy.js";
 
@@ -105,8 +113,17 @@ export function describeConfigIssues(issues: readonly ConfigIssue[]): string[] {
 }
 
 export interface StorageWiring {
-  readonly qdrantConfig: QdrantStorageConfig;
-  readonly storage: QdrantStorage;
+  readonly qdrantConfig?: QdrantStorageConfig;
+  readonly backend: "lancedb" | "qdrant";
+  readonly storeUrl: string;
+  readonly storagePath?: string;
+  readonly collectionPrefix: string;
+  readonly storage: {
+    vectorStore: VectorStore;
+    metadataStore: MetadataStore;
+    graphStore: GraphStore;
+    close?: () => Promise<void>;
+  };
   readonly vectorStore: VectorStore;
   readonly codeCollection: string;
   /** Woher die benutzte Adresse kommt — `doctor` zeigt das dem Nutzer. */
@@ -114,7 +131,8 @@ export interface StorageWiring {
 }
 
 /**
- * Baut die Qdrant-Adapter aus der aufgeloesten Konfiguration.
+ * Build the selected storage adapter from the resolved configuration.
+ * Local LanceDB is lazy; the service ownership policy below applies to Qdrant.
  *
  * WP-222: das ist der Engpass, durch den JEDER Befehl geht, der einen
  * Vektorspeicher anfasst — und deshalb die Stelle, an der die Regel aus
@@ -129,6 +147,13 @@ export function wireStorage(
   view: WorkspaceView,
   env: Readonly<Record<string, string | undefined>>,
 ): StorageWiring {
+  if (view.config.storage.backend === "lancedb") return wireLanceDbStorage(view);
+  if (view.config.storage.backend !== "qdrant") {
+    throw new OperationalError(
+      "Invalid storage backend.",
+      "Set storage.backend to lancedb or qdrant.",
+    );
+  }
   const decision = decideVectorStore({ qdrant: view.config.qdrant, env });
   if (!decision.allowed) {
     throw new OperationalError(decision.reason, decision.nextStep ?? "See `untangle init --help`.");
@@ -154,12 +179,75 @@ export function wireStorage(
   const storage = createQdrantStorage({ config: qdrantConfig, clock: systemClock, transport });
 
   return {
+    backend: "qdrant",
+    storeUrl: qdrantConfig.url,
+    collectionPrefix: qdrantConfig.collectionPrefix,
     qdrantConfig,
     storage,
     vectorStore: storage.vectorStore,
     codeCollection: codeCollectionName(qdrantConfig.collectionPrefix, view.profileShortId),
     decision,
   };
+}
+
+/** Local storage is lazy: wiring and missing-index reads create no directories. */
+function wireLanceDbStorage(view: WorkspaceView): StorageWiring {
+  const storagePath = canonicalLocalPath(
+    path.resolve(view.root, view.config.storage.path ?? ".untangle/index/lancedb"),
+  );
+  const storeUrl = pathToFileURL(storagePath).href;
+  const config = QDRANT_STORAGE_DEFAULTS;
+  const storage = createLanceDbStorage({
+    path: storagePath,
+    clock: systemClock,
+    collectionPrefix: config.collectionPrefix,
+    upsertMaxPoints: config.upsertMaxPoints,
+    upsertBudgetBytes: config.upsertBudgetBytes,
+    graphPartBudgetBytes: config.graphPartBudgetBytes,
+  });
+  return {
+    backend: "lancedb",
+    storeUrl,
+    storagePath,
+    collectionPrefix: config.collectionPrefix,
+    storage,
+    vectorStore: storage.vectorStore,
+    codeCollection: codeCollectionName(config.collectionPrefix, view.profileShortId),
+    decision: {
+      url: storeUrl,
+      origin: "embedded",
+      allowed: true,
+      reason: "project-local LanceDB; no database server required",
+    },
+  };
+}
+
+function canonicalLocalPath(selected: string): string {
+  try {
+    return realpathSync(selected);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+    const parent = path.dirname(selected);
+    if (parent === selected) throw error;
+    return path.join(canonicalLocalPath(parent), path.basename(selected));
+  }
+}
+
+/** Old Qdrant records retain their endpoint identity; embedded stores never adopt them. */
+export function matchesStoredBackend(
+  state: IndexStateV1,
+  wiring: Pick<StorageWiring, "backend" | "storeUrl">,
+): boolean {
+  return (
+    (state.storageBackend ?? "qdrant") === wiring.backend &&
+    (state.storeUrl ?? state.qdrantUrl) === wiring.storeUrl
+  );
+}
+
+export function storageIndexScope(
+  wiring: Pick<StorageWiring, "backend" | "storeUrl">,
+): Pick<IndexStateScope, "storageBackend" | "storeUrl"> {
+  return { storageBackend: wiring.backend, storeUrl: wiring.storeUrl };
 }
 
 /** Baut den Ollama-Embedder aus der aufgeloesten Konfiguration. */

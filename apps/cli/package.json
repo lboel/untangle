@@ -86,6 +86,7 @@
     "@untangle-code/parser-registry": "workspace:*",
     "@untangle-code/scanner": "workspace:*",
     "@untangle-code/search": "workspace:*",
+    "@untangle-code/storage-lancedb": "workspace:*",
     "@untangle-code/storage-local": "workspace:*",
     "@untangle-code/storage-qdrant": "workspace:*",
     "@untangle-code/symbol-graph": "workspace:*",

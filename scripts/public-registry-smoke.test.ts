@@ -252,7 +252,12 @@ describe("public acceptance isolation and immutable reports", () => {
       consumers: [],
     });
     expect(report.failure.message).toMatch(/ENOENT/);
-    expect(report.tooling).toHaveLength(6);
+    expect(report.tooling).toHaveLength(7);
+    expect(
+      report.tooling.some((tool: { path: string }) =>
+        tool.path.endsWith("release-local-search-consumer.mjs"),
+      ),
+    ).toBe(true);
     expect(
       report.tooling.some((tool: { path: string }) =>
         tool.path.endsWith("release-frontend-consumer.mjs"),

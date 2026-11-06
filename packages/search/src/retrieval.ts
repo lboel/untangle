@@ -23,7 +23,7 @@ export type RetrievalBranch = "dense" | "sparse" | "symbol";
 type RetrievalTarget = Pick<ProfileTargetV1, "collection" | "embeddingProfileId" | "embedder">;
 
 export interface IndependentRetrievalRequest {
-  vectorStore: Pick<VectorStore, "hybridQuery" | "scroll">;
+  vectorStore: Pick<VectorStore, "hybridQuery" | "scroll" | "backend">;
   target: RetrievalTarget;
   text: string;
   filter: PayloadFilter;
@@ -155,12 +155,24 @@ async function executeBranch<T>(
       request.mode === "hybrid" ? request.branchTimeoutMs : undefined,
       retrieve.bind(undefined, request),
       options,
+      request.vectorStore.backend === "lancedb" ? "LANCEDB_UNAVAILABLE" : "QDRANT_UNAVAILABLE",
     );
     options.signal?.throwIfAborted();
     return { branch, status: "succeeded", result };
   } catch (error) {
     rethrowCancellation(error, options);
-    return { branch, status: "failed", error };
+    return {
+      branch,
+      status: "failed",
+      error:
+        isUntangleError(error) || branch === "dense" || request.vectorStore.backend !== "lancedb"
+          ? error
+          : new UntangleError(
+              "LANCEDB_UNAVAILABLE",
+              error instanceof Error ? error.message : String(error),
+              { operation: "search_retrieval", retryable: true, cause: error },
+            ),
+    };
   }
 }
 

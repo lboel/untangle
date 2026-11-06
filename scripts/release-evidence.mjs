@@ -295,7 +295,7 @@ function gatePlan(outDir) {
   ];
 }
 
-function bindBundle(outDir, revision) {
+export function bindBundle(outDir, revision) {
   const reportFile = path.join(outDir, "bundle", "release-report.json");
   const report = JSON.parse(readFileSync(reportFile, "utf8"));
   if (report.verified !== true || report.source?.stable !== true)
@@ -315,10 +315,10 @@ function bindBundle(outDir, revision) {
   )
     throw new Error("Candidate toolchain/platform differs from the gate runner.");
   if (
-    report.packages?.length !== 20 ||
-    new Set(report.packages.map((entry) => entry.name)).size !== 20
+    report.packages?.length !== 21 ||
+    new Set(report.packages.map((entry) => entry.name)).size !== 21
   )
-    throw new Error("Expected the complete 20-package release bundle.");
+    throw new Error("Expected the complete 21-package release bundle.");
   if (
     JSON.stringify(report.consumers.map((entry) => entry.packageManager).sort()) !==
     '["npm","pnpm"]'

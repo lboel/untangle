@@ -11,12 +11,28 @@ import { DEFAULT_EMBEDDING_NORMALIZATION, PREPARED_TEXT_VERSION } from "./defaul
 import type { EffectiveUntangleConfigV1 } from "./types.js";
 
 /**
- * SHA-256 of the canonical JSON of `config`. Used as `buildWorkspaceId`'s
+ * SHA-256 of the canonical JSON of `config`. The additive storage section
+ * is excluded for Qdrant to preserve existing workspace identities; its
+ * connection remains represented by the unchanged qdrant section. Used as `buildWorkspaceId`'s
  * `configHash` input (spec.md §5.1) when no explicit `workspaceId` is
  * configured, and to detect effective-config drift between index runs
  * (architecture.md §6.3, §13.4 "Generation-Commit").
  */
 export function computeConfigHash(config: unknown): string {
+  if (typeof config === "object" && config !== null && !Array.isArray(config)) {
+    const record = config as Record<string, unknown>;
+    const storage = record["storage"];
+    if (
+      typeof storage === "object" &&
+      storage !== null &&
+      "backend" in storage &&
+      storage.backend === "qdrant"
+    ) {
+      const legacyConfig = { ...record };
+      delete legacyConfig["storage"];
+      return sha256Hex(canonicalJson(legacyConfig));
+    }
+  }
   return sha256Hex(canonicalJson(config));
 }
 

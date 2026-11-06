@@ -8,7 +8,7 @@ import { inspectIndexFreshness } from "../cli/index-freshness.js";
 import { refreshWorkspaceIndex } from "../cli/index-refresh.js";
 import { resolveIndexState } from "../cli/index-state.js";
 import { systemClock } from "../cli/system.js";
-import { loadWorkspace } from "../cli/workspace.js";
+import { loadWorkspace, storageIndexScope, wireStorage } from "../cli/workspace.js";
 
 import { detectRefName, resolveTarget } from "./index/target.js";
 import { createStreamSink } from "./watch/runtime.js";
@@ -159,6 +159,7 @@ export async function inspectIndexWatch(
   const resolution = await resolveIndexState([target.rootPath], view.workspaceId, {
     repoIds: [target.repoId],
     refs: [target.refId],
+    ...storageIndexScope(wireStorage(view, ctx.env)),
   });
   ctx.signal.throwIfAborted();
   if (resolution.kind === "invalid") {

@@ -25,7 +25,7 @@ import type {
   VectorStore,
   WorkspaceRecord,
 } from "@untangle-code/domain";
-import { qdrantUnavailableError } from "@untangle-code/observability";
+import { lanceDbUnavailableError, qdrantUnavailableError } from "@untangle-code/observability";
 
 import { abortedRejection } from "./abort.js";
 import { metadataCollectionName } from "./collections.js";
@@ -414,7 +414,7 @@ export class QdrantMetadataStore implements MetadataStore {
         return records;
       }
       if (page.nextOffset === offset) {
-        throw qdrantUnavailableError(
+        throw (this.store.backend === "lancedb" ? lanceDbUnavailableError : qdrantUnavailableError)(
           `Metadata scroll cursor did not advance (collection "${this.collection}")`,
           { operation: "metadata_store_list", context: { collection: this.collection } },
         );

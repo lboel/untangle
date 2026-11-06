@@ -27,14 +27,15 @@
     "complexity:report": "node scripts/complexity-report.mjs",
     "walk:messung": "node scripts/walk-messung.mjs",
     "walk:gegenprobe": "node scripts/walk-gegenprobe.mjs",
-    "e2e:smoke": "node scripts/e2e-smoke.mjs && node scripts/feature-workflow-smoke.mjs && node scripts/quickstart-smoke.mjs && node scripts/init-setup-smoke.mjs",
+    "e2e:smoke": "node scripts/e2e-smoke.mjs && node scripts/feature-workflow-smoke.mjs && node scripts/quickstart-smoke.mjs && node scripts/init-setup-smoke.mjs && node scripts/lancedb-search-smoke.mjs",
     "e2e:setup": "node scripts/init-setup-smoke.mjs",
     "e2e:search": "node scripts/local-search-smoke.mjs",
     "grammar-provenance": "node scripts/astgrep-grammar-provenance.mjs",
     "e2e:release": "node scripts/release-smoke.mjs",
     "e2e:product": "node scripts/feature-workflow-smoke.mjs",
     "e2e:quickstart": "node scripts/quickstart-smoke.mjs",
-    "setup:local": "node scripts/setup-local.mjs"
+    "setup:local": "node scripts/setup-local.mjs",
+    "e2e:lancedb": "node scripts/lancedb-search-smoke.mjs"
   },
   "devDependencies": {
     "@eslint/js": "9.39.5",

@@ -35,6 +35,13 @@ interface Ledger {
   bindingErrors: string[];
 }
 interface EvidenceModule {
+  bindBundle(
+    outDir: string,
+    revision: string,
+  ): {
+    packages: { name: string; file: string; sha256: string }[];
+    gitRevision: string;
+  };
   parseOptions(args: string[]): { outDir: string };
   manifestDigest(entries: Entry[]): string;
   captureSourceManifest(root: string): Entry[];
@@ -55,6 +62,9 @@ interface EvidenceModule {
 const evidence = (await import(
   pathToFileURL(path.resolve("scripts/release-evidence.mjs")).href
 )) as EvidenceModule;
+const releaseInventory = (await import(
+  pathToFileURL(path.resolve("scripts/verify-release-candidate.mjs")).href
+)) as { PUBLIC_PACKAGES: string[] };
 const directories: string[] = [];
 const sha256 = (bytes: string | Buffer): string => createHash("sha256").update(bytes).digest("hex");
 
@@ -98,6 +108,94 @@ function fixture(): { root: string; outDir: string; sourceDigest: string; distDi
     distDigest: evidence.manifestDigest(evidence.captureDistManifest(root)),
   };
 }
+
+function bundleFixture() {
+  const f = fixture();
+  const bundle = path.join(f.outDir, "bundle");
+  mkdirSync(path.join(bundle, "tarballs"), { recursive: true });
+  const revision = "a".repeat(40);
+  const snapshot = { gitRevision: revision, contentSha256: "b".repeat(64) };
+  const packages = releaseInventory.PUBLIC_PACKAGES.map((name) => {
+    const file = `${name.slice(1).replace("/", "-")}-0.1.0.tgz`;
+    const bytes = Buffer.from(`frozen original bytes: ${name}`);
+    writeFileSync(path.join(bundle, "tarballs", file), bytes);
+    return { name, version: "0.1.0", file, sha256: sha256(bytes) };
+  });
+  const sbom = "source-bound installed production SBOM";
+  writeFileSync(path.join(bundle, "sbom.cdx.json"), sbom);
+  writeFileSync(
+    path.join(bundle, "SHA256SUMS"),
+    packages.map((entry) => `${entry.sha256}  tarballs/${entry.file}\n`).join("") +
+      `${sha256(sbom)}  sbom.cdx.json\n`,
+  );
+  writeFileSync(
+    path.join(bundle, "publish-order.json"),
+    JSON.stringify(
+      packages.map(({ name, version, file }) => ({ name, version, file: `tarballs/${file}` })),
+    ),
+  );
+  const report = {
+    verified: true,
+    source: { stable: true, before: snapshot, afterPack: snapshot, after: snapshot },
+    node: process.version,
+    platform: process.platform,
+    arch: process.arch,
+    packages,
+    consumers: [{ packageManager: "npm" }, { packageManager: "pnpm" }],
+    sbom: { sha256: sha256(sbom) },
+  };
+  function saveReport() {
+    writeFileSync(path.join(bundle, "release-report.json"), JSON.stringify(report));
+  }
+  saveReport();
+  return { ...f, bundle, revision, report, saveReport };
+}
+
+describe("21-package candidate bundle binding", () => {
+  it("binds every original package including LanceDB without dropping the previous inventory", () => {
+    const f = bundleFixture();
+    const bound = evidence.bindBundle(f.outDir, f.revision);
+    expect(bound.gitRevision).toBe(f.revision);
+    expect(bound.packages).toHaveLength(21);
+    expect(bound.packages.map((entry) => entry.name)).toEqual(releaseInventory.PUBLIC_PACKAGES);
+    expect(bound.packages.some((entry) => entry.name === "@untangle-code/storage-lancedb")).toBe(
+      true,
+    );
+    expect(bound.packages.some((entry) => entry.name === "@untangle-code/storage-qdrant")).toBe(
+      true,
+    );
+  });
+
+  it("rejects the previous 20-package inventory when the new adapter is missing", () => {
+    const f = bundleFixture();
+    f.report.packages = f.report.packages.filter(
+      (entry) => entry.name !== "@untangle-code/storage-lancedb",
+    );
+    f.saveReport();
+    expect(() => evidence.bindBundle(f.outDir, f.revision)).toThrow("complete 21-package");
+  });
+
+  it("rejects duplicate package names even when the array length is 21", () => {
+    const f = bundleFixture();
+    f.report.packages[1]!.name = f.report.packages[0]!.name;
+    f.saveReport();
+    expect(() => evidence.bindBundle(f.outDir, f.revision)).toThrow("complete 21-package");
+  });
+
+  it("retains the original tarball and production SBOM integrity gates", () => {
+    const f = bundleFixture();
+    const native = f.report.packages.find(
+      (entry) => entry.name === "@untangle-code/storage-lancedb",
+    )!;
+    writeFileSync(path.join(f.bundle, "tarballs", native.file), "modified original tarball");
+    expect(() => evidence.bindBundle(f.outDir, f.revision)).toThrow("Original tarball changed");
+    const second = bundleFixture();
+    writeFileSync(path.join(second.bundle, "sbom.cdx.json"), "modified SBOM");
+    expect(() => evidence.bindBundle(second.outDir, second.revision)).toThrow(
+      "production SBOM changed",
+    );
+  });
+});
 
 afterEach(() => {
   for (const directory of directories.splice(0))

@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "tsBuildInfoFile": "tsconfig.tsbuildinfo",
+    "types": ["node"]
+  },
+  "references": [
+    {
+      "path": "../domain"
+    },
+    {
+      "path": "../storage-qdrant"
+    }
+  ],
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.test.ts", "src/testing/**"]
+}

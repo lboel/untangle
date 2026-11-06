@@ -61,6 +61,8 @@ comes first.
 |---|---|
 | `UNTANGLE_WORKSPACE_ID` | `workspaceId` |
 | `UNTANGLE_PROJECT_ID` | `projectId` |
+| `UNTANGLE_STORAGE_BACKEND` | `storage.backend` (`lancedb` or `qdrant`) |
+| `UNTANGLE_LANCEDB_PATH` | `storage.path` (local directory) |
 | `UNTANGLE_QDRANT_MODE` / `_URL` / `_API_KEY_ENV` / `_COLLECTION_PREFIX` / `_REQUEST_TIMEOUT_MS` / `_MAX_RETRIES` | `qdrant.*` |
 | `UNTANGLE_EMBEDDINGS_MODE` / `_URL` / `_API_KEY_ENV` / `_MODEL` / `_DIMENSIONS` / `_REQUEST_TIMEOUT_MS` | `embeddings.*` |
 | `UNTANGLE_INDEX_WATCH` / `_MAX_FILE_SIZE_MB` / `_EXTRA_EXTENSIONS` (CSV) | `index.*` |
@@ -70,6 +72,31 @@ comes first.
 
 The complete machine-readable table is `ENV_MAPPING` in `src/env.ts`. `*_API_KEY_ENV` sets another
 environment variable's **name**, never its secret value (see Secrets).
+
+## Search storage
+
+New projects use embedded LanceDB at `.untangle/index/lancedb`. A relative `storage.path`
+resolves against the repository root, including when configuration lives in
+`.untangle/config.json`. Absolute local directories are accepted; URI schemes and network
+paths are rejected.
+
+Existing projects that explicitly configure a `qdrant` section or a mapped
+`UNTANGLE_QDRANT_*` variable retain Qdrant. An explicit `storage.backend` overrides that
+compatibility default, with the ordinary layer precedence. Setting only `storage.path`
+does not move an existing Qdrant project. Qdrant connection options remain under `qdrant`:
+
+```toml
+[storage]
+backend = "qdrant"
+
+[qdrant]
+mode = "external"
+url = "http://127.0.0.1:16333"
+```
+
+`parseConfigText(text, "json" | "toml")` parses and migrates an existing document without
+filesystem access, product defaults or environment overrides. Callers such as `init` can
+preserve declared storage choices while inspecting the original configuration.
 
 ## Secrets (spec.md §4.4/§4.5, §24; architecture.md §23.2)
 
@@ -130,7 +157,9 @@ configuration hash and thus the derived workspace ID itself.
 ## Canonical effective configuration, hash and `embedding_profile_id`
 
 `computeConfigHash(effectiveConfig)` equals `SHA256(canonical_json(effectiveConfig))`, using
-domain's `canonicalJson`/`sha256Hex`. Without explicit `workspaceId`, `loadConfig` uses that hash as
+domain's `canonicalJson`/`sha256Hex`, for LanceDB. For Qdrant, the additive `storage` section is
+excluded so existing configuration hashes and derived workspace identities remain unchanged;
+the endpoint and other connection options remain represented by `qdrant`. Without explicit `workspaceId`, `loadConfig` uses that hash as
 `configHash` input to `buildWorkspaceId` (spec §5.1). `deriveEmbeddingProfile`/
 `deriveEmbeddingProfileId` construct domain's `EmbeddingProfile` from `EmbeddingConfig` plus fixed
 `DEFAULT_EMBEDDING_NORMALIZATION` (`"none"`) and `PREPARED_TEXT_VERSION`

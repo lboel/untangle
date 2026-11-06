@@ -41,7 +41,14 @@ const FLAGS: FlagSpecs = {
   },
   offline: {
     kind: "boolean",
-    describe: "No network probes; Ollama and Qdrant are treated as absent.",
+    describe: "No network probes; local LanceDB setup remains available.",
+  },
+  storage: {
+    kind: "string",
+    placeholder: "lancedb|qdrant",
+    describe:
+      "Search storage backend. LanceDB keeps the index in the project without a service; Qdrant is an explicit opt-in.",
+    defaultLabel: "lancedb for new projects; existing explicit backend is preserved",
   },
   "embedding-model": {
     kind: "string",
@@ -95,11 +102,16 @@ export function initOptionsFrom(args: ParsedArgs, cwd: string): InitOptionsV1 {
   const visionPath = stringFlag(args, "vision");
   const specPath = stringFlag(args, "spec");
   const featureManifestPath = stringFlag(args, "feature-map");
+  const storageBackend =
+    args.flags["storage"] === undefined
+      ? undefined
+      : enumFlag(args, "storage", ["lancedb", "qdrant"] as const, "lancedb");
   return {
     root: path.resolve(cwd, flagRoot ?? positional ?? "."),
     force: boolFlag(args, "force"),
     dryRun: boolFlag(args, "dry-run"),
     offline: boolFlag(args, "offline"),
+    ...(storageBackend === undefined ? {} : { storageBackend }),
     ...(preferredModel === undefined ? {} : { preferredModel }),
     ...(visionPath === undefined ? {} : { visionPath }),
     ...(specPath === undefined ? {} : { specPath }),
@@ -122,13 +134,13 @@ export function createInitCommand(deps: InitCommandDepsV1 = {}): Command {
       implementedBy: "commands/init/index.js",
       summary: "Discover a project and write a commented untangle.toml",
       usage:
-        "untangle init [PATH] [--interactive|--no-interactive] [--vision=PATH] [--spec=PATH] [--feature-map=PATH] [--force] [--dry-run] [--offline]",
+        "untangle init [PATH] [--interactive|--no-interactive] [--storage=lancedb|qdrant] [--vision=PATH] [--spec=PATH] [--feature-map=PATH] [--force] [--dry-run] [--offline]",
       details: [
         "On a terminal, guided setup previews configuration, optional local search/analyzer installation and a local feature/code map. No file, download or service is changed before the final selection. Preparing recipes and executing the displayed setup are separate choices. Prompts stay on stderr. Escape and Ctrl-C cancel; raw terminal mode is restored before external tools run.",
         "Pipes, agents, --format=json, --dry-run, --offline and --no-interactive retain config-only behavior. Explicit --interactive requires a terminal and cannot be combined with JSON or dry-run. Explicit offline interactive setup may prepare local files but cannot download or start tools.",
         `Discovers project languages weighted by lines, identifying parsed and search-only languages; monorepo topology across workspace packages and container services; an available embedding provider with its reported model, vector width and context window; an available vector store; and .gitignore rules plus defaults.`,
         `Writes a ${CONFIG_FILE_NAME} with comments explaining each value's evidence. Omitted values come from product defaults; the file includes only decisions made by init.`,
-        "Missing Ollama or Qdrant is not an error. Configuration is still written with one next step.",
+        "New projects use embedded LanceDB at .untangle/index/lancedb. No Docker or Qdrant probe is needed. Select --storage=qdrant for an owned or explicitly configured server. Missing Ollama is not an error; local offline indexing remains available.",
         "Vision and specification are inspected locally through filenames, readability, hashes and document references. --vision and --spec select sources relative to the project directory. The review draft confirms neither features nor ownership and does not claim semantic conformance.",
         "A supplied --feature-map, or untangle.features.json when present, makes declared features, code/test evidence, ownership declarations and feature complexity visible. No tests are executed and semantic conformance is not independently proven. Noninteractive init writes no visual map; confirmed guided setup may save a separate HTML/JSON snapshot. No ownership or implementation is confirmed automatically.",
         "Spec-driven setup can inspect detected local Spec Kit or OpenSpec artifacts when no explicit feature manifest was chosen. Only final confirmation saves a source-bound proposed manifest under .untangle/sdd/ and uses it for this setup's feature report/map. Existing declarations are preserved. No framework commands or tests run; imported features remain planned/proposed without invented owners. The same connector is available through `untangle product connect [auto|spec-kit|openspec]`.",
