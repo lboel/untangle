@@ -42,7 +42,7 @@ describe("Release onboarding", () => {
         .trim()
         .split("\n"),
     ).toEqual([
-      "npm install --save-dev --save-exact @untangle-code/cli@0.1.0",
+      "npm install --save-dev --save-exact @untangle-code/cli@next",
       "npm exec -- untangle complexity --top=10",
     ]);
     expect(html).toMatch(/data-copy-command="setup-command" hidden/u);
@@ -111,7 +111,7 @@ function copyHarness(writeText?: (text: string) => Promise<void>) {
   const button = new CopyElement("Copy commands");
   button.attributes.set("data-copy-command", "setup-command");
   const command = new CopyElement(
-    "\nnpm install --save-dev --save-exact @untangle-code/cli@0.1.0\nnpm exec -- untangle complexity --top=10\n",
+    "\nnpm install --save-dev --save-exact @untangle-code/cli@next\nnpm exec -- untangle complexity --top=10\n",
   );
   const announcement = new CopyElement("");
   const elements = new Map([
@@ -155,7 +155,7 @@ describe("Command copying", () => {
     expect(harness.button.getAttribute("aria-busy")).toBe("true");
     expect(harness.announcement.textContent).toBe("");
     expect(writeText).toHaveBeenCalledExactlyOnceWith(
-      "npm install --save-dev --save-exact @untangle-code/cli@0.1.0\nnpm exec -- untangle complexity --top=10",
+      "npm install --save-dev --save-exact @untangle-code/cli@next\nnpm exec -- untangle complexity --top=10",
     );
 
     complete?.();
