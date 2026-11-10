@@ -31,9 +31,14 @@
 </p>
 
 <p align="center">
-  <img src="./docs/assets/untangle-yarn-3d.png" alt="Three-dimensional yarn illustration: intertwined strands resolve into a clear loose thread" width="1200" />
+  <a href="https://lboel.github.io/untangle/untangle-example.html#untangle-view">
+    <picture>
+      <source media="(prefers-reduced-motion: reduce)" srcset="./docs/assets/untangle-feature-map-still.png" />
+      <img src="./docs/assets/untangle-feature-map.gif" alt="Untangle's own 3D repository map groups code, tests and specs by declared feature scope" width="900" />
+    </picture>
+  </a>
   <br />
-  <sub>Brand illustration of the Untangle idea; not a screenshot or measured repository graph.</sub>
+  <sub>Feature grouping on a frozen snapshot of Untangle's own repository (<code>d11bdaf</code>). <a href="https://lboel.github.io/untangle/untangle-example.html#untangle-view">Open the interactive 3D map</a> to regroup by code, tests, ownership, Vision / Spec or unassigned files.</sub>
 </p>
 
 **Specs describe what should exist. Untangle helps an agent find the implementation,
