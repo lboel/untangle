@@ -1,5 +1,5 @@
-import { constants } from "node:fs";
-import { lstat, open } from "node:fs/promises";
+import { closeSync, constants, openSync } from "node:fs";
+import { lstat } from "node:fs/promises";
 import path from "node:path";
 import { performance } from "node:perf_hooks";
 import { setTimeout as delay } from "node:timers/promises";
@@ -25,12 +25,15 @@ export async function withMutationLock<T>(
   call.check();
   const file = path.join(root, MUTATION_GUARD_FILE);
   try {
-    const handle = await open(
-      file,
-      constants.O_CREAT | constants.O_EXCL | constants.O_WRONLY | constants.O_NOFOLLOW,
-      0o600,
+    // Close the creation descriptor before another call in this isolate can
+    // start a SQLite transaction. Closing a raw descriptor can drop POSIX locks.
+    closeSync(
+      openSync(
+        file,
+        constants.O_CREAT | constants.O_EXCL | constants.O_WRONLY | constants.O_NOFOLLOW,
+        0o600,
+      ),
     );
-    await handle.close();
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
   }
@@ -74,14 +77,13 @@ export async function withMutationLock<T>(
         await delay(Math.min(20, call.remaining()), undefined, { signal: call.signal });
       }
     }
-    guard.exec("CREATE TABLE IF NOT EXISTS writer_guard (id INTEGER PRIMARY KEY)");
+    // Keep the guard transaction free of writes and release it with ROLLBACK.
+    // COMMIT can try to upgrade the lock while another writer probes the guard.
     call.check();
     // Never race work against cancellation: releasing the guard while an
     // uninterruptible native write is still running would permit lost upserts.
     const result = await work();
     call.check();
-    guard.exec("COMMIT");
-    acquired = false;
     return result;
   } finally {
     try {

@@ -1,5 +1,5 @@
 import { execFile, spawn, type ChildProcess } from "node:child_process";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
@@ -12,7 +12,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { StorageCall } from "./operation.js";
 import { collectionTableName } from "./schema.js";
 import { LanceDbVectorStore } from "./vector-store.js";
-import { withMutationLock } from "./write-lock.js";
+import { MUTATION_GUARD_FILE, withMutationLock } from "./write-lock.js";
 
 interface Worker {
   child: ChildProcess;
@@ -23,6 +23,13 @@ interface Worker {
 const workers: Worker[] = [];
 let root: string;
 let current: LanceDbVectorStore;
+const points = {
+  name: "points",
+  denseDimensions: 3,
+  denseDistance: "Cosine",
+  sparseBm25: true,
+  onDiskPayload: true,
+} as const;
 
 function worker(mode: string, name = "worker"): Worker {
   const child = spawn(
@@ -39,7 +46,7 @@ function worker(mode: string, name = "worker"): Worker {
   const done = new Promise<{ code: number | null; signal: NodeJS.Signals | null; stderr: string }>(
     (resolve, reject) => {
       child.once("error", reject);
-      child.once("exit", (code, signal) => resolve({ code, signal, stderr }));
+      child.once("close", (code, signal) => resolve({ code, signal, stderr }));
     },
   );
   const result: Worker = {
@@ -80,13 +87,7 @@ function worker(mode: string, name = "worker"): Worker {
 beforeEach(async () => {
   root = await mkdtemp(path.join(os.tmpdir(), "untangle-lance-process-"));
   current = new LanceDbVectorStore({ path: root });
-  await current.ensureCollection({
-    name: "points",
-    denseDimensions: 3,
-    denseDistance: "Cosine",
-    sparseBm25: true,
-    onDiskPayload: true,
-  });
+  await current.ensureCollection(points);
 });
 afterEach(async () => {
   for (const item of workers.splice(0)) {
@@ -137,6 +138,25 @@ describe("real independent processes", () => {
     expect(
       (await current.retrieve("points", ["a-7", "b-7", "shared"])).map((point) => point.id),
     ).toEqual(["a-7", "b-7", "shared"]);
+  });
+
+  it("initializes native storage while a second process holds a read lock on the empty guard", async () => {
+    await rm(root, { recursive: true, force: true });
+    await mkdir(root);
+    await writeFile(path.join(root, MUTATION_GUARD_FILE), "", { flag: "wx", mode: 0o600 });
+    const reader = worker("read-guard");
+    await reader.wait((message) => message["ready"] === true);
+    reader.child.send("start");
+    await reader.wait((message) => message["locked"] === true);
+
+    await current.ensureCollection(points);
+    await current.upsert("points", [{ id: "first", payload: {} }]);
+    expect((await current.retrieve("points", ["first"])).map((point) => point.id)).toEqual([
+      "first",
+    ]);
+
+    reader.child.send("release");
+    expect(await reader.done).toMatchObject({ code: 0, signal: null });
   });
 
   it("aborts and times out while another real process holds the mutex, then recovers after SIGKILL", async () => {
