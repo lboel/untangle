@@ -12,7 +12,7 @@
 
 <p align="center">
   <a href="https://github.com/lboel/untangle/actions/workflows/ci.yml"><img src="https://github.com/lboel/untangle/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI for remote main" /></a>
-  <a href="./docs/RELEASE.md"><img src="https://img.shields.io/badge/status-pre--release-dd6221?style=flat-square" alt="Status: pre-release" /></a>
+  <a href="https://www.npmjs.com/package/@untangle-code/cli/v/0.1.0"><img src="https://img.shields.io/badge/npm-0.1.0%20on%20next-dd6221?style=flat-square" alt="npm: version 0.1.0 on next" /></a>
   <a href="./LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0--only-003632?style=flat-square" alt="License: AGPL-3.0-only" /></a>
   <a href="./package.json"><img src="https://img.shields.io/badge/Node.js-22.13%2B%20%7C%2024%2B-339933?style=flat-square&logo=node.js&logoColor=white" alt="Node.js 22.13 or later in the 22 line, or 24 and later" /></a>
   <a href="./package.json"><img src="https://img.shields.io/badge/pnpm-10.34.5-f69220?style=flat-square&logo=pnpm&logoColor=white" alt="Package manager: pnpm 10.34.5" /></a>
@@ -49,15 +49,23 @@ whole feature before an edit, use real test evidence in review, and observe recu
 friction as the codebase grows. Start with existing specs or analyze code first and add
 product context gradually.
 
-> **Source preview.** Clone this repository and build locally using the quickstart below.
-> Packages are not published to npm. A later package release is planned as `0.1.0` on `next`.
-> The CI badge reports remote `main`, not this workspace or an unrun release candidate.
-> See the [source history and publication scope](./docs/PUBLIC_REPOSITORY_RELEASE.md)
-> and the [package release procedure](./docs/RELEASE.md).
+> **npm preview.** Untangle `0.1.0` is available on the `next` channel. See the
+> [release guide](./docs/RELEASE.md) for the package and platform checks.
 
 ## First result without search services
 
-Use **Node.js `^22.13.0 || >=24.0.0`** and **pnpm 10.34.5**. With repository access:
+Use **Node.js `^22.13.0 || >=24.0.0`**. Install the preview, then run the analysis from your project:
+
+```bash
+npm install --global @untangle-code/cli@next
+untangle --version
+cd /path/to/your/project
+untangle complexity --top=10
+```
+
+Direct analysis needs no index, vector database, embedding service or cloud account.
+
+To try Untangle on its own source with **pnpm 10.34.5**:
 
 ```bash
 git clone https://github.com/lboel/untangle.git
@@ -73,9 +81,9 @@ pnpm setup:local --project=/absolute/path/to/project
 ```
 
 The report includes coverage, hotspots, explained omissions, next commands and an MCP
-template with real local paths. **Direct analysis needs no index, Qdrant, Ollama, LLM or
-cloud account.** The helper reads the target project; installation and build change the
-Untangle checkout. It registers no MCP host and writes no target configuration or shell profile.
+template with real local paths. The helper reads the target project; installation and build
+change the Untangle checkout. It registers no MCP host and writes no target configuration or
+shell profile.
 
 Use `--dry-run` to inspect the plan, `--format=json` for structured output, or `--skip-build`
 to use existing Dist files without certifying their freshness.
@@ -96,10 +104,7 @@ untangle complexity --top=10 --format=json
 untangle init --offline --dry-run
 ```
 
-The CLI examples below assume this shorthand or an installed candidate binary. A CLI
-tarball alone does not publish its internal dependencies. The optional
-[npm installer](./scripts/install.sh) checks prerequisites; its `--dry-run` installs nothing
-and does not establish registry availability.
+The CLI examples below work with this shorthand or with the npm installation above.
 
 </details>
 
