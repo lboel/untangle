@@ -59,11 +59,12 @@ last point does not restart iteration. Separate scroll calls see fresh snapshots
 so a changing corpus is not a transaction spanning all pages.
 
 All cooperating writer processes acquire a SQLite `BEGIN IMMEDIATE` lock before
-opening the Lance writer connection. The `.untangle-writer.sqlite` file contains
-only an empty guard table: no product, payload, catalog or vector data. SQLite's
-OS-backed lock prevents two missing-key merge-inserts from creating duplicate
-logical IDs. It has no expiring lease, PID guessing or lock-file takeover. Process
-death releases the lock; acknowledged Lance commits survive. An interrupted
+opening the Lance writer connection. The `.untangle-writer.sqlite` file serves
+only as a mutex. The guard transaction makes no database changes and releases the
+lock with `ROLLBACK` after the Lance operation settles. SQLite's OS-backed lock
+prevents two missing-key merge-inserts from creating duplicate logical IDs. It
+has no expiring lease, PID guessing or lock-file takeover. Process death releases
+the lock. Acknowledged Lance commits survive. An interrupted
 collection creation can reuse only an exactly matching, marked Lance table.
 
 This guard is for processes on the **same host and a local filesystem supporting
