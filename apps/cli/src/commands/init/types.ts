@@ -159,6 +159,8 @@ export interface IgnoreFindingsV1 {
 /** One reachable embedding model as the provider itself describes it. */
 export interface EmbeddingModelInfoV1 {
   name: string;
+  /** The provider reports that the model is backed by an upstream host. */
+  remote?: true;
   /** Vector width the provider reports; `undefined` when it does not say. */
   dimensions?: number;
   /** Context window the provider reports; `undefined` when it does not say. */

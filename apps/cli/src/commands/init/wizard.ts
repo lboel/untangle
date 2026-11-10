@@ -13,6 +13,12 @@ import { writeFeatureMap } from "../graph/feature-map.js";
 import { writeSddConnection } from "../sdd.js";
 
 import {
+  firstIndexHelp,
+  planFirstIndex,
+  startFirstIndex,
+  type FirstIndexDeps,
+} from "./first-index.js";
+import {
   applyIntegrationSetup,
   integrationCatalog,
   planIntegrationSetup,
@@ -22,9 +28,9 @@ import {
 import { runInit, type InitDepsV1, type InitOptionsV1 } from "./run.js";
 import { inspectInitStorage } from "./storage.js";
 import type { InitResultV1 } from "./types.js";
-import type { WizardTerminal } from "./wizard-terminal.js";
+import type { WizardChoice, WizardTerminal } from "./wizard-terminal.js";
 
-export interface InitWizardDepsV1 {
+export interface InitWizardDepsV1 extends FirstIndexDeps {
   terminal: WizardTerminal;
   initialize?: typeof runInit;
   planIntegrations?: typeof planIntegrationSetup;
@@ -364,21 +370,38 @@ export async function runInitWizard(
     offline: options.offline,
   });
   showPlan(terminal, plan, preview, map);
+  const firstIndex = options.offline ? undefined : planFirstIndex(preview);
+  if (!options.offline && preview.findings.storage?.backend === "lancedb") {
+    terminal.message(
+      firstIndex === undefined
+        ? firstIndexHelp(preview, options.preferredModel)
+        : `\nFirst index (only with explicit selection)\nLanceDB directory: ${firstIndex.directory}\nLocal Ollama: ${firstIndex.endpoint}\nModel: ${firstIndex.model} (${String(firstIndex.dimensions)} dimensions)\nThe index sends scanned project text to this local service and writes the index to this directory.`,
+    );
+  }
   if (sdd !== undefined)
     terminal.message(
       `SDD review draft: ${sdd.frameworks.join(", ")} → .untangle/sdd/ (${String(sdd.features.length)} proposed features). Existing feature declarations are preserved. The selected draft will be used for this setup's feature report and map.`,
     );
-  const actions =
-    plan.items.length > 0 && !options.offline
-      ? [
-          { value: "prepare", label: "Prepare config and recipes only; download/start nothing" },
-          { value: "execute", label: "Apply config and execute the displayed tool setup" },
-          { value: "cancel", label: "Cancel without writes" },
-        ]
-      : [
-          { value: "prepare", label: "Apply this local setup" },
-          { value: "cancel", label: "Cancel without writes" },
-        ];
+  const executeTools = plan.items.length > 0 && !options.offline;
+  const actions: WizardChoice<"prepare" | "execute" | "index" | "cancel">[] = [
+    {
+      value: "prepare",
+      label: executeTools
+        ? "Prepare config and recipes only; download/start nothing"
+        : "Apply this local setup",
+    },
+  ];
+  if (executeTools)
+    actions.push({ value: "execute", label: "Apply config and execute the displayed tool setup" });
+  if (firstIndex !== undefined)
+    actions.push({
+      value: "index",
+      label: "Apply setup and build the LanceDB index",
+      ...(executeTools
+        ? { detail: "Prepare the selected tool recipes without executing them." }
+        : {}),
+    });
+  actions.push({ value: "cancel", label: "Cancel without writes" });
   const action = await terminal.choose("Apply this setup?", actions);
   if (action === "cancel") return { result: null, exitCode: EXIT.cancelled };
   ctx.signal.throwIfAborted();
@@ -446,5 +469,24 @@ export async function runInitWizard(
     }
   }
   ctx.signal.throwIfAborted();
+  if (action === "index" && firstIndex !== undefined) {
+    const exitCode = await startFirstIndex(
+      { ...ctx, env: configuredDeps.env ?? ctx.env },
+      firstIndex,
+      result,
+      deps,
+    );
+    return {
+      result:
+        exitCode === EXIT.ok
+          ? {
+              ...result,
+              nextStep:
+                'From the project directory, try `untangle query "your search" --require-fresh` to verify the index.',
+            }
+          : result,
+      exitCode,
+    };
+  }
   return { result, exitCode: EXIT.ok };
 }

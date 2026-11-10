@@ -16,10 +16,23 @@ services are not silently deleted.
 New projects default to embedded LanceDB under `.untangle/index/lancedb`. The TUI asks where
 the index should live before offering analyzers. `init --storage=lancedb` or
 `init --storage=qdrant` sets the backend in scriptable setup. Existing explicit storage and
-legacy Qdrant selections are preserved. Init and doctor do not create database tables.
+legacy Qdrant selections are preserved. Config-only init and doctor do not create database tables.
 
-With LanceDB, the Qdrant/Ollama Compose offer is hidden. Symbol and lexical search can use
-`index --embedder=offline`; language-model semantics require a separately configured embedder.
+With LanceDB, the Qdrant/Ollama Compose offer is hidden. Start
+[Ollama](https://docs.ollama.com/quickstart) on the same machine and run
+`ollama pull nomic-embed-text` if you need an embedding model. The wizard checks that
+the selected loopback endpoint can actually embed with the configured model. If it can,
+**Apply setup and build the LanceDB index** applies the configuration and runs the first
+index immediately. Its review shows the endpoint, model and index location. This option
+prepares any selected analyzer recipes. Use the separate tool execution option to install
+or start those tools.
+
+If the endpoint or effective configuration changes, the wizard stops before indexing.
+The separate configuration-only option remains available. With npm `0.1.1`, select the model
+explicitly with `untangle init --interactive --embedding-model=nomic-embed-text:latest`,
+apply the configuration and run `untangle index` separately. Symbol and lexical search
+can use `index --embedder=offline` without an embedding service.
+
 For a server-backed index, select an owned or external Qdrant service. Switching storage
 requires indexing that backend; old databases are preserved and never silently migrated.
 
