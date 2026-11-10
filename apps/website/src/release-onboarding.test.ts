@@ -28,19 +28,23 @@ describe("Release onboarding", () => {
     expect(setup).toContain("needs no");
     expect(setup).not.toContain("untangle index");
     expect(setup).not.toContain("untangle doctor");
-    expect(setup).toContain("pnpm 10.34.5");
-    expect(setup).toContain("npm package is not published yet");
+    expect(setup).toContain("Node.js 22 (22.13+) or 24+");
+    expect(setup).toContain("npm exec -- untangle init --offline --dry-run");
     expect(html).toMatch(/href="#local-install"\s*>\s*Analyze your first repository\s*<\/a\s*>/u);
   });
 
   it("keeps the first copied commands executable without target-path placeholders", () => {
     const commands = html.match(/<code id="setup-command">([\s\S]*?)<\/code>/u)?.[1];
     expect(commands).toBeDefined();
-    expect(commands).toContain("pnpm setup:local");
-    expect(commands).toContain('UNTANGLE_CLI="$PWD/apps/cli/dist/index.js"');
-    expect(commands).toContain('untangle() { node "$UNTANGLE_CLI" "$@"; }');
-    expect(commands).not.toContain("/path/to/");
-    expect(commands).not.toContain("npm install --global");
+    expect(
+      commands
+        ?.replace(/<\/?span>/gu, "")
+        .trim()
+        .split("\n"),
+    ).toEqual([
+      "npm install --save-dev --save-exact @untangle-code/cli@0.1.0",
+      "npm exec -- untangle complexity --top=10",
+    ]);
     expect(html).toMatch(/data-copy-command="setup-command" hidden/u);
   });
 
@@ -106,7 +110,9 @@ class CopyElement {
 function copyHarness(writeText?: (text: string) => Promise<void>) {
   const button = new CopyElement("Copy commands");
   button.attributes.set("data-copy-command", "setup-command");
-  const command = new CopyElement("\npnpm install --frozen-lockfile\npnpm run build\n");
+  const command = new CopyElement(
+    "\nnpm install --save-dev --save-exact @untangle-code/cli@0.1.0\nnpm exec -- untangle complexity --top=10\n",
+  );
   const announcement = new CopyElement("");
   const elements = new Map([
     ["setup-command", command],
@@ -149,7 +155,7 @@ describe("Command copying", () => {
     expect(harness.button.getAttribute("aria-busy")).toBe("true");
     expect(harness.announcement.textContent).toBe("");
     expect(writeText).toHaveBeenCalledExactlyOnceWith(
-      "pnpm install --frozen-lockfile\npnpm run build",
+      "npm install --save-dev --save-exact @untangle-code/cli@0.1.0\nnpm exec -- untangle complexity --top=10",
     );
 
     complete?.();
@@ -157,7 +163,7 @@ describe("Command copying", () => {
     expect(harness.button.disabled).toBe(false);
     expect(harness.button.getAttribute("aria-busy")).toBe("false");
     expect(harness.button.textContent).toBe("Copy again");
-    expect(harness.announcement.textContent).toContain("Commands copied.");
+    expect(harness.announcement.textContent).toContain("at your project root.");
   });
 
   it("offers the visible text as recovery when clipboard permission is denied", async () => {

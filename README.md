@@ -54,18 +54,45 @@ product context gradually.
 
 ## First result without search services
 
-Use **Node.js `^22.13.0 || >=24.0.0`**. Install the preview, then run the analysis from your project:
+Use **Node.js `^22.13.0 || >=24.0.0`**. In a project that uses npm, install Untangle
+as an exact dev dependency so the team can use the same version:
+
+```bash
+cd /path/to/your/project
+npm install --save-dev --save-exact @untangle-code/cli@0.1.0
+npm exec -- untangle complexity --top=10
+```
+
+Commit `package.json` and `package-lock.json` to share the installation with your team.
+Direct analysis needs no project configuration, index, vector database, embedding service or
+cloud account. To preview and then write a local `untangle.toml`:
+
+```bash
+npm exec -- untangle init --offline --dry-run
+npm exec -- untangle init --offline
+```
+
+**Try it once in any repository.** Run this from the project root, even if it has no
+`package.json`. npm uses its cache and leaves the project's dependencies alone.
+
+```bash
+npm exec --yes --package=@untangle-code/cli@0.1.0 -- untangle complexity --top=10
+```
+
+**Use it across projects.** Install the preview globally, then run `untangle` from any project root.
 
 ```bash
 npm install --global @untangle-code/cli@next
 untangle --version
-cd /path/to/your/project
-untangle complexity --top=10
 ```
 
-Direct analysis needs no index, vector database, embedding service or cloud account.
+The remaining CLI examples use `untangle` directly. For a project-local installation, use
+`npm exec -- untangle` in its place.
 
-To try Untangle on its own source with **pnpm 10.34.5**:
+<details>
+<summary>Build from source for development</summary>
+
+Use **pnpm 10.34.5**:
 
 ```bash
 git clone https://github.com/lboel/untangle.git
@@ -73,38 +100,9 @@ cd untangle
 pnpm setup:local
 ```
 
-This installs locked dependencies, builds Untangle and analyzes its own sources. To inspect
-another repository:
-
-```bash
-pnpm setup:local --project=/absolute/path/to/project
-```
-
-The report includes coverage, hotspots, explained omissions, next commands and an MCP
-template with real local paths. The helper reads the target project; installation and build
-change the Untangle checkout. It registers no MCP host and writes no target configuration or
-shell profile.
-
-Use `--dry-run` to inspect the plan, `--format=json` for structured output, or `--skip-build`
-to use existing Dist files without certifying their freshness.
-
-<details>
-<summary>Build manually and use the remaining CLI examples</summary>
-
-```bash
-pnpm install --frozen-lockfile
-pnpm build
-node apps/cli/dist/index.js complexity
-
-# Temporary shorthand for this shell; no global installation:
-UNTANGLE_CLI="$PWD/apps/cli/dist/index.js"
-untangle() { node "$UNTANGLE_CLI" "$@"; }
-cd /absolute/path/to/project
-untangle complexity --top=10 --format=json
-untangle init --offline --dry-run
-```
-
-The CLI examples below work with this shorthand or with the npm installation above.
+This installs locked dependencies, builds Untangle and analyzes its own sources. To analyze
+another project from the checkout, run `pnpm setup:local --project=/absolute/path/to/project`.
+See [Contributing](./CONTRIBUTING.md) for the development workflow.
 
 </details>
 
@@ -172,8 +170,15 @@ retain their own checks.
 
 ## Connect your agent
 
-`pnpm setup:local --project=…` prints a copyable stdio-MCP configuration. For a host supporting
-`mcpServers`, use the absolute paths returned by setup:
+From the project with the local npm installation, get the absolute paths to Node and the
+installed CLI:
+
+```bash
+node -p 'process.execPath'
+node -p "require.resolve('@untangle-code/cli')"
+```
+
+For a host supporting `mcpServers`, insert those paths and your project root:
 
 ```json
 {
@@ -181,7 +186,7 @@ retain their own checks.
     "untangle": {
       "command": "/absolute/path/to/node",
       "args": [
-        "/absolute/path/to/untangle/apps/cli/dist/index.js",
+        "/absolute/path/to/project/node_modules/@untangle-code/cli/dist/index.js",
         "mcp",
         "--stdio",
         "--root=/absolute/path/to/project"
@@ -192,7 +197,7 @@ retain their own checks.
 ```
 
 The fixed root binds the engine to your project independently of the host's working
-directory. Import the template explicitly; the shell shorthand is not an executable host command.
+directory. Add the entry to your host's MCP configuration.
 
 | Task | MCP tools |
 |---|---|
