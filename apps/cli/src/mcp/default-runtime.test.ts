@@ -8,6 +8,7 @@ import { DefaultUntangleMcpRuntime } from "./default-runtime.js";
 import type { McpInvocationContext, UntangleMcpToolName } from "./types.js";
 
 const UNREACHABLE_ENV = {
+  UNTANGLE_STORAGE_BACKEND: "qdrant",
   UNTANGLE_QDRANT_MODE: "external",
   UNTANGLE_QDRANT_URL: "http://127.0.0.1:9",
 };

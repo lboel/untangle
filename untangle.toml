@@ -122,11 +122,12 @@ exclude = [
 
 # ------------------------------------------------------------------------
 # VEKTORSPEICHER
-#
-# `managed`, weil keiner geantwortet hat: `untangle` startet dann eine EIGENE
-# Instanz mit eigenem Port und eigenem Volume. Eine fremde Instanz wird nie
-# uebernommen (spec.md §3.2).
 # ------------------------------------------------------------------------
+[storage]
+# Store this checkout's index locally under .untangle/index/lancedb.
+backend = "lancedb"
+
+# Used when the Qdrant backend is selected explicitly.
 [qdrant]
 mode = "managed"
 # url = "http://127.0.0.1:16333"   # eigene Instanz, sobald sie laeuft
@@ -135,7 +136,9 @@ collectionPrefix = "untangle_untangle_"
 # Ein API-Schluessel wird NIE hier abgelegt, nur der NAME der Umgebungsvariablen:
 # apiKeyEnv = "UNTANGLE_QDRANT_API_KEY"
 
-# Nicht geprueft: http://127.0.0.1:6333 — Standardport einer fremden Instanz — spec.md §3.2 verbietet, fremde Dienste zu veraendern. Bewusst uebernimm ihn mit UNTANGLE_QDRANT_URL, sonst startet `untangle` eine eigene Instanz auf 16333 mit eigenem Volume.
+# For an existing server, set UNTANGLE_STORAGE_BACKEND=qdrant,
+# UNTANGLE_QDRANT_MODE=external and UNTANGLE_QDRANT_URL to its endpoint.
+# Managed Qdrant uses its own instance and volume (spec.md §3.2).
 
 # ------------------------------------------------------------------------
 # EINBETTUNGEN

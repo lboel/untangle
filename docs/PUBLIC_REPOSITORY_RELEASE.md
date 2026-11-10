@@ -94,9 +94,10 @@ copies already obtained by others.
   Keep prerelease, coverage and installation limitations accurate. Do not advertise
   public npm installation before the actual registry installation has passed.
 - Require regular Node 22/24 CI and all four Linux/macOS × Node 22/24 release
-  cells at the exact candidate. Verify their original archives with the existing
-  compatibility verifier; preserve failed attempts. Run configured live-search
-  acceptance separately and mark missing infrastructure `unverified`.
+  cells at the exact candidate, including default embedded LanceDB search. Verify their
+  original archives with the compatibility verifier and preserve failed attempts. Record
+  optional Ollama and Qdrant acceptance separately and mark missing infrastructure
+  `unverified` for that run.
 - Approve and apply the intended `main` protection policy. A proposed minimum is
   required `build (node 22.x)` and `build (node 24.x)` checks, with force-push and
   branch deletion disabled. The owner must choose PR/review requirements and

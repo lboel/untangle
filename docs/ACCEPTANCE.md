@@ -151,19 +151,26 @@ of WP-227 and the hanging Ollama embedding endpoint.
 
 ## Repeatable release acceptance from October 2026
 
-After a fresh build, `pnpm run e2e:search` runs real search cases with Qdrant and
-Ollama. Coverage includes independent retrieval paths, identifier spellings,
-file changes/deletions, watcher updates, service failures and migration from old
-lexical/chunker fingerprints. A long line in an ordinary class must not remove
-its private methods from symbol search. `--require-fresh` must explicitly reject
-stale results.
+After a fresh build, `pnpm run e2e:lancedb` verifies the default search backend using real
+embedded tables and offline embeddings. It checks persistence across processes, CLI and
+MCP search, identifier spellings and fresh results after file changes or deletions.
+`--require-fresh` must explicitly reject stale results. The candidate matrix runs this
+acceptance as part of `pnpm run e2e:smoke`.
+
+Use `pnpm run e2e:lancedb --semantic` for separate LanceDB semantic and hybrid coverage
+with the configured local Ollama model. `pnpm run e2e:search` exercises the optional Qdrant
+backend with real Qdrant and Ollama. That suite covers independent retrieval paths, file
+changes and deletions, watcher updates, service failures and migration from old lexical
+and chunker fingerprints. A long line in an ordinary class must preserve its private
+methods in symbol search. Mark a service-backed run `unverified` when its infrastructure
+is unavailable.
 
 `pnpm run e2e:release --out-dir=".untangle/releases/<new-candidate-id>"` checks the
 original tarballs, after content and license checks, in fresh external npm and
 pnpm projects. The CLI-only consumer must run help, native TypeScript/Python
-analysis and MCP stdio before more public packages are installed. Only a
-successful run creates the bundle of tarballs, `SHA256SUMS`, `publish-order.json`
-and `release-report.json`.
+analysis, MCP stdio and embedded LanceDB search before more public packages are
+installed. Only a successful run creates the bundle of tarballs, `SHA256SUMS`,
+`publish-order.json` and `release-report.json`.
 
 Every candidate must record runtime/platform, source/build checksums, exit codes
 and actual search results. Local checks prove only the platform used. The
