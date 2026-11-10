@@ -55,9 +55,9 @@ infrastructure remains optional for integration tests:
 | `pnpm run clean` | Remove build artifacts (`dist`, `.turbo`, `coverage`, `*.tsbuildinfo`) across the repository. |
 | `pnpm run check-licenses` | Check the production dependency license allowlist. |
 | `pnpm run check-publishable` | Pack and inspect actual distribution tarballs, entry points, sources and licenses. |
-| `pnpm run e2e:smoke` | Check built adapters/graphs, real feature workflow, checkout/MCP entry and actual terminal setup without external services. |
-| `pnpm run e2e:lancedb` | Check real embedded search, reopen, backend/path switching, graph generations and freshness without external services. Add `-- --semantic` for the configured local Ollama acceptance. |
-| `pnpm run e2e:search` | Check local search with real Qdrant/Ollama, including freshness, outages, watch and migration. |
+| `pnpm run e2e:smoke` | Check built adapters/graphs, real feature workflow, checkout/MCP entry, actual terminal setup and embedded LanceDB search without external services. |
+| `pnpm run e2e:lancedb` | Check real embedded search, reopen, backend/path switching, graph generations and freshness without external services. Add `--semantic` for the configured local Ollama acceptance. |
+| `pnpm run e2e:search` | Check the optional Qdrant backend with real Qdrant and Ollama, including freshness, outages, watch and migration. |
 | `pnpm run e2e:product` | Check built CLI/MCP on independent TypeScript/Python projects, including real Vitest reports, failures, skips and source changes. |
 | `pnpm run e2e:quickstart` | Check index-free entry and an unchanged usable MCP template on an external project without Git/configuration. |
 | `pnpm run e2e:setup` | Check actual TUI cancellation/terminal restoration, scriptable init and local feature/code artifacts; Python 3 on Linux/macOS, no external services. |
@@ -136,13 +136,17 @@ pnpm run check-licenses
 pnpm run check-publishable
 pnpm run e2e:smoke
 pnpm run e2e:release --out-dir=".untangle/releases/<new-candidate-id>"
-pnpm run e2e:search
 ```
+
+The smoke gate includes the default search acceptance, which can also run on its own as
+`pnpm run e2e:lancedb` after building. Use `pnpm run e2e:lancedb --semantic` for additional
+semantic and hybrid coverage with the configured local Ollama model, or `pnpm run e2e:search`
+for the optional Qdrant/Ollama acceptance.
 
 The output contains actual checked tarballs, SHA-256 hashes, package versions,
 dependency order and verification report. A failed run must never mark a candidate
-verified. The bundle is local release evidence; live search acceptance is recorded
-separately with its actual infrastructure.
+verified. The bundle includes the installed LanceDB checks. Record any service-backed search
+acceptance separately with the infrastructure used.
 
 [Release candidate](./.github/workflows/release-candidate.yml) runs on
 `release-candidate/**` branches and manual GitHub Actions dispatch. It checks

@@ -113,6 +113,8 @@ The E2E smoke gate runs these separate acceptances in sequence:
 3. Checkout first value and usable MCP template: `scripts/quickstart-smoke.mjs`.
 4. Guided init, actual terminal cancellation/restoration, automation contracts and index-free
    feature/code artifacts: `scripts/init-setup-smoke.mjs`.
+5. Real embedded LanceDB search using the default storage path, persistent tables, fresh
+   retrieval and MCP (`scripts/lancedb-search-smoke.mjs`).
 
 Terminal acceptance requires Python 3/POSIX PTYs on Linux/macOS and starts no external analyzer
 or search service. Missing toolchains must not be recorded as success. A failed substep fails
@@ -121,6 +123,8 @@ not claim Python test execution or productivity gains.
 
 Release installation first requests only the CLI, proving transitive dependency resolution.
 It checks native parsers, public imports, CLI/MCP, product/init contracts and stale evidence.
+Both installed npm/pnpm consumers also index and query real LanceDB tables with offline
+embeddings and record that proof in `release-report.json`.
 Independent installed-consumer fixtures also verify Vue scripts and static frontend/FastAPI
 boundaries; workspace imports are insufficient installation evidence. New SDD connections
 must be checked through the actual public CLI and consumed by feature analysis/map output.
@@ -128,7 +132,7 @@ Browser visual/accessibility acceptance of the 3D map remains distinct from math
 static and VM interaction tests.
 
 Each job retains source/Dist manifests, toolchain, Git/Actions identity, exit codes and hashed
-logs. Failed attempts remain evidence, not verified bundles. A passing `bundle/` contains 20
+logs. Failed attempts remain evidence, not verified bundles. A passing `bundle/` contains 21
 original tarballs, `SHA256SUMS`, `publish-order.json`, `release-report.json` and a CycloneDX
 SBOM from the actual installed production tree. No workspace links or existing Dist files
 replace these checks.
@@ -145,9 +149,15 @@ Runner-specific tarball hashes may differ; publish only the selected checked ori
 Local evidence proves no other platform. Windows/additional optional parser peers are
 outside the matrix.
 
-Live search acceptance (`pnpm e2e:search`) additionally needs real reachable Qdrant/Ollama and
-the configured model. Record infrastructure/source state and results separately. Missing
-infrastructure is `unverified`.
+After a fresh build, run `pnpm run e2e:lancedb` for standalone acceptance of the default search
+backend. It exercises the built CLI and MCP with real LanceDB tables and offline embeddings.
+The candidate matrix already runs this check through `pnpm run e2e:smoke`.
+
+For separate semantic and hybrid coverage with LanceDB, run `pnpm run e2e:lancedb --semantic`
+with the configured local Ollama model. For the optional Qdrant backend, `pnpm run e2e:search`
+runs end-to-end coverage with real reachable Qdrant and Ollama. Record the source commit,
+infrastructure, model and results for each service-backed run. Mark missing infrastructure
+`unverified` for that run.
 
 ## Public approval
 
@@ -155,11 +165,12 @@ A maintainer must actually confirm:
 
 1. The exact commit, license/NOTICE and public repository access. Candidate verification
    does not change visibility.
-2. npm authentication, control of `@untangle-code`, all 20 package names and chosen version.
+2. npm authentication, control of `@untangle-code`, all 21 package names and chosen version.
    `npm whoami` and authenticated permission checks are required; anonymous `E404` proves
    no name rights.
 3. All four matrix jobs and required regular CI jobs pass at that commit, with archived
-   compatibility and live-search evidence.
+   compatibility and embedded-search evidence. Archive any additional service-backed search
+   runs separately.
 4. `next` as the release channel. A later explicit `latest` update is a tag change, not
    republishing an identical package version.
 5. Signed tag `v0.1.0` on the checked commit and durable evidence retention; Actions artifacts
@@ -170,11 +181,12 @@ or repacking before publication; any change requires a new candidate.
 
 ## Publish original tarballs
 
-Initial publication needs an authenticated authorized maintainer. Trusted Publishing for
-existing npm packages does not grant missing scope/package permissions. npm provenance
-requires public packages and repository.
+For the first publication, an authorized maintainer signs in interactively with
+`npm login --registry=https://registry.npmjs.org` and completes npm's two-factor authentication
+challenge when prompted. npm provenance requires public packages and a public repository.
 
-After explicit approval and complete candidate verification, in canonical `bundle/`:
+After explicit approval and complete candidate verification, run these checks in the
+canonical `bundle/` directory.
 
 ```bash
 sha256sum --check SHA256SUMS
@@ -184,24 +196,28 @@ npm whoami --registry=https://registry.npmjs.org
 
 `publish-order.json` lists dependencies before consumers. Publish each recorded file directly
 with `npm publish <file> --access=public --tag=next --registry=https://registry.npmjs.org`.
+Follow npm's two-factor authentication prompt when it appears during publication.
 On partial failure, stop and record actual registry state. Do not overwrite published versions
 or hide errors by packing again.
 
 The prepared protected [publish workflow](../.github/workflows/publish.yml) uses those same
-originals with OIDC/provenance. Before use, configure each package's exact repository/workflow/
-environment Trusted Publisher with direct publish rights, and protect `npm-release` with
-human approval. Requirements include npm ≥11.5.1, Node ≥22.14 and GitHub-hosted runners. The
-candidate workflow does not configure accounts/protections.
+originals with provenance. Once the packages exist, use npm Trusted Publishing (OIDC) for
+subsequent automated releases. Configure each package's Trusted Publisher for the exact
+repository, workflow and environment with direct publish rights. The workflow requires
+human approval in `npm-release`, npm ≥11.5.1, Node ≥22.14 and GitHub-hosted runners.
 
-For bootstrap publication, an approving maintainer can provide a short-lived, least-privilege
-`NPM_BOOTSTRAP_TOKEN` exclusively in the protected environment. The workflow uses it and emits
-provenance on the public runner. Remove it afterward and configure package OIDC. Tokens never
-belong in sources, artifacts, logs or chat. Run only after merging the checked commit into
-the default branch; inspect registry state before retrying a partial publication.
+Until npm removes granular-token direct publishing in January 2027, the workflow also
+supports a one-time bootstrap using a short-lived granular token with direct publish access,
+the minimum publishing scope and bypass 2FA. Store it as `NPM_BOOTSTRAP_TOKEN` exclusively in
+the protected `npm-release` environment. After the run, remove the secret and revoke the
+token. Run the workflow on the checked commit after it reaches the default branch. Inspect
+registry state before retrying a partial publication.
+[npm access-token deprecation](https://docs.npmjs.com/about-access-tokens/#direct-publishing-is-being-deprecated)
 
-Official references: [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/),
+See [npm two-factor authentication](https://docs.npmjs.com/accessing-npm-using-2fa/),
+[npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/),
 [npm publish](https://docs.npmjs.com/cli/v11/commands/npm-publish/),
-[GitHub artifact attestations](https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/use-artifact-attestations).
+and [GitHub artifact attestations](https://docs.github.com/en/actions/how-tos/secure-your-work/use-artifact-attestations/use-artifact-attestations).
 
 ## Verify public installation
 
@@ -217,11 +233,12 @@ pnpm exec untangle --version
 pnpm exec untangle --help
 ```
 
-Compare registry integrity for all 21 packages to the canonical report and repeat CLI-only
-resolution, native analysis, product/init/MCP and public-import checks. Only that run proves
-public installation. Create the GitHub release with signed tag, original tarballs, hashes,
-SBOM, compatibility/matrix/live evidence and version limits. Update README/website to the
-available public entry only afterward.
+Run `node scripts/public-registry-smoke.mjs --bundle=<canonical-bundle-dir> --out=<new-report.json>`
+from the checkout. It compares registry integrity for all 21 packages to the canonical report
+and repeats CLI-only resolution, native analysis, product/init/MCP, public-import and embedded
+LanceDB search checks. Create the GitHub release with the signed tag, original tarballs, hashes,
+SBOM, compatibility and matrix evidence, any separately recorded service-backed search evidence
+and version limits. Update README/website to the available public entry only afterward.
 
 ## Release notes 0.1.0
 

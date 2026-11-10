@@ -122,11 +122,12 @@ exclude = [
 
 # ------------------------------------------------------------------------
 # VEKTORSPEICHER
-#
-# `managed`, weil keiner geantwortet hat: `untangle` startet dann eine EIGENE
-# Instanz mit eigenem Port und eigenem Volume. Eine fremde Instanz wird nie
-# uebernommen (spec.md §3.2).
 # ------------------------------------------------------------------------
+[storage]
+# Store this checkout's index locally under .untangle/index/lancedb.
+backend = "lancedb"
+
+# Used when UNTANGLE_STORAGE_BACKEND=qdrant is selected explicitly.
 [qdrant]
 mode = "managed"
 # url = "http://127.0.0.1:16333"   # eigene Instanz, sobald sie laeuft
