@@ -85,7 +85,7 @@ for (const button of copyButtons) {
       button.textContent = "Copy again";
       if (copyAnnouncement) {
         copyAnnouncement.textContent =
-          "Commands copied. Paste them in a terminal in the Untangle checkout.";
+          "Commands copied. Paste them in a terminal at your project root.";
       }
     } catch {
       button.textContent = "Try copy again";

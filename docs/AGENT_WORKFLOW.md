@@ -4,37 +4,31 @@ This workflow connects a coding agent to local repository search, declared featu
 and inspectable measurements, with or without spec-driven development. Domain decisions and
 authorization to edit sources remain with the team or calling harness.
 
-## 1. Choose the checkout, project and host
+## 1. Install in the project and connect the host
 
-In an available Untangle checkout:
-
-```bash
-pnpm setup:local --project=/absolute/path/to/project
-```
-
-The command installs locked checkout dependencies, builds and produces an index-free complexity
-report with absolute follow-up commands and an MCP template. The project root must exist.
-`--dry-run` shows the plan; `--skip-build` trusts existing artifacts without proving source/Dist
-correspondence. A temporary shorthand for the following examples:
+Use Node.js `^22.13.0 || >=24.0.0`. In an existing npm project:
 
 ```bash
-UNTANGLE_CLI="$PWD/apps/cli/dist/index.js"
-untangle() { node "$UNTANGLE_CLI" "$@"; }
 cd /absolute/path/to/project
+npm install --save-dev --save-exact @untangle-code/cli@0.1.0
+npm exec -- untangle complexity --top=10 --format=json
+npm exec -- untangle init --offline --dry-run --format=json
+npm exec -- untangle init --offline
 ```
 
-MCP hosts instead use the printed absolute Node/CLI paths and
-`mcp --stdio --root=/absolute/path/to/project`. A shell function is not a host executable,
-and the template is not automatic client registration.
-
-`complexity`, `product`, `init --offline` and `graph boundaries` need no index/embedding
-service. An offline dry-run writes nothing:
+Direct analysis needs no index or services. The dry-run previews setup without writing.
+For a project without a `package.json`, run a single command using the npm cache:
 
 ```bash
-untangle complexity --top=10 --format=json
-untangle init --offline --dry-run --format=json
-untangle product --format=json
+npm exec --yes --package=@untangle-code/cli@0.1.0 -- untangle complexity --top=10 --format=json
 ```
+
+For the remaining examples, use `npm exec -- untangle` with the project-local install or run
+`untangle` directly after `npm install --global @untangle-code/cli@next`.
+
+To connect a local MCP host, use the absolute Node and installed CLI paths with
+`mcp --stdio --root=/absolute/path/to/project`. Follow the [MCP configuration example](../README.md#connect-your-agent)
+to resolve the paths and add the entry to your client.
 
 Configuration-only init inspects languages, topology, services, ignore rules and product
 documents. Without dry-run it writes commented `untangle.toml`, preserving differing existing

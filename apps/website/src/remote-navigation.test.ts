@@ -29,8 +29,8 @@ function check() {
   });
 }
 
-describe("Repository navigation preserves the page's local-resource boundary", () => {
-  it("accepts the two exact repository anchors and the displayed clone command", () => {
+describe("External navigation preserves the page's local-resource boundary", () => {
+  it("accepts the exact npm and repository anchors", () => {
     expect(check()).toContain("passed static, privacy and design constraints");
   });
 
@@ -47,9 +47,14 @@ describe("Repository navigation preserves the page's local-resource boundary", (
       '<a href="https://github.com/lboel/untangle" ping="https://example.com">Repository</a>',
     ],
     [
-      "an extra clone span outside setup",
+      "a clone command with a remote URL",
       "index.html",
       "<span>git clone https://github.com/lboel/untangle.git</span>",
+    ],
+    [
+      "an extra npm anchor outside quickstart",
+      "index.html",
+      '<a href="https://www.npmjs.com/package/@untangle-code/cli">Untangle from npm</a>',
     ],
   ])("still rejects a remote %s", (_name, file, injected) => {
     const target = path.join(root, "src", file);

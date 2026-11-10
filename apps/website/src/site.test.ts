@@ -115,18 +115,19 @@ describe("Untangle website content contract", () => {
     expect(html).toContain("no analytics");
   });
 
-  it("offers only the currently truthful repository-local install path", () => {
-    expect(html).toContain("pnpm install --frozen-lockfile");
-    expect(html).toContain("pnpm run build");
-    expect(html).not.toContain("pnpm --filter @untangle-code/cli build");
-    expect(html).toContain("node apps/cli/dist/index.js mcp --stdio");
-    expect(html).toContain("Use the repository build for the CLI and MCP server.");
-    expect(html).toMatch(/npm\s+package\s+is not published\s+yet/u);
-    expect(html).toContain("E404");
+  it("offers npm install routes and connects the installed CLI to MCP", () => {
+    expect(html).toContain(
+      "npm exec --yes --package=@untangle-code/cli@0.1.0 -- untangle complexity --top=10",
+    );
+    expect(html).toContain("npm install --global @untangle-code/cli@next");
+    expect(html).toContain("npm exec -- untangle mcp --stdio");
+    expect(html).toContain(
+      '"/absolute/path/to/project/node_modules/@untangle-code/cli/dist/index.js"',
+    );
+    expect(html).toContain('"--root=/absolute/path/to/project"');
     expect(html).toContain("--embedder=offline");
     expect(html).toContain("avoids Ollama");
     expect(html).toContain("FEATURE_UNAVAILABLE");
-    expect(html).not.toContain("npm install --global @untangle-code/cli");
   });
 });
 
@@ -156,11 +157,16 @@ describe("Untangle website static delivery", () => {
       expect(ids.has(anchor), `missing anchor target #${anchor}`).toBe(true);
     }
 
-    expect([...html.matchAll(/href="https:\/\/github\.com\/lboel\/untangle"/gu)]).toHaveLength(2);
+    expect([...html.matchAll(/href="(https:\/\/[^"]+)"/gu)].map((match) => match[1])).toEqual([
+      "https://www.npmjs.com/package/@untangle-code/cli",
+      "https://github.com/lboel/untangle",
+    ]);
     const localHtml = html
-      .replace('<a href="https://github.com/lboel/untangle">Untangle repository</a>', "")
-      .replace('<a href="https://github.com/lboel/untangle">Repository</a>', "")
-      .replace("<span>git clone https://github.com/lboel/untangle.git</span>", "");
+      .replace(
+        '<a href="https://www.npmjs.com/package/@untangle-code/cli">Untangle from npm</a>',
+        "",
+      )
+      .replace('<a href="https://github.com/lboel/untangle">Repository</a>', "");
     expect(`${localHtml}\n${styles}\n${script}`).not.toMatch(/(?:https?:)?\/\//iu);
   });
 

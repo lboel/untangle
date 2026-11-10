@@ -1,10 +1,10 @@
 # @untangle-code/website
 
 Private static landing page for Untangle's local search/complexity harness, without runtime
-dependencies. The first action produces an actual checkout complexity report through
-`pnpm setup:local`, which explicitly installs locked dependencies and builds the workspace.
-Manual commands and plan-only entry are disclosed. Qdrant, Ollama, MCP and external analyzers
-are optional, explicitly selected next steps.
+dependencies. The quickstart installs the published CLI as an exact npm development dependency
+and runs a complexity report in the visitor's project. It also shows one-off and global
+installation, plus a preview of offline initialization. MCP, indexed search and external
+analyzers are optional next steps.
 
 The page distinguishes three layers:
 
@@ -17,10 +17,8 @@ The page distinguishes three layers:
 
 English product copy describes implemented capabilities. The feature workflow uses existing
 manifests, `product --path`, stdout-only `--draft` and explicit source-bound Vitest runs.
-Project-specific paths/IDs are replaceable examples. The first setup block runs in an
-available checkout; new users start from the visible repository link and `git clone`.
-The source preview runs from a local checkout. No global npm installation is advertised
-as available before package publication.
+Project-specific paths and IDs are replaceable examples. The first setup block runs from an
+existing npm project. The one-off command also works from repositories without a package manifest.
 
 The landing-page feature diagram and clear/tangled search comparison are illustrative.
 The opening yarn image and scroll-driven 3D scene express the same idea: follow a
@@ -94,10 +92,9 @@ and website tests validate the selected public artifacts without historical chec
 ## Deliberate boundaries
 
 - No production/runtime dependencies, remote fonts/images, analytics, scripts or automatic
-  network requests. Two explicitly clicked repository links and the displayed HTTPS clone
-  command are the only remote-URL exceptions. Checks accept their complete fixed HTML
-  fragments in their intended positions; CSS/JS, other links and remote resources stay
-  blocked. This replaces the older blanket URL ban without allowing remote page resources.
+  network requests. The npm package link in the quickstart and GitHub repository link in the
+  footer are the only remote URL exceptions. Checks accept their complete fixed HTML
+  fragments in their intended positions. Remote resources in HTML, CSS and JavaScript stay blocked.
 - The generated example has a separate strict boundary: its approved inline script/style
   bytes are hash-bound, its Content Security Policy denies network access, and the SVG
   namespace is accepted only as a namespace. Public projection validation checks the JSON
@@ -116,7 +113,7 @@ and website tests validate the selected public artifacts without historical chec
   Transparent wool-ball SVG and favicon use renderer-compatible sRGB colors. The yarn PNG is copied
   byte-for-byte from [the canonical brand asset](../../docs/assets/untangle-yarn-3d.png),
   retaining its native alpha and embedded generation prompt.
-- Initialization is demonstrated with `--dry-run`. Configuration, feature assignment,
+- Offline initialization is previewed with `--dry-run` before the apply command. Feature assignment,
   services and test execution are not represented as automatically complete. Deterministic
   offline vectors are separate from language-model semantics.
 
@@ -128,5 +125,5 @@ before claiming visual/accessibility acceptance of a release.
 The app belongs to pnpm/Vitest through `apps/*`. The separate
 [Pages workflow](../../.github/workflows/pages.yml) publishes only its eleven-file allowlist:
 the nine website assets plus the package's complete `LICENSE` and `NOTICE`.
-The source repository remains private. See [website deployment](../../docs/WEBSITE_DEPLOYMENT.md)
+See [website deployment](../../docs/WEBSITE_DEPLOYMENT.md)
 for the source-bound publication and verification procedure.

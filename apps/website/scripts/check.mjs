@@ -67,19 +67,17 @@ requireText(styles, "prefers-reduced-motion: reduce", "reduced-motion support");
 requireText(script, 'classList.add("js")', "progressive-enhancement marker");
 requireText(script, 'event.key === "ArrowRight"', "tab-list keyboard navigation");
 
-// Only these user-initiated source links and the displayed command may leave the page.
+// Only these user-initiated links may leave the page.
 // Match complete inert fragments in their intended location, never URL substrings or code.
 const quickstart = html.slice(html.indexOf('id="local-install"'), html.indexOf('id="start"'));
 const footer = html.slice(html.indexOf('<footer class="site-footer">'));
-const setup = html.match(/<code id="setup-command">([\s\S]*?)<\/code>/u)?.[1] ?? "";
 let localHtml = html;
 for (const [fragment, region] of [
-  ['<a href="https://github.com/lboel/untangle">Untangle repository</a>', quickstart],
+  ['<a href="https://www.npmjs.com/package/@untangle-code/cli">Untangle from npm</a>', quickstart],
   ['<a href="https://github.com/lboel/untangle">Repository</a>', footer],
-  ["<span>git clone https://github.com/lboel/untangle.git</span>", setup],
 ]) {
   if (!region.includes(fragment) || html.split(fragment).length !== 2) {
-    errors.push("repository navigation must appear exactly once in its intended location");
+    errors.push("external navigation must appear exactly once in its intended location");
   } else localHtml = localHtml.replace(fragment, "");
 }
 const allSource = `${localHtml}\n${styles}\n${script}\n${story}\n${scene}`;

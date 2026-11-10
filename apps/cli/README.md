@@ -3,34 +3,60 @@
 Untangle's CLI and MCP entry point: the **`untangle`** binary. It connects local search,
 code complexity and declared feature responsibility. Requires Node.js **`^22.13.0 || >=24.0.0`**.
 
-The first public release is being prepared. The recorded public lookup on 2 November 2026
-returned `E404` for `@untangle-code/cli@0.1.0`; this is not a current availability or scope-rights
-claim. Until publication, use an available checkout. One CLI tarball does not publish its
-Untangle dependencies. The [release guide](https://github.com/lboel/untangle/blob/main/docs/RELEASE.md)
-separates local acceptance, remote matrix and actual publication.
-
 The [agent workflow](https://github.com/lboel/untangle/blob/main/docs/AGENT_WORKFLOW.md)
 connects MCP, search, complete feature scopes and real tests, with a copyable task brief for
 spec-driven development and agentic engineering.
 
-## Installed CLI — after registry publication
+## Install in an npm project
 
-After `@untangle-code/cli@0.1.0` and its Untangle dependencies are published to npm, use
-this version-pinned entry point without a global installation. Replace the project path:
+From the directory containing your project's `package.json`, add Untangle as a pinned
+development dependency and run a first analysis.
 
 ```bash
-npm exec --yes --package=@untangle-code/cli@0.1.0 -- \
-  untangle complexity --root=/absolute/path/to/project --format=json
-
-npm exec --yes --package=@untangle-code/cli@0.1.0 -- \
-  untangle init --root=/absolute/path/to/project --offline --dry-run --format=json
+npm install --save-dev --save-exact @untangle-code/cli@0.1.0
+npm exec -- untangle --version
+npm exec -- untangle complexity --top=10
 ```
 
-`npm exec` may download the package. Direct complexity analysis needs no search services;
-the offline init dry-run previews configuration without writing files or probing services.
-The checkout helper below is a separate way to build and try an unpublished version.
+Direct complexity analysis runs on the current project without an index or search services.
+Commit the manifest and lockfile changes to share the version with your team.
 
-## First checkout result
+Preview the project setup, then create `untangle.toml` when you're ready.
+
+```bash
+npm exec -- untangle init --offline --dry-run
+npm exec -- untangle init --offline
+```
+
+Offline init inspects local files and skips network probes. Dry-run previews the
+configuration. The second command creates it in a new project and reports any differences
+with an existing configuration.
+
+## Try it in any repository
+
+Run a one-off analysis from a project directory, including repositories without a `package.json`.
+
+```bash
+npm exec --yes --package=@untangle-code/cli@0.1.0 -- untangle complexity --top=10
+```
+
+`npm exec` fetches the package into the npm cache if needed. To preview setup the same way,
+replace `complexity --top=10` with `init --offline --dry-run`.
+
+## Install once for multiple projects
+
+Install the npm preview globally if you prefer to run `untangle` directly from each project.
+
+```bash
+npm install --global @untangle-code/cli@next
+untangle --version
+cd /path/to/your/project
+untangle complexity --top=10
+```
+
+For a project installation, prefix the `untangle` examples below with `npm exec --`.
+
+## Build from a source checkout
 
 From the checkout root with **pnpm 10.34.5**:
 
@@ -216,7 +242,8 @@ roles, not human approval or an objective feature-richness score.
 | `mcp` | Implemented: stdio runtime; specified unbuilt capabilities explicitly unavailable. |
 
 Command specifications/`--help` are executable truth. Registered but unbuilt MCP tools return
-`FEATURE_UNAVAILABLE`. An explicit-root MCP template:
+`FEATURE_UNAVAILABLE`. For a project installation, configure the MCP host with the absolute
+paths to your Node executable, installed CLI and project root.
 
 ```json
 {
@@ -224,7 +251,7 @@ Command specifications/`--help` are executable truth. Registered but unbuilt MCP
     "untangle": {
       "command": "/absolute/path/to/node",
       "args": [
-        "/absolute/path/to/untangle/apps/cli/dist/index.js",
+        "/path/to/your/project/node_modules/@untangle-code/cli/dist/index.js",
         "mcp",
         "--stdio",
         "--root=/path/to/your/project"
