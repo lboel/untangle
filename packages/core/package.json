@@ -1,6 +1,6 @@
 {
   "name": "@untangle-code/core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "type": "module",
   "description": "Untangle index pipeline: the stage implementations (discovery, analysis, embedding, storage, graphs, commit) that wire scanner, parser-registry, chunker, complexity, embeddings, storage and the graph packages into the job runner of @untangle-code/jobs.",

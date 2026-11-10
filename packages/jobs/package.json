@@ -1,6 +1,6 @@
 {
   "name": "@untangle-code/jobs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "type": "module",
   "description": "Untangle job core: index job state machine (spec.md §11.1), typed job events, checkpoint store, resume planning, generation commit, bounded queues with backpressure and AbortSignal cancellation (architecture.md §13, §21.3).",

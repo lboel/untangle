@@ -12,7 +12,7 @@
 
 <p align="center">
   <a href="https://github.com/lboel/untangle/actions/workflows/ci.yml"><img src="https://github.com/lboel/untangle/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI for remote main" /></a>
-  <a href="https://www.npmjs.com/package/@untangle-code/cli/v/0.1.0"><img src="https://img.shields.io/badge/npm-0.1.0%20on%20next-dd6221?style=flat-square" alt="npm: version 0.1.0 on next" /></a>
+  <a href="https://www.npmjs.com/package/@untangle-code/cli?activeTab=versions"><img src="https://img.shields.io/badge/npm-next-dd6221?style=flat-square" alt="npm: next channel" /></a>
   <a href="./LICENSE"><img src="https://img.shields.io/badge/license-AGPL--3.0--only-003632?style=flat-square" alt="License: AGPL-3.0-only" /></a>
   <a href="./package.json"><img src="https://img.shields.io/badge/Node.js-22.13%2B%20%7C%2024%2B-339933?style=flat-square&logo=node.js&logoColor=white" alt="Node.js 22.13 or later in the 22 line, or 24 and later" /></a>
   <a href="./package.json"><img src="https://img.shields.io/badge/pnpm-10.34.5-f69220?style=flat-square&logo=pnpm&logoColor=white" alt="Package manager: pnpm 10.34.5" /></a>
@@ -49,7 +49,7 @@ whole feature before an edit, use real test evidence in review, and observe recu
 friction as the codebase grows. Start with existing specs or analyze code first and add
 product context gradually.
 
-> **npm preview.** Untangle `0.1.0` is available on the `next` channel. See the
+> **npm preview.** Install Untangle from the `next` channel. See the
 > [release guide](./docs/RELEASE.md) for the package and platform checks.
 
 ## First result without search services
@@ -59,11 +59,12 @@ as an exact dev dependency so the team can use the same version:
 
 ```bash
 cd /path/to/your/project
-npm install --save-dev --save-exact @untangle-code/cli@0.1.0
+npm install --save-dev --save-exact @untangle-code/cli@next
 npm exec -- untangle complexity --top=10
 ```
 
-Commit `package.json` and `package-lock.json` to share the installation with your team.
+The install resolves `next` once and saves the exact version. Commit `package.json` and
+`package-lock.json` to share that version with your team.
 Direct analysis needs no project configuration, index, vector database, embedding service or
 cloud account. To preview and then write a local `untangle.toml`:
 
@@ -76,7 +77,7 @@ npm exec -- untangle init --offline
 `package.json`. npm uses its cache and leaves the project's dependencies alone.
 
 ```bash
-npm exec --yes --package=@untangle-code/cli@0.1.0 -- untangle complexity --top=10
+npm exec --yes --package=@untangle-code/cli@next -- untangle complexity --top=10
 ```
 
 **Use it across projects.** Install the preview globally, then run `untangle` from any project root.

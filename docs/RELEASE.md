@@ -1,28 +1,25 @@
-# First public release
+# Release guide
 
-The candidate version is **0.1.0**, channel **`next`**. This early local CLI/MCP release
-provides search, graphs, AST complexity and declared Vision → Feature → Code/Tests → Ownership
-alignment. It is not a full Sonar/Sentrux replacement. Semantic conformance and durable
-ownership remain unproven; incomplete parser/symbol/test/feature coverage stays visible.
+Use the version in the root `package.json` and publish preview releases to **`next`**.
+Verify the exact source commit and all package artifacts before publication.
 
 ## Publication status and evidence scope
 
-The first public distribution is **source only**: clone the repository, install locked
-build dependencies and use the local CLI/MCP quickstart. No npm packages, package release
-tag or registry installation are implied by public repository access. A later npm release
-requires the separate approval, publishing and registry-installation checks below.
+Untangle `0.1.0` was the first npm release. For a new version, publication and an
+installation from the public registry are separate checks. Use the
+[npm package page](https://www.npmjs.com/package/@untangle-code/cli) for current availability.
 
 The public history starts from a new root snapshot on 5 November 2026. The earlier
 repository and its Actions history remain private. See the
 [source-history and publication record](./PUBLIC_REPOSITORY_RELEASE.md).
 
-CI and the Linux/macOS × Node 22/24 release-candidate matrix must pass for the new root
-commit. Evidence from the private development history does not certify the new commit.
+CI and the Linux/macOS × Node 22/24 release-candidate matrix must pass for the release
+commit. Evidence from previous commits does not certify that commit.
 Keep exact-commit original artifacts and acceptance records; refresh them after changes.
 The frozen website example identifies its historical measurement and renderer revisions;
 it is not a fresh measurement of the public checkout or evidence that its tests ran.
 
-For a later package release, verify current npm authentication and rights to `@untangle-code`
+For each package release, verify current npm authentication and rights to `@untangle-code`
 and every package name. Earlier anonymous `E404` responses establish no name rights.
 No verification workflow changes publishing rights or account protections.
 
@@ -173,7 +170,7 @@ A maintainer must actually confirm:
    runs separately.
 4. `next` as the release channel. A later explicit `latest` update is a tag change, not
    republishing an identical package version.
-5. Signed tag `v0.1.0` on the checked commit and durable evidence retention; Actions artifacts
+5. Signed tag `v<version>` on the checked commit and durable evidence retention; Actions artifacts
    expire after 30 days.
 
 Do not change versions, sources or manifests after verification. No workspace `npm pack`
@@ -181,7 +178,7 @@ or repacking before publication; any change requires a new candidate.
 
 ## Publish original tarballs
 
-For the first publication, an authorized maintainer signs in interactively with
+For interactive publication, an authorized maintainer signs in with
 `npm login --registry=https://registry.npmjs.org` and completes npm's two-factor authentication
 challenge when prompted. npm provenance requires public packages and a public repository.
 
@@ -224,11 +221,13 @@ and [GitHub artifact attestations](https://docs.github.com/en/actions/how-tos/se
 After actual publication, in fresh directories without local workspace/registry overrides:
 
 ```bash
-npm install --omit=dev --engine-strict @untangle-code/cli@0.1.0
+# Set this to the release version from the checked commit.
+VERSION=0.1.1
+npm install --omit=dev --engine-strict "@untangle-code/cli@$VERSION"
 npx --no-install untangle --version
 npx --no-install untangle --help
 # Use a separate project for pnpm:
-pnpm add --prod @untangle-code/cli@0.1.0
+pnpm add --prod "@untangle-code/cli@$VERSION"
 pnpm exec untangle --version
 pnpm exec untangle --help
 ```
@@ -240,7 +239,7 @@ LanceDB search checks. Create the GitHub release with the signed tag, original t
 SBOM, compatibility and matrix evidence, any separately recorded service-backed search evidence
 and version limits. Update README/website to the available public entry only afterward.
 
-## Release notes 0.1.0
+## Release notes
 
 See [CHANGELOG.md](../CHANGELOG.md) for implemented capabilities, including independent fresh
 retrieval, AST/graph evidence, Vue/HTTP boundaries, declared feature complexity, explicit

@@ -117,7 +117,7 @@ describe("Untangle website content contract", () => {
 
   it("offers npm install routes and connects the installed CLI to MCP", () => {
     expect(html).toContain(
-      "npm exec --yes --package=@untangle-code/cli@0.1.0 -- untangle complexity --top=10",
+      "npm exec --yes --package=@untangle-code/cli@next -- untangle complexity --top=10",
     );
     expect(html).toContain("npm install --global @untangle-code/cli@next");
     expect(html).toContain("npm exec -- untangle mcp --stdio");

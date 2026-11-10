@@ -1,9 +1,17 @@
 # Changes
 
-## 0.1.0 — prepared, not yet published
+## 0.1.1
 
-The first public release is intended for npm's `next` channel. Publication status and
-required approvals are documented in the [release guide](./docs/RELEASE.md).
+- The npm package README shows how to pin Untangle in a project, try it without adding a
+  dependency, or install it globally for use across repositories.
+- The guide starts with a complexity report and shows how to preview offline setup and
+  connect the installed CLI to an agent via MCP.
+- The CLI and MCP report `0.1.1`.
+
+## 0.1.0 — 2026-11-10
+
+First public npm release. Fresh npm and pnpm consumers verified installation from the
+public registry. See the [release guide](./docs/RELEASE.md) for the acceptance procedure.
 
 ### Repository context for coding agents
 
@@ -67,6 +75,5 @@ required approvals are documented in the [release guide](./docs/RELEASE.md).
 Feature boundaries and owners are declarations. Test/search evidence proves neither complete
 semantic conformance nor durable ownership or general productivity gains. Untangle is not a
 complete Sonar/Sentrux replacement. Unresolved relationships and parse gaps stay visible.
-Windows is outside the release matrix. Publication and installation from the public registry
-remain separate, outstanding release steps. Evidence applies only to the exact sources and
-platforms actually checked.
+Windows is outside the release matrix. Evidence applies only to the exact sources and platforms
+actually checked.

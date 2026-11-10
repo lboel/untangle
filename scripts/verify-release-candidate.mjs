@@ -40,7 +40,9 @@ export const PUBLIC_PACKAGES = Object.freeze(
     "storage-qdrant",
     "symbol-graph",
     "watcher",
-  ].map((name) => `@untangle-code/${name}`).sort(),
+  ]
+    .map((name) => `@untangle-code/${name}`)
+    .sort(),
 );
 const GATES = [
   "install",
@@ -54,7 +56,9 @@ const GATES = [
   "e2e-smoke",
   "release",
 ];
-const VERSION = "0.1.0";
+export const RELEASE_VERSION = JSON.parse(
+  readFileSync(new URL("../package.json", import.meta.url), "utf8"),
+).version;
 const HASH = /^[a-f0-9]{64}$/u;
 const COMMIT = /^[a-f0-9]{40}$/u;
 const compare = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
@@ -610,7 +614,7 @@ function verifyConsumers(report, executable) {
   for (const consumer of report.consumers) {
     const cli = consumer.cliOnly;
     requireThat(
-      cli?.requested === `@untangle-code/cli@${VERSION}` &&
+      cli?.requested === `@untangle-code/cli@${RELEASE_VERSION}` &&
         cli.installation?.exitCode === 0 &&
         strings(cli.installation.command) &&
         cli.installation.command[0] === consumer.packageManager &&
@@ -622,7 +626,7 @@ function verifyConsumers(report, executable) {
     );
     const runtime = cli.runtime;
     requireThat(
-      typeof runtime?.cliVersion === "string" && runtime.cliVersion.includes(VERSION),
+      typeof runtime?.cliVersion === "string" && runtime.cliVersion.includes(RELEASE_VERSION),
       "Installed CLI runtime version differs.",
     );
     requireThat(
@@ -633,7 +637,7 @@ function verifyConsumers(report, executable) {
     );
     requireThat(
       runtime.mcp?.about?.ok === true &&
-        runtime.mcp.about.data?.version === VERSION &&
+        runtime.mcp.about.data?.version === RELEASE_VERSION &&
         runtime.mcp.stderr === "" &&
         strings(runtime.mcp.toolNames) &&
         runtime.mcp.toolNames.includes("untangle_about") &&
@@ -644,14 +648,16 @@ function verifyConsumers(report, executable) {
       Array.isArray(consumer.imports?.installed) &&
         consumer.imports.installed.length === PUBLIC_PACKAGES.length &&
         equal(consumer.imports.installed.map((item) => item.name).sort(compare), PUBLIC_PACKAGES) &&
-        consumer.imports.installed.every((item) => item.version === VERSION),
+        consumer.imports.installed.every((item) => item.version === RELEASE_VERSION),
       "All public package import proof is missing.",
     );
     verifyProduct(runtime, executable);
     try {
       assertLocalSearchConsumerProof(runtime.localSearch);
     } catch (error) {
-      throw new Error(`Installed LanceDB search consumer proof is missing or invalid: ${error.message}`);
+      throw new Error(
+        `Installed LanceDB search consumer proof is missing or invalid: ${error.message}`,
+      );
     }
     try {
       requireThat(
@@ -715,9 +721,11 @@ function verifyBundle(evidence, read, commit) {
   const artifacts = [];
   const records = [];
   for (const record of report.packages) {
-    const expectedFile = `${record.name.slice(1).replace("/", "-")}-${VERSION}.tgz`;
+    const expectedFile = `${record.name.slice(1).replace("/", "-")}-${RELEASE_VERSION}.tgz`;
     requireThat(
-      record.version === VERSION && record.file === expectedFile && HASH.test(record.sha256),
+      record.version === RELEASE_VERSION &&
+        record.file === expectedFile &&
+        HASH.test(record.sha256),
       "Tarball identity/version differs.",
     );
     const file = `bundle/tarballs/${record.file}`;
@@ -731,7 +739,7 @@ function verifyBundle(evidence, read, commit) {
     const manifest = readPackedManifest(bytes);
     requireThat(
       manifest.name === record.name &&
-        manifest.version === VERSION &&
+        manifest.version === RELEASE_VERSION &&
         manifest.private !== true &&
         manifest.publishConfig?.access === "public",
       `Packed public manifest differs: ${record.name}`,
@@ -816,7 +824,8 @@ function verifyBundle(evidence, read, commit) {
       components.every(
         (item) =>
           typeof item.purl === "string" &&
-          decodeURIComponent(item.purl.split(/[?#]/u)[0]) === `pkg:npm/${record.name}@${VERSION}`,
+          decodeURIComponent(item.purl.split(/[?#]/u)[0]) ===
+            `pkg:npm/${record.name}@${RELEASE_VERSION}`,
       ),
       `SBOM purl differs: ${record.name}`,
     );
@@ -990,7 +999,7 @@ export function verifyReleaseCandidates({ artifactsDir, commit }) {
     kind: "release_compatibility",
     status: "verified",
     commit,
-    version: VERSION,
+    version: RELEASE_VERSION,
     actions: actionRun,
     matrix: contexts.map(
       ({ canonicalFiles: _files, packedManifests: _manifests, ...context }) => context,
@@ -1054,7 +1063,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       const result = verifyReleaseCandidates(options);
       writeCompatibilityManifest(options.out, result, options.artifactsDir);
       process.stdout.write(
-        `Verified four candidate contexts and 21 original ${VERSION} packages. Canonical: ubuntu-latest / Node 22.\n`,
+        `Verified four candidate contexts and 21 original ${RELEASE_VERSION} packages. Canonical: ubuntu-latest / Node 22.\n`,
       );
     }
   } catch (error) {

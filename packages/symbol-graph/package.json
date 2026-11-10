@@ -1,6 +1,6 @@
 {
   "name": "@untangle-code/symbol-graph",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "type": "module",
   "description": "Untangle symbol graph: deterministic symbol nodes and call edges with honest resolution confidence, call paths, entry-point detection (WP-88) and impact analysis (spec.md §15, architecture.md §17).",

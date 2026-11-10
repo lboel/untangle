@@ -10,7 +10,7 @@ Use Node.js `^22.13.0 || >=24.0.0`. In an existing npm project:
 
 ```bash
 cd /absolute/path/to/project
-npm install --save-dev --save-exact @untangle-code/cli@0.1.0
+npm install --save-dev --save-exact @untangle-code/cli@next
 npm exec -- untangle complexity --top=10 --format=json
 npm exec -- untangle init --offline --dry-run --format=json
 npm exec -- untangle init --offline
@@ -20,7 +20,7 @@ Direct analysis needs no index or services. The dry-run previews setup without w
 For a project without a `package.json`, run a single command using the npm cache:
 
 ```bash
-npm exec --yes --package=@untangle-code/cli@0.1.0 -- untangle complexity --top=10 --format=json
+npm exec --yes --package=@untangle-code/cli@next -- untangle complexity --top=10 --format=json
 ```
 
 For the remaining examples, use `npm exec -- untangle` with the project-local install or run

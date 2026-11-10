@@ -27,6 +27,7 @@ interface Compatibility {
 }
 interface Verifier {
   PUBLIC_PACKAGES: string[];
+  RELEASE_VERSION: string;
   verifyReleaseCandidates(input: { artifactsDir: string; commit: string }): Compatibility;
   writeCompatibilityManifest(out: string, result: Compatibility, artifactsDir: string): void;
   parseOptions(args: string[]): {
@@ -40,6 +41,7 @@ interface Verifier {
 const verifier = (await import(
   pathToFileURL(path.resolve("scripts/verify-release-candidate.mjs")).href
 )) as Verifier;
+const { RELEASE_VERSION } = verifier;
 const frontendConsumer = (await import(
   pathToFileURL(path.resolve("scripts/release-frontend-consumer.mjs")).href
 )) as {
@@ -460,21 +462,22 @@ function fixture(options: FixtureOptions = {}) {
     const records = ordered.map((name) => {
       const manifest: PackedManifest = {
         name,
-        version: "0.1.0",
+        version: RELEASE_VERSION,
         private: false,
         publishConfig: { access: "public" },
-        dependencies: name === "@untangle-code/cli" ? { "@untangle-code/domain": "0.1.0" } : {},
+        dependencies:
+          name === "@untangle-code/cli" ? { "@untangle-code/domain": RELEASE_VERSION } : {},
       };
       options.editManifest?.(manifest);
       const bytes = tar([
         ["package/package.json", JSON.stringify(manifest)],
         ["package/dist/context.txt", `${os}-${nodeMajor}`],
       ]);
-      const file = `${name.slice(1).replace("/", "-")}-0.1.0.tgz`;
+      const file = `${name.slice(1).replace("/", "-")}-${RELEASE_VERSION}.tgz`;
       writeFileSync(path.join(root, "bundle/tarballs", file), bytes);
       return {
         name,
-        version: "0.1.0",
+        version: RELEASE_VERSION,
         file,
         bytes: bytes.length,
         sha256: hash(bytes),
@@ -488,7 +491,7 @@ function fixture(options: FixtureOptions = {}) {
         type: "library",
         name: record.name,
         version: record.version,
-        purl: `pkg:npm/%40untangle-code/${record.name.split("/")[1]}@0.1.0`,
+        purl: `pkg:npm/%40untangle-code/${record.name.split("/")[1]}@${RELEASE_VERSION}`,
         hashes: [
           {
             alg: "SHA-512",
@@ -624,16 +627,16 @@ function fixture(options: FixtureOptions = {}) {
       consumers: ["npm", "pnpm"].map((packageManager) => ({
         packageManager,
         cliOnly: {
-          requested: "@untangle-code/cli@0.1.0",
+          requested: `@untangle-code/cli@${RELEASE_VERSION}`,
           installation: {
-            command: [packageManager, "install", "@untangle-code/cli@0.1.0"],
+            command: [packageManager, "install", `@untangle-code/cli@${RELEASE_VERSION}`],
             exitCode: 0,
           },
           runtime: {
-            cliVersion: "untangle 0.1.0",
+            cliVersion: `untangle ${RELEASE_VERSION}`,
             complexity: { filesAnalyzed: 2, totals: { executionUnits: 2 }, skipped: [] },
             mcp: {
-              about: { ok: true, data: { version: "0.1.0" } },
+              about: { ok: true, data: { version: RELEASE_VERSION } },
               stderr: "",
               toolNames: ["untangle_about", "untangle_product", "untangle_boundaries"],
               product: mcpProduct,
@@ -644,7 +647,7 @@ function fixture(options: FixtureOptions = {}) {
             localSearch: localSearchProofFixture(),
           },
         },
-        imports: { installed: names.map((name) => ({ name, version: "0.1.0" })) },
+        imports: { installed: names.map((name) => ({ name, version: RELEASE_VERSION })) },
       })),
     };
     json(path.join(root, "bundle/release-report.json"), report);
@@ -846,7 +849,10 @@ describe("offline original release candidate verification", () => {
   });
   it("rejects changed original bytes without writing a success artifact", () => {
     const f = fixture();
-    const file = path.join(f.dirs[0]!, "bundle/tarballs/untangle-code-domain-0.1.0.tgz");
+    const file = path.join(
+      f.dirs[0]!,
+      `bundle/tarballs/untangle-code-domain-${RELEASE_VERSION}.tgz`,
+    );
     writeFileSync(file, Buffer.concat([readFileSync(file), Buffer.from("changed")]));
     expect(() =>
       verifier.verifyReleaseCandidates({ artifactsDir: f.artifactsDir, commit: COMMIT }),
@@ -1137,7 +1143,7 @@ describe("offline original release candidate verification", () => {
           else if (change === "private") manifest.private = true;
           else
             manifest.dependencies["@untangle-code/domain"] =
-              change === "workspace" ? "workspace:*" : "^0.1.0";
+              change === "workspace" ? "workspace:*" : `^${RELEASE_VERSION}`;
         },
       });
       expect(() =>

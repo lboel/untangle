@@ -1,6 +1,6 @@
 {
   "name": "@untangle-code/scanner",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "type": "module",
   "description": "Untangle scanner: recursive file discovery, ignore rules, symlink safety, binary/language classification and the content-hash pipeline.",

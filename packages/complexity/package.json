@@ -1,6 +1,6 @@
 {
   "name": "@untangle-code/complexity",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "type": "module",
   "description": "Untangle complexity engine: pure, deterministic calculators for cyclomatic, cognitive, structural, textual, syntactic, Halstead and maintainability metrics, plus aggregation and explainability (spec.md §16).",

@@ -275,14 +275,15 @@
                 tabindex="0"
                 role="region"
                 aria-label="Project installation and first analysis commands"
-              ><code id="setup-command"><span>npm install --save-dev --save-exact @untangle-code/cli@0.1.0</span>
+              ><code id="setup-command"><span>npm install --save-dev --save-exact @untangle-code/cli@next</span>
 <span>npm exec -- untangle complexity --top=10</span></code></pre>
             </div>
             <p class="copy-status" id="copy-announcement" role="status" aria-live="polite"></p>
             <p class="install-note">
-              Commit <code>package.json</code> and <code>package-lock.json</code> to share the
-              installed version with your team. For the examples below, run
-              <code>npm exec -- untangle</code> in place of <code>untangle</code>.
+              npm resolves <code>next</code> once and saves the exact version. Commit
+              <code>package.json</code> and <code>package-lock.json</code> to share it with your
+              team. For the examples below, run <code>npm exec -- untangle</code> in place of
+              <code>untangle</code>.
             </p>
             <details class="measurement-details">
               <summary>Try it once in any repository</summary>
@@ -292,7 +293,7 @@
                 tabindex="0"
                 role="region"
                 aria-label="One-off complexity analysis"
-              ><code>npm exec --yes --package=@untangle-code/cli@0.1.0 -- untangle complexity --top=10</code></pre>
+              ><code>npm exec --yes --package=@untangle-code/cli@next -- untangle complexity --top=10</code></pre>
             </details>
             <details class="measurement-details">
               <summary>Install globally for multiple repositories</summary>

@@ -1,6 +1,6 @@
 {
   "name": "@untangle-code/config",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "type": "module",
   "description": "Untangle configuration: types, discovery, layering, JSON Schema, secret redaction and canonical effective config.",

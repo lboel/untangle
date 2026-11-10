@@ -1,6 +1,6 @@
 {
   "name": "@untangle-code/context-artifacts",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "type": "module",
   "description": "Untangle context artifact adapters: Markdown/ADR, SQL schema, OpenAPI/AsyncAPI, Protobuf, Terraform/HCL, Kubernetes YAML, Docker/Compose and a safe text fallback, aggregated behind one ArtifactAdapter registry (spec.md §19, architecture.md §20).",
