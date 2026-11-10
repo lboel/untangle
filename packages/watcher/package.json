@@ -1,6 +1,6 @@
 {
   "name": "@untangle-code/watcher",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "type": "module",
   "description": "Untangle watcher: native recursive filesystem watching with debounce/coalescing, periodic reconciliation and cross-process ref locking (spec.md §12.3, §12.1; architecture.md §21.1).",

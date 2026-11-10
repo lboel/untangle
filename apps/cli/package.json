@@ -1,6 +1,6 @@
 {
   "name": "@untangle-code/cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "type": "module",
   "description": "Local search and complexity harness for coding agents: code graphs, declared feature ownership and spec-to-code evidence.",

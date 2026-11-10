@@ -1,6 +1,6 @@
 {
   "name": "@untangle-code/observability",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "type": "module",
   "description": "Untangle observability: typed errors, structured logging, redaction, correlation ids, metrics and profiling. No I/O ports beyond stderr/process.",

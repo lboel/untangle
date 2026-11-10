@@ -1,6 +1,6 @@
 {
   "name": "@untangle-code/storage-local",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "type": "module",
   "description": "Untangle local state under .untangle/: cache (embeddings/parser/git-blobs), atomic checkpoint mirror, file-based LockProvider, path-sandboxed FileSystemPort adapter.",

@@ -1,6 +1,6 @@
 {
   "name": "@untangle-code/parser-registry",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "type": "module",
   "description": "Untangle parser registry: lazy-loaded LanguageAdapter registry plus TypeScript/JavaScript/TSX/JSX tree-sitter adapters.",

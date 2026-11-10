@@ -1,6 +1,6 @@
 {
   "name": "@untangle-code/testkit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "description": "Untangle test infrastructure: in-memory port implementations, a deterministic embedder, a fixture builder, port-contract suites and retrieval-evaluation utilities. No network, no Docker, no Ollama.",

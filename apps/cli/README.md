@@ -13,7 +13,7 @@ From the directory containing your project's `package.json`, add Untangle as a p
 development dependency and run a first analysis.
 
 ```bash
-npm install --save-dev --save-exact @untangle-code/cli@0.1.0
+npm install --save-dev --save-exact @untangle-code/cli@0.1.1
 npm exec -- untangle --version
 npm exec -- untangle complexity --top=10
 ```
@@ -37,7 +37,7 @@ with an existing configuration.
 Run a one-off analysis from a project directory, including repositories without a `package.json`.
 
 ```bash
-npm exec --yes --package=@untangle-code/cli@0.1.0 -- untangle complexity --top=10
+npm exec --yes --package=@untangle-code/cli@0.1.1 -- untangle complexity --top=10
 ```
 
 `npm exec` fetches the package into the npm cache if needed. To preview setup the same way,

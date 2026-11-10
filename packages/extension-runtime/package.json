@@ -1,6 +1,6 @@
 {
   "name": "@untangle-code/extension-runtime",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "type": "module",
   "description": "Untangle analyzer-extension runtime: manifest loading and validation, output-format parsers (sarif, junit-xml, generic-findings, generic-metrics), license gate, pinned digests and the process/HTTP boundary. Knows output formats, never individual tools (extensions.md X9).",

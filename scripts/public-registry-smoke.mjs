@@ -21,7 +21,7 @@ import {
   smokeConsumer,
   validateProductionSbom,
 } from "./release-smoke.mjs";
-import { PUBLIC_PACKAGES } from "./verify-release-candidate.mjs";
+import { PUBLIC_PACKAGES, RELEASE_VERSION } from "./verify-release-candidate.mjs";
 
 export const PUBLIC_REGISTRY = "https://registry.npmjs.org";
 const hash = (data, algorithm = "sha256", encoding = "hex") =>
@@ -144,7 +144,7 @@ async function loadOriginalBundle(bundle, signal, env) {
   const packages = [];
   for (const expected of report.packages) {
     assert.match(expected.file, /^[^/\\]+\.tgz$/u);
-    assert.equal(expected.version, "0.1.0");
+    assert.equal(expected.version, RELEASE_VERSION);
     const name = `tarballs/${expected.file}`;
     const bytes = read(name);
     assert.equal(hash(bytes), expected.sha256, `Original SHA-256 differs: ${expected.name}.`);

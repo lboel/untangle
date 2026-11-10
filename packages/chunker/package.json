@@ -1,6 +1,6 @@
 {
   "name": "@untangle-code/chunker",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "type": "module",
   "description": "Untangle AST chunker: lossless, token-budgeted code chunking with line-fallback and minified strategies (spec.md §8, architecture.md §6.6, §14).",
