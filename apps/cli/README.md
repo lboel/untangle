@@ -21,6 +21,22 @@ npm exec -- untangle complexity --top=10
 Direct complexity analysis runs on the current project without an index or search services.
 Commit the manifest and lockfile changes to share the version with your team.
 
+### Set up local search
+
+Start [Ollama](https://docs.ollama.com/quickstart) locally and pull an embedding model. In
+the project terminal, open guided setup and choose **LanceDB**:
+
+```bash
+ollama pull nomic-embed-text
+npm exec -- untangle init --interactive --embedding-model=nomic-embed-text:latest
+```
+
+When the wizard offers **Apply setup and build the LanceDB index**, review the local
+endpoint and model, then select it. With npm `0.1.1`, apply the configuration and start
+the index with `npm exec -- untangle index`. LanceDB stores the index in the project.
+
+### Set up configuration offline
+
 Preview the project setup, then create `untangle.toml` when you're ready.
 
 ```bash

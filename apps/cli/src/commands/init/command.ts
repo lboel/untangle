@@ -141,6 +141,7 @@ export function createInitCommand(deps: InitCommandDepsV1 = {}): Command {
         `Discovers project languages weighted by lines, identifying parsed and search-only languages; monorepo topology across workspace packages and container services; an available embedding provider with its reported model, vector width and context window; an available vector store; and .gitignore rules plus defaults.`,
         `Writes a ${CONFIG_FILE_NAME} with comments explaining each value's evidence. Omitted values come from product defaults; the file includes only decisions made by init.`,
         "New projects use embedded LanceDB at .untangle/index/lancedb. No Docker or Qdrant probe is needed. Select --storage=qdrant for an owned or explicitly configured server. Missing Ollama is not an error; local offline indexing remains available.",
+        "Online guided setup can apply the configuration and build the first LanceDB index with a verified loopback Ollama endpoint. The wizard shows the model and storage directory before asking. Configuration-only setup stays available. If Ollama or the model is missing, setup shows how to install, start or pull it before retrying.",
         "Vision and specification are inspected locally through filenames, readability, hashes and document references. --vision and --spec select sources relative to the project directory. The review draft confirms neither features nor ownership and does not claim semantic conformance.",
         "A supplied --feature-map, or untangle.features.json when present, makes declared features, code/test evidence, ownership declarations and feature complexity visible. No tests are executed and semantic conformance is not independently proven. Noninteractive init writes no visual map; confirmed guided setup may save a separate HTML/JSON snapshot. No ownership or implementation is confirmed automatically.",
         "Spec-driven setup can inspect detected local Spec Kit or OpenSpec artifacts when no explicit feature manifest was chosen. Only final confirmation saves a source-bound proposed manifest under .untangle/sdd/ and uses it for this setup's feature report/map. Existing declarations are preserved. No framework commands or tests run; imported features remain planned/proposed without invented owners. The same connector is available through `untangle product connect [auto|spec-kit|openspec]`.",
@@ -164,6 +165,11 @@ export function createInitCommand(deps: InitCommandDepsV1 = {}): Command {
           "An existing file differs and was preserved (use --force), or the generated configuration would be invalid.",
         ],
         [EXIT.usage, "Invalid arguments."],
+        [
+          EXIT.environment,
+          "The approved first index could not use the local Ollama or storage configuration.",
+        ],
+        [EXIT.cancelled, "The guided setup or selected indexing run was cancelled."],
       ],
     },
 

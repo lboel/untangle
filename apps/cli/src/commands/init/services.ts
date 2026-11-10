@@ -19,6 +19,7 @@
  * written regardless, and the command names exactly one next step.
  */
 
+import { DEFAULT_EMBEDDING_CONFIG } from "@untangle-code/config";
 import { compareCodepoints } from "@untangle-code/domain";
 
 import { MANAGED_QDRANT_URL, qdrantProbePlan } from "../../cli/vector-store-policy.js";
@@ -50,18 +51,30 @@ interface OllamaModel {
   name?: unknown;
   capabilities?: unknown;
   details?: OllamaModelDetails;
+  remote_host?: unknown;
+  remote_model?: unknown;
+}
+
+function isRequestedModel(name: string, requested: string): boolean {
+  return name === requested || name === `${requested}:latest`;
+}
+
+export function isRemoteEmbeddingModel(model: EmbeddingModelInfoV1): boolean {
+  return model.remote === true || /[:-]cloud$/iu.test(model.name);
 }
 
 /**
- * Reads `/api/tags` into the embedding models it describes.
+ * Reads the embedding candidates from `/api/tags`. Explicit capabilities
+ * take precedence because chat models may also report an embedding width.
  *
- * The provider reports `capabilities`, `embedding_length` and
- * `context_length` per model, so the vector width is READ, never guessed and
- * never obtained by sending the model something to embed. A model that
- * predates the `capabilities` field is still recognised by the presence of an
- * `embedding_length`, which only embedding models carry.
+ * Older or sparse responses may omit capabilities and dimensions. Keep the
+ * known default and explicitly selected installed tag as probe candidates.
+ * The caller still checks the selected candidate with a real embedding.
  */
-export function readEmbeddingModels(payload: unknown): EmbeddingModelInfoV1[] {
+export function readEmbeddingModels(
+  payload: unknown,
+  preferredModel?: string,
+): EmbeddingModelInfoV1[] {
   if (typeof payload !== "object" || payload === null) {
     return [];
   }
@@ -78,13 +91,14 @@ export function readEmbeddingModels(payload: unknown): EmbeddingModelInfoV1[] {
     if (name === undefined || name.length === 0) {
       continue;
     }
-    const capabilities = Array.isArray(raw.capabilities)
-      ? raw.capabilities.filter((item): item is string => typeof item === "string")
-      : [];
     const details = typeof raw.details === "object" && raw.details !== null ? raw.details : {};
     const dimensions = positiveInteger(details.embedding_length);
     const contextLength = positiveInteger(details.context_length);
-    const isEmbedding = capabilities.includes("embedding") || dimensions !== undefined;
+    const isEmbedding = Array.isArray(raw.capabilities)
+      ? raw.capabilities.includes("embedding")
+      : dimensions !== undefined ||
+        isRequestedModel(name, DEFAULT_EMBEDDING_CONFIG.model) ||
+        (preferredModel !== undefined && isRequestedModel(name, preferredModel));
     if (!isEmbedding) {
       continue;
     }
@@ -92,6 +106,9 @@ export function readEmbeddingModels(payload: unknown): EmbeddingModelInfoV1[] {
       name,
       ...(dimensions === undefined ? {} : { dimensions }),
       ...(contextLength === undefined ? {} : { contextLength }),
+      ...(readString(raw, "remote_host") || readString(raw, "remote_model")
+        ? { remote: true }
+        : {}),
     });
   }
   found.sort((a, b) => compareCodepoints(a.name, b.name));
@@ -125,7 +142,9 @@ export function chooseEmbeddingModel(
     return undefined;
   }
   if (preferred !== undefined) {
-    const exact = models.find((model) => model.name === preferred);
+    const exact =
+      models.find((model) => model.name === preferred) ??
+      models.find((model) => isRequestedModel(model.name, preferred));
     if (exact !== undefined) {
       return { model: exact, reason: "explicitly requested (--embedding-model)" };
     }
@@ -192,7 +211,7 @@ export async function probeOllama(input: ProbeInput): Promise<OllamaFindingsV1> 
   }
   const versionString = readString(version, "version");
   const tags = await http.getJson(`${trimSlash(ollamaUrl)}/api/tags`, limits.probeTimeoutMs);
-  const embeddingModels = readEmbeddingModels(tags);
+  const embeddingModels = readEmbeddingModels(tags, input.preferredModel);
   const choice = chooseEmbeddingModel(embeddingModels, input.preferredModel);
 
   const embedProbe =

@@ -1,3 +1,7 @@
+import { existsSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+
 import { discoverSddArtifacts } from "@untangle-code/core";
 import { describe, expect, it, vi } from "vitest";
 
@@ -10,7 +14,14 @@ import type { FeatureMapWriteResultV1 } from "../graph/feature-map.js";
 import { createInitCommand } from "./command.js";
 import type { IntegrationSetupReportV1 } from "./integrations.js";
 import { runInit, type InitDepsV1 } from "./run.js";
-import { ROOT, demoDeps, seedDemoProject, silentProbe, tagsPayload } from "./test-support.js";
+import {
+  ROOT,
+  demoDeps,
+  scriptedProbe,
+  seedDemoProject,
+  silentProbe,
+  tagsPayload,
+} from "./test-support.js";
 import type { HttpProbePort } from "./types.js";
 import type { WizardChoice, WizardTerminal } from "./wizard-terminal.js";
 import { runInitWizard, type InitWizardDepsV1 } from "./wizard.js";
@@ -22,6 +33,7 @@ function context(): CommandContext & { io: BufferIo } {
 /** Answers must be options actually offered by the production flow. */
 function scriptedTerminal(answers: string[], inputs: string[] = [], interactive = true) {
   const questions: string[] = [];
+  const choicesByQuestion = new Map<string, readonly string[]>();
   const messages: string[] = [];
   const remaining = [...answers];
   const entered = [...inputs];
@@ -32,6 +44,10 @@ function scriptedTerminal(answers: string[], inputs: string[] = [], interactive 
       choices: readonly WizardChoice<T>[],
     ): Promise<T> => {
       questions.push(question);
+      choicesByQuestion.set(
+        question,
+        choices.map((choice) => choice.value),
+      );
       const answer = remaining.shift();
       expect(answer, `Missing scripted answer for ${question}`).toBeDefined();
       expect(
@@ -50,7 +66,7 @@ function scriptedTerminal(answers: string[], inputs: string[] = [], interactive 
       messages.push(text);
     }),
   };
-  return { terminal, questions, messages, remaining, entered };
+  return { terminal, questions, choicesByQuestion, messages, remaining, entered };
 }
 
 function setupReport(items: IntegrationSetupReportV1["items"] = []): IntegrationSetupReportV1 {
@@ -619,6 +635,181 @@ describe("guided init orchestration", () => {
     expect(h.apply.mock.calls[0]![0].offline).toBe(true);
     expect(h.apply.mock.calls[0]![1]?.execute).toBe(false);
     expect(result.result?.findings.ollama.outcome).toBe("unreachable");
+  });
+});
+
+describe("guided LanceDB first index", () => {
+  const localOllama = "http://127.0.0.1:11434";
+  const model = "nomic-embed-text";
+  const readyProbe = { ok: true as const, dimensions: 768 };
+  const http = scriptedProbe(
+    {
+      [`${localOllama}/api/version`]: { version: "0.12.0" },
+      [`${localOllama}/api/tags`]: {
+        models: [{ name: model, capabilities: ["embedding"], details: { embedding_length: 768 } }],
+      },
+    },
+    readyProbe,
+  );
+
+  async function inProject(
+    answer: "index" | "prepare" | "cancel",
+    test: (fixture: {
+      root: string;
+      config: string;
+      ctx: ReturnType<typeof context>;
+      run: (probe?: HttpProbePort) => Promise<number>;
+      runIndex: ReturnType<typeof vi.fn<NonNullable<InitWizardDepsV1["runIndex"]>>>;
+      messages: string[];
+      choicesByQuestion: ReadonlyMap<string, readonly string[]>;
+    }) => Promise<void>,
+    env: CommandContext["env"] = {},
+  ): Promise<void> {
+    const root = realpathSync(mkdtempSync(path.join(tmpdir(), "untangle-guided-index-")));
+    const config = path.join(root, "untangle.toml");
+    try {
+      writeFileSync(path.join(root, "lookup.ts"), "export const lookup = (id: string) => id;\n");
+      const ctx = { ...context(), cwd: root, env };
+      const script = scriptedTerminal(["quick", "done", "no", answer]);
+      const runIndex = vi.fn<NonNullable<InitWizardDepsV1["runIndex"]>>();
+      const run = (probe = http) => {
+        const command = createInitCommand({
+          http: probe,
+          wizard: {
+            terminal: script.terminal,
+            applyIntegrations: async () => ({ ...setupReport(), root }),
+            runIndex,
+          },
+        });
+        return command.run(
+          ctx,
+          parseArgs(["--interactive", "--storage=lancedb"], command.spec.flags),
+        );
+      };
+      await test({
+        root,
+        config,
+        ctx,
+        run,
+        runIndex,
+        messages: script.messages,
+        choicesByQuestion: script.choicesByQuestion,
+      });
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  }
+
+  it.each([EXIT.ok, EXIT.environment])(
+    "starts the approved index after writing the project config and preserves exit code %s",
+    async (indexExit) => {
+      await inProject("index", async ({ root, config, ctx, run, runIndex, messages }) => {
+        runIndex.mockImplementation(async (indexContext, args) => {
+          expect(existsSync(config)).toBe(true);
+          expect(indexContext.signal).toBe(ctx.signal);
+          expect(args.flags).toMatchObject({ root, embedder: "auto" });
+          indexContext.io.out("index diagnostics\n");
+          return indexExit;
+        });
+        expect(await run()).toBe(indexExit);
+        expect(runIndex).toHaveBeenCalledOnce();
+        expect(messages.join("\n")).toContain(localOllama);
+        expect(messages.join("\n")).toContain(model);
+        expect(ctx.io.outText).toBe(indexExit === EXIT.ok ? `${config}\n` : "");
+        expect(ctx.io.errText).toContain("index diagnostics");
+        if (indexExit === EXIT.ok) expect(ctx.io.errText).toContain("--require-fresh");
+      });
+    },
+  );
+
+  it.each(["prepare", "cancel"] as const)("never indexes after choosing %s", async (answer) => {
+    await inProject(answer, async ({ config, run, runIndex }) => {
+      expect(await run()).toBe(answer === "prepare" ? EXIT.ok : EXIT.cancelled);
+      expect(existsSync(config)).toBe(answer === "prepare");
+      expect(runIndex).not.toHaveBeenCalled();
+    });
+  });
+
+  it("stops before indexing if the final Ollama probe fails", async () => {
+    const probeEmbedding = vi
+      .fn<HttpProbePort["probeEmbedding"]>()
+      .mockResolvedValueOnce(readyProbe)
+      .mockResolvedValue({ ok: false, timedOut: true, detail: "probe timed out" });
+    await inProject("index", async ({ run, runIndex }) => {
+      expect(await run({ ...http, probeEmbedding })).toBe(EXIT.environment);
+      expect(probeEmbedding).toHaveBeenCalledTimes(2);
+      expect(runIndex).not.toHaveBeenCalled();
+    });
+  });
+
+  it("does not index when the effective embedder URL differs from the approved loopback URL", async () => {
+    await inProject(
+      "index",
+      async ({ run, runIndex }) => {
+        expect(await run()).toBe(EXIT.environment);
+        expect(runIndex).not.toHaveBeenCalled();
+      },
+      { UNTANGLE_OLLAMA_URL: localOllama, UNTANGLE_EMBEDDINGS_URL: "https://example.com" },
+    );
+  });
+
+  it("pins the index transport to the reviewed Ollama origin and disallows redirects", async () => {
+    const transport = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response("{}"));
+    try {
+      await inProject("index", async ({ run, runIndex }) => {
+        runIndex.mockImplementation(async (_ctx, _args, options) => {
+          const send = options?.embeddingFetch;
+          expect(send).toBeDefined();
+          await expect(send!("https://example.com/api/embed")).rejects.toThrow(
+            "approved local Ollama endpoint",
+          );
+          const url = `${localOllama}/api/embed`;
+          await send!(url, { method: "POST", redirect: "follow" });
+          expect(transport).toHaveBeenCalledExactlyOnceWith(
+            url,
+            expect.objectContaining({ method: "POST", redirect: "error" }),
+          );
+          return EXIT.ok;
+        });
+        expect(await run()).toBe(EXIT.ok);
+      });
+    } finally {
+      transport.mockRestore();
+    }
+  });
+
+  it("gives an installation and model-pull path when local Ollama is unavailable", async () => {
+    await inProject("prepare", async ({ run, runIndex, messages }) => {
+      expect(await run(silentProbe())).toBe(EXIT.ok);
+      const review = messages.join("\n");
+      expect(review).toContain("https://ollama.com/download");
+      expect(review).toContain("ollama serve");
+      expect(review).toContain("ollama pull nomic-embed-text");
+      expect(runIndex).not.toHaveBeenCalled();
+    });
+  });
+
+  it("does not offer a first index through a cloud model on a loopback endpoint", async () => {
+    const cloud = scriptedProbe(
+      {
+        [`${localOllama}/api/version`]: { version: "0.12.0" },
+        [`${localOllama}/api/tags`]: {
+          models: [
+            {
+              name: "embedding:cloud",
+              capabilities: ["embedding"],
+              details: { embedding_length: 768 },
+            },
+          ],
+        },
+      },
+      readyProbe,
+    );
+    await inProject("prepare", async ({ run, runIndex, choicesByQuestion }) => {
+      expect(await run(cloud)).toBe(EXIT.ok);
+      expect(choicesByQuestion.get("Apply this setup?")).toEqual(["prepare", "cancel"]);
+      expect(runIndex).not.toHaveBeenCalled();
+    });
   });
 });
 

@@ -222,7 +222,7 @@ function wireLanceDbStorage(view: WorkspaceView): StorageWiring {
   };
 }
 
-function canonicalLocalPath(selected: string): string {
+export function canonicalLocalPath(selected: string): string {
   try {
     return realpathSync(selected);
   } catch (error) {
@@ -251,7 +251,7 @@ export function storageIndexScope(
 }
 
 /** Baut den Ollama-Embedder aus der aufgeloesten Konfiguration. */
-export function wireEmbedder(view: WorkspaceView): EmbeddingProvider {
+export function wireEmbedder(view: WorkspaceView, fetchImpl?: typeof fetch): EmbeddingProvider {
   const embeddings = view.config.embeddings;
   return new OllamaEmbeddingProvider(
     {
@@ -264,7 +264,11 @@ export function wireEmbedder(view: WorkspaceView): EmbeddingProvider {
       maxConnections: embeddings.maxConnections,
       requestTimeoutMs: embeddings.requestTimeoutMs,
     },
-    { clock: systemClock, random: systemRandom },
+    {
+      clock: systemClock,
+      random: systemRandom,
+      ...(fetchImpl === undefined ? {} : { fetchImpl }),
+    },
   );
 }
 

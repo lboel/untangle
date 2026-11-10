@@ -236,6 +236,27 @@ describe("Infrastruktur", () => {
     expect(chooseEmbeddingModel(models, "small-embed:300m")?.model.name).toBe("small-embed:300m");
     expect(chooseEmbeddingModel([])).toBeUndefined();
   });
+
+  it("ignores chat-only dimensions and probes the installed default when tags lack metadata", async () => {
+    const url = "http://127.0.0.1:11434";
+    const http = scriptedProbe({
+      [`${url}/api/version`]: { version: "0.12.0" },
+      [`${url}/api/tags`]: {
+        models: [
+          {
+            name: "wide-chat:latest",
+            capabilities: ["completion", "vision"],
+            details: { context_length: 131072, embedding_length: 2560 },
+          },
+          { name: "nomic-embed-text:latest", details: { family: "nomic-bert" } },
+        ],
+      },
+    });
+    const result = await runInit({ ...OFFLINE, offline: false }, demoDeps(seedDemoProject(), http));
+    expect(result.findings.ollama.chosenModel?.name).toBe("nomic-embed-text:latest");
+    expect(result.findings.ollama.embedProbe).toMatchObject({ outcome: "ok", dimensions: 1024 });
+    expect(result.rendered).toContain("dimensions = 1024");
+  });
 });
 
 describe("Ignorierregeln", () => {

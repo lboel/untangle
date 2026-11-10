@@ -89,6 +89,7 @@ import {
   wireEmbedder,
   wireStorage,
   storageIndexScope,
+  type WorkspaceView,
 } from "../../cli/workspace.js";
 
 import {
@@ -182,7 +183,12 @@ const FLAGS: FlagSpecs = {
   },
 };
 
-export const indexCommand: Command = {
+interface IndexRunOptions {
+  readonly workspace?: WorkspaceView;
+  readonly embeddingFetch?: typeof fetch;
+}
+
+export const indexCommand = {
   spec: {
     name: "index",
     implementedBy: "commands/index/index.js",
@@ -213,7 +219,7 @@ export const indexCommand: Command = {
     ],
   },
 
-  async run(ctx: CommandContext, args: ParsedArgs): Promise<number> {
+  async run(ctx: CommandContext, args: ParsedArgs, options: IndexRunOptions = {}): Promise<number> {
     const format = enumFlag(args, "format", ["text", "json"] as const, "text");
     const embedderChoice = enumFlag(args, "embedder", ["auto", "offline"] as const, "auto");
     const dryRun = args.flags["dry-run"] === true;
@@ -225,11 +231,13 @@ export const indexCommand: Command = {
     const timeoutMs = integerFlag(args, "timeout", DEFAULT_EMBEDDING_TIMEOUT_MS);
     const rootFlag = stringFlag(args, "root");
 
-    const view = loadWorkspace({
-      cwd: rootFlag === undefined ? ctx.cwd : path.resolve(ctx.cwd, rootFlag),
-      env: ctx.env,
-      strict: true,
-    });
+    const view =
+      options.workspace ??
+      loadWorkspace({
+        cwd: rootFlag === undefined ? ctx.cwd : path.resolve(ctx.cwd, rootFlag),
+        env: ctx.env,
+        strict: true,
+      });
 
     const target = resolveTarget({
       config: view.config,
@@ -294,7 +302,7 @@ export const indexCommand: Command = {
           "lexical search remains complete, while dense search is severely limited.",
       );
     } else {
-      embedder = wireEmbedder(view);
+      embedder = wireEmbedder(view, options.embeddingFetch);
       profile = view.profile;
     }
     const profileId = buildEmbeddingProfileId(profile);
@@ -571,7 +579,7 @@ export const indexCommand: Command = {
       "The report above describes completed work; `--format=json` lists every skipped item.",
     );
   },
-};
+} satisfies Command;
 
 /**
  * Die Stellschrauben aus der wirksamen Konfiguration (spec.md §4.6) UND die

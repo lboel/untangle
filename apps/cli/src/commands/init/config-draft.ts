@@ -180,12 +180,14 @@ function buildEmbeddingSection(findings: ProjectFindingsV1): EmbeddingSection {
       contextLength: DEFAULT_EMBEDDING_CONFIG.contextLength,
     };
   }
+  const probe = findings.ollama.embedProbe;
+  const measuredWidth = probe.outcome === "ok" ? probe.dimensions : undefined;
   return {
     provider: "ollama",
     mode: "external",
     url: findings.ollama.url,
     model: chosen.name,
-    dimensions: chosen.dimensions ?? DEFAULT_EMBEDDING_CONFIG.dimensions,
+    dimensions: measuredWidth ?? chosen.dimensions ?? DEFAULT_EMBEDDING_CONFIG.dimensions,
     contextLength: chosen.contextLength ?? DEFAULT_EMBEDDING_CONFIG.contextLength,
   };
 }

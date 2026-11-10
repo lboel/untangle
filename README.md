@@ -65,8 +65,27 @@ npm exec -- untangle complexity --top=10
 
 The install resolves `next` once and saves the exact version. Commit `package.json` and
 `package-lock.json` to share that version with your team.
-Direct analysis needs no project configuration, index, vector database, embedding service or
-cloud account. To preview and then write a local `untangle.toml`:
+Direct analysis needs no project configuration, index, embedding service or cloud account.
+
+**Set up local search.** Install and start [Ollama](https://docs.ollama.com/quickstart) locally.
+From your project root, pull an embedding model, open the wizard and select **LanceDB**.
+The index lives under `.untangle/index/lancedb`.
+
+```bash
+ollama pull nomic-embed-text
+npm exec -- untangle init --interactive --embedding-model=nomic-embed-text:latest
+```
+
+When the wizard offers **Apply setup and build the LanceDB index**, review the model and
+local endpoint, then select it to start indexing. With npm `0.1.1`, apply the configuration
+in the wizard, then run the index command separately:
+
+```bash
+npm exec -- untangle index
+npm exec -- untangle query "account lookup" --mode=hybrid --require-fresh
+```
+
+To preview and write configuration without probing services, use offline setup:
 
 ```bash
 npm exec -- untangle init --offline --dry-run
